@@ -1,19 +1,26 @@
 import { ref, computed } from 'vue'
 import { uid } from '../utils/uid'
 import { defaultMetadata, defaultSettings, defaultSections } from '../constants/sectionDefaults'
+import { getAuthService } from '../services/auth/index.js'
 
-// ─── Singleton state (shared across all composables) ──────────────────────────
-// We export the raw refs so other composables can mutate them directly
+function now() {
+  return new Date().toISOString()
+}
+
+// ─── Initial resume ───────────────────────────────────────────────────────────
 
 const firstId = uid()
 
 export const resumes = ref([
   {
     id: firstId,
+    userId: getAuthService().getUserId(),
     title: 'My Resume',
     pageSize: 'A4',
     settings: defaultSettings(),
     metadata: defaultMetadata(),
+    createdAt: now(),
+    updatedAt: now(),
   },
 ])
 
@@ -33,7 +40,10 @@ export const activeMetadata = computed({
   },
   set(val) {
     const r = resumes.value.find((r) => r.id === activeResumeId.value)
-    if (r) r.metadata = val
+    if (r) {
+      r.metadata = val
+      r.updatedAt = now()
+    }
   },
 })
 
