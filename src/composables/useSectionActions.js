@@ -1,22 +1,38 @@
 import { uid } from '../utils/uid'
 import { resumes, sections, activeResumeId } from './useResumeState'
+import { getAuthService } from '../services/auth/index.js'
+
+function now() {
+  return new Date().toISOString()
+}
+function userId() {
+  return getAuthService().getUserId()
+}
 
 export function addSection(type = 'custom') {
+  const resumeId = activeResumeId.value
   sections.value.push({
     id: uid(),
+    userId: userId(),
+    resumeId,
     title: type === 'custom' ? 'Custom Section' : type.charAt(0).toUpperCase() + type.slice(1),
     type,
     description: '',
     sharedAcrossViews: false,
-    viewIds: [activeResumeId.value],
+    viewIds: [resumeId],
     isCollapsed: false,
     entries: [],
+    createdAt: now(),
+    updatedAt: now(),
   })
 }
 
 export function renameSection(sectionId, newTitle) {
   const s = sections.value.find((s) => s.id === sectionId)
-  if (s) s.title = newTitle.trim() || s.title
+  if (s) {
+    s.title = newTitle.trim() || s.title
+    s.updatedAt = now()
+  }
 }
 
 export function deleteSection(sectionId) {
@@ -25,7 +41,10 @@ export function deleteSection(sectionId) {
 
 export function toggleSectionCollapse(sectionId) {
   const s = sections.value.find((s) => s.id === sectionId)
-  if (s) s.isCollapsed = !s.isCollapsed
+  if (s) {
+    s.isCollapsed = !s.isCollapsed
+    s.updatedAt = now()
+  }
 }
 
 export function toggleSectionSharing(sectionId) {
@@ -39,6 +58,7 @@ export function toggleSectionSharing(sectionId) {
     s.sharedAcrossViews = true
     s.viewIds = resumes.value.map((r) => r.id)
   }
+  s.updatedAt = now()
 }
 
 export function updateSectionOrder(newSections) {

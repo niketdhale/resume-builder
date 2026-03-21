@@ -1,50 +1,37 @@
 import { ref, watch } from 'vue'
+import { getStorageAdapter } from '../services/storage/index.js'
 import { resumes, sections, activeResumeId } from './useResumeState'
 
-const STORAGE_KEY_RESUMES = 'resume_builder_resumes'
-const STORAGE_KEY_SECTIONS = 'resume_builder_sections'
-const STORAGE_KEY_ACTIVE = 'resume_builder_active'
+const storage = getStorageAdapter()
+
+const KEYS = {
+  resumes: 'resumes',
+  sections: 'sections',
+  active: 'active_resume_id',
+}
 
 // ─── Save ─────────────────────────────────────────────────────────────────────
 
-export function saveToStorage() {
-  try {
-    localStorage.setItem(STORAGE_KEY_RESUMES, JSON.stringify(resumes.value))
-    localStorage.setItem(STORAGE_KEY_SECTIONS, JSON.stringify(sections.value))
-    localStorage.setItem(STORAGE_KEY_ACTIVE, JSON.stringify(activeResumeId.value))
-  } catch (e) {
-    console.warn('Failed to save to localStorage', e)
-  }
+export async function saveToStorage() {
+  await storage.save(KEYS.resumes, resumes.value)
+  await storage.save(KEYS.sections, sections.value)
+  await storage.save(KEYS.active, activeResumeId.value)
 }
 
 // ─── Load ─────────────────────────────────────────────────────────────────────
 
-export function loadFromStorage() {
-  try {
-    const savedResumes = localStorage.getItem(STORAGE_KEY_RESUMES)
-    const savedSections = localStorage.getItem(STORAGE_KEY_SECTIONS)
-    const savedActive = localStorage.getItem(STORAGE_KEY_ACTIVE)
-    return {
-      resumes: savedResumes ? JSON.parse(savedResumes) : null,
-      sections: savedSections ? JSON.parse(savedSections) : null,
-      active: savedActive ? JSON.parse(savedActive) : null,
-    }
-  } catch (e) {
-    console.warn('Failed to load from localStorage', e)
-    return { resumes: null, sections: null, active: null }
-  }
-}
+export async function hydrateFromStorage() {
+  const savedResumes = await storage.load(KEYS.resumes)
+  const savedSections = await storage.load(KEYS.sections)
+  const savedActive = await storage.load(KEYS.active)
 
-// ─── Hydrate state from storage on startup ────────────────────────────────────
+  if (savedResumes) resumes.value = savedResumes
+  if (savedSections) sections.value = savedSections
 
-export function hydrateFromStorage() {
-  const saved = loadFromStorage()
-  if (saved.resumes) resumes.value = saved.resumes
-  if (saved.sections) sections.value = saved.sections
-  if (saved.active && resumes.value.find((r) => r.id === saved.active)) {
-    activeResumeId.value = saved.active
+  if (savedActive && resumes.value.find((r) => r.id === savedActive)) {
+    activeResumeId.value = savedActive
   } else {
-    activeResumeId.value = resumes.value[0].id
+    activeResumeId.value = resumes.value[0]?.id
   }
 }
 
@@ -52,13 +39,12 @@ export function hydrateFromStorage() {
 
 export const savedIndicator = ref(false)
 export const lastSavedTime = ref(null)
-
 let saveTimer = null
 
 export function triggerSave() {
   clearTimeout(saveTimer)
-  saveTimer = setTimeout(() => {
-    saveToStorage()
+  saveTimer = setTimeout(async () => {
+    await saveToStorage()
     lastSavedTime.value = new Date()
     savedIndicator.value = true
   }, 500)
@@ -73,7 +59,7 @@ export function formatSavedTime(date) {
   })
 }
 
-// ─── Setup watchers ───────────────────────────────────────────────────────────
+// ─── Watchers ─────────────────────────────────────────────────────────────────
 
 export function setupStorageWatchers() {
   watch(resumes, () => triggerSave(), { deep: true })

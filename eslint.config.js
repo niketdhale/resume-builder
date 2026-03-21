@@ -3,6 +3,10 @@ import pluginVue from 'eslint-plugin-vue'
 import globals from 'globals'
 
 export default [
+  // ─── Ignored paths ─────────────────────────────────────────────────────────
+  {
+    ignores: ['dist/**', 'node_modules/**', 'coverage/**', 'playwright-report/**'],
+  },
   // ─── Node config files ─────────────────────────────────────────────────────
   {
     files: ['vite.config.js', 'playwright.config.js', 'eslint.config.js'],

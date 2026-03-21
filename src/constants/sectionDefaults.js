@@ -1,4 +1,15 @@
 import { uid } from '../utils/uid'
+import { getAuthService } from '../services/auth/index.js'
+
+function now() {
+  return new Date().toISOString()
+}
+
+function userId() {
+  return getAuthService().getUserId()
+}
+
+// ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export function defaultMetadata() {
   return {
@@ -11,6 +22,8 @@ export function defaultMetadata() {
     website: '',
   }
 }
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
 
 export function defaultSettings() {
   return {
@@ -31,13 +44,13 @@ export function defaultSettings() {
     marginX: 12,
     marginY: 12,
     entrySpacing: 8,
-    // Design - Font
+    // Design — Font
     fontCategory: 'sans',
     fontFamily: 'Source Sans Pro',
-    // Design - Colors
+    // Design — Colors
     accentColor: '#6366f1',
     borderColor: '#e5e7eb',
-    // Design - Apply accent
+    // Design — Apply accent
     accentName: false,
     accentJobTitle: false,
     accentHeadings: false,
@@ -47,12 +60,12 @@ export function defaultSettings() {
     accentSubtitle: false,
     accentLinkIcons: false,
     accentHeaderIcons: false,
-    // Design - Section headings
+    // Design — Section headings
     headingStyle: 'underline',
     headingCapitalization: 'uppercase',
     headingSize: 'M',
     headingIcons: 'none',
-    // Design - Link styling
+    // Design — Link styling
     linkUnderline: false,
     linkBlueColor: false,
     linkIcon: true,
@@ -60,17 +73,24 @@ export function defaultSettings() {
   }
 }
 
-export function defaultSections(viewId) {
+// ─── Default sections ─────────────────────────────────────────────────────────
+
+export function defaultSections(resumeId) {
   const make = (title, type, description) => ({
     id: uid(),
+    userId: userId(),
+    resumeId,
     title,
     type,
     description,
     sharedAcrossViews: false,
-    viewIds: [viewId],
+    viewIds: [resumeId],
     isCollapsed: true,
     entries: [],
+    createdAt: now(),
+    updatedAt: now(),
   })
+
   return [
     make(
       'Professional Experience',
@@ -146,12 +166,18 @@ export function defaultSections(viewId) {
   ]
 }
 
-export function defaultEntry() {
+// ─── Default entry ────────────────────────────────────────────────────────────
+
+export function defaultEntry(sectionId) {
   return {
     id: uid(),
+    userId: userId(),
+    sectionId,
     isVisible: true,
     isEditing: true,
     information: '',
+    createdAt: now(),
+    updatedAt: now(),
     // common
     title: '',
     content: '',
