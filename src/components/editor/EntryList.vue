@@ -20,7 +20,7 @@ function onDragEnd() {
     <!-- Empty state -->
     <div
       v-if="section.entries.length === 0"
-      class="flex flex-col items-center justify-center py-6 text-gray-300"
+      class="flex flex-col items-center justify-center py-6 text-gray-300 dark:text-gray-600"
     >
       <span class="text-2xl mb-1">📝</span>
       <p class="text-xs">No entries yet</p>

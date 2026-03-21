@@ -106,26 +106,33 @@ function wordCount(text) {
   <div
     :class="[
       'rounded-xl border transition-all duration-200 shadow-sm hover:shadow-md',
-      entry.isVisible ? 'border-gray-100 bg-white' : 'border-gray-100 bg-gray-50 opacity-50',
+      entry.isVisible
+        ? 'border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800'
+        : 'border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 opacity-50',
     ]"
   >
     <!-- Entry Header -->
     <div class="flex items-center gap-2 px-4 py-3">
-      <span class="entry-drag-handle cursor-grab text-gray-300 hover:text-gray-400 flex-shrink-0">
+      <span
+        class="entry-drag-handle cursor-grab text-gray-300 dark:text-gray-600 hover:text-gray-400 dark:hover:text-gray-400 flex-shrink-0"
+      >
         <GripVertical :size="14" />
       </span>
       <div class="flex-1 min-w-0">
-        <p class="text-sm font-medium text-gray-700 truncate">
+        <p class="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">
           {{ getPreviewLabel(entry, sectionType) }}
         </p>
-        <p v-if="getPreviewSub(entry, sectionType)" class="text-xs text-gray-400 truncate">
+        <p
+          v-if="getPreviewSub(entry, sectionType)"
+          class="text-xs text-gray-400 dark:text-gray-500 truncate"
+        >
           {{ getPreviewSub(entry, sectionType) }}
         </p>
       </div>
       <div class="flex items-center gap-1 flex-shrink-0">
         <button
           @click="openEditor"
-          class="p-1 text-gray-400 hover:text-indigo-500 transition-colors"
+          class="p-1 text-gray-400 dark:text-gray-500 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
           title="Edit"
         >
           <Pencil :size="13" />
@@ -134,8 +141,8 @@ function wordCount(text) {
           @click="toggleEntryVisibility(sectionId, entry.id)"
           :class="
             entry.isVisible
-              ? 'text-gray-400 hover:text-gray-600'
-              : 'text-gray-300 hover:text-gray-500'
+              ? 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
+              : 'text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400'
           "
           class="p-1 transition-colors"
           :title="entry.isVisible ? 'Hide' : 'Show'"
@@ -145,7 +152,7 @@ function wordCount(text) {
         </button>
         <button
           @click="duplicateEntry(sectionId, entry.id)"
-          class="p-1 text-gray-400 hover:text-indigo-500 transition-colors"
+          class="p-1 text-gray-400 dark:text-gray-500 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
           title="Duplicate"
         >
           <Copy :size="13" />
@@ -153,7 +160,7 @@ function wordCount(text) {
         <button
           v-if="!confirmDelete"
           @click="confirmDelete = true"
-          class="p-1 text-gray-400 hover:text-red-500 transition-colors"
+          class="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors"
           title="Delete"
         >
           <Trash2 :size="13" />
@@ -161,13 +168,13 @@ function wordCount(text) {
         <div v-else class="flex items-center gap-1">
           <button
             @click="deleteEntry(sectionId, entry.id)"
-            class="text-xs px-2 py-0.5 bg-red-500 text-white rounded hover:bg-red-600"
+            class="text-xs px-2 py-0.5 bg-red-500 hover:bg-red-600 text-white rounded"
           >
             Yes
           </button>
           <button
             @click="confirmDelete = false"
-            class="text-xs px-2 py-0.5 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+            class="text-xs px-2 py-0.5 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
           >
             No
           </button>
@@ -186,25 +193,25 @@ function wordCount(text) {
     >
       <div
         v-if="entry.isEditing"
-        class="overflow-hidden border-t border-gray-100 px-4 py-3 flex flex-col gap-2"
+        class="overflow-hidden border-t border-gray-100 dark:border-gray-700 px-4 py-3 flex flex-col gap-2"
       >
         <!-- EXPERIENCE -->
         <template v-if="sectionType === 'experience'">
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-gray-500">Role</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Role</label>
               <input v-model="draft.role" placeholder="Software Engineer" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Company</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Company</label>
               <input v-model="draft.company" placeholder="Acme Corp" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Start Date</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Start Date</label>
               <input v-model="draft.startDate" type="month" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">End Date</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">End Date</label>
               <input
                 v-model="draft.endDate"
                 type="month"
@@ -213,41 +220,45 @@ function wordCount(text) {
               />
             </div>
           </div>
-          <label class="flex items-center gap-2 text-xs text-gray-500 cursor-pointer">
+          <label
+            class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 cursor-pointer"
+          >
             <input type="checkbox" v-model="draft.currentlyWorking" class="accent-indigo-600" />
             Currently working here
           </label>
-          <label class="text-xs text-gray-500">Description</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400">Description</label>
           <textarea
             v-model="draft.description"
             rows="3"
             placeholder="Describe your role..."
             class="input resize-none"
           />
-          <p class="text-xs text-gray-400">{{ wordCount(draft.description) }} words</p>
+          <p class="text-xs text-gray-400 dark:text-gray-500">
+            {{ wordCount(draft.description) }} words
+          </p>
         </template>
 
         <!-- EDUCATION -->
         <template v-else-if="sectionType === 'education'">
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-gray-500">Degree</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Degree</label>
               <input v-model="draft.degree" placeholder="B.Sc. Computer Science" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Institution</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Institution</label>
               <input v-model="draft.institution" placeholder="MIT" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Start Date</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Start Date</label>
               <input v-model="draft.startDate" type="month" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">End Date</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">End Date</label>
               <input v-model="draft.endDate" type="month" class="input" />
             </div>
           </div>
-          <label class="text-xs text-gray-500">Honors / Focus</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400">Honors / Focus</label>
           <input v-model="draft.honors" placeholder="Magna Cum Laude" class="input" />
         </template>
 
@@ -255,11 +266,11 @@ function wordCount(text) {
         <template v-else-if="sectionType === 'skills'">
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-gray-500">Skill</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Skill</label>
               <input v-model="draft.skill" placeholder="Vue.js" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Level</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Level</label>
               <select v-model="draft.level" class="input">
                 <option value="">Select level</option>
                 <option>Beginner</option>
@@ -275,11 +286,11 @@ function wordCount(text) {
         <template v-else-if="sectionType === 'languages'">
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-gray-500">Language</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Language</label>
               <input v-model="draft.language" placeholder="English" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Proficiency</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Proficiency</label>
               <select v-model="draft.proficiency" class="input">
                 <option value="">Select proficiency</option>
                 <option>Basic</option>
@@ -295,15 +306,15 @@ function wordCount(text) {
         <template v-else-if="sectionType === 'certificates'">
           <div class="grid grid-cols-2 gap-2">
             <div class="col-span-2">
-              <label class="text-xs text-gray-500">Certificate Name</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Certificate Name</label>
               <input v-model="draft.certName" placeholder="AWS Solutions Architect" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Issuer</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Issuer</label>
               <input v-model="draft.issuer" placeholder="Amazon Web Services" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Date Earned</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Date Earned</label>
               <input v-model="draft.dateEarned" type="month" class="input" />
             </div>
           </div>
@@ -311,9 +322,9 @@ function wordCount(text) {
 
         <!-- INTERESTS -->
         <template v-else-if="sectionType === 'interests'">
-          <label class="text-xs text-gray-500">Interest</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400">Interest</label>
           <input v-model="draft.title" placeholder="Open Source Development" class="input" />
-          <label class="text-xs text-gray-500">Description</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400">Description</label>
           <textarea
             v-model="draft.content"
             rows="2"
@@ -326,37 +337,39 @@ function wordCount(text) {
         <template v-else-if="sectionType === 'projects'">
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-gray-500">Project Name</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Project Name</label>
               <input v-model="draft.projectName" placeholder="Resume Builder" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Your Role</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Your Role</label>
               <input v-model="draft.projectRole" placeholder="Lead Developer" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Start Date</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Start Date</label>
               <input v-model="draft.startDate" type="month" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">End Date</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">End Date</label>
               <input v-model="draft.endDate" type="month" class="input" />
             </div>
           </div>
-          <label class="text-xs text-gray-500">Description</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400">Description</label>
           <textarea
             v-model="draft.description"
             rows="3"
             placeholder="Challenges, impact, technologies..."
             class="input resize-none"
           />
-          <p class="text-xs text-gray-400">{{ wordCount(draft.description) }} words</p>
+          <p class="text-xs text-gray-400 dark:text-gray-500">
+            {{ wordCount(draft.description) }} words
+          </p>
         </template>
 
         <!-- COURSES -->
         <template v-else-if="sectionType === 'courses'">
           <div class="grid grid-cols-2 gap-2">
             <div class="col-span-2">
-              <label class="text-xs text-gray-500">Course Name</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Course Name</label>
               <input
                 v-model="draft.courseName"
                 placeholder="Machine Learning Specialization"
@@ -364,11 +377,11 @@ function wordCount(text) {
               />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Institution / Platform</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Institution / Platform</label>
               <input v-model="draft.courseInstitution" placeholder="Coursera" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Date Completed</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Date Completed</label>
               <input v-model="draft.dateCompleted" type="month" class="input" />
             </div>
           </div>
@@ -378,19 +391,19 @@ function wordCount(text) {
         <template v-else-if="sectionType === 'awards'">
           <div class="grid grid-cols-2 gap-2">
             <div class="col-span-2">
-              <label class="text-xs text-gray-500">Award Name</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Award Name</label>
               <input v-model="draft.awardName" placeholder="Best Innovation Award" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Issuer</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Issuer</label>
               <input v-model="draft.awardIssuer" placeholder="TechConf 2024" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Date</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Date</label>
               <input v-model="draft.awardDate" type="month" class="input" />
             </div>
           </div>
-          <label class="text-xs text-gray-500">Description</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400">Description</label>
           <textarea
             v-model="draft.description"
             rows="2"
@@ -403,20 +416,20 @@ function wordCount(text) {
         <template v-else-if="sectionType === 'organisations'">
           <div class="grid grid-cols-2 gap-2">
             <div class="col-span-2">
-              <label class="text-xs text-gray-500">Organisation Name</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Organisation Name</label>
               <input v-model="draft.orgName" placeholder="Open Source Foundation" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Your Role</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Your Role</label>
               <input v-model="draft.orgRole" placeholder="Volunteer / Member" class="input" />
             </div>
             <div></div>
             <div>
-              <label class="text-xs text-gray-500">Start Date</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Start Date</label>
               <input v-model="draft.orgStart" type="month" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">End Date</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">End Date</label>
               <input v-model="draft.orgEnd" type="month" class="input" />
             </div>
           </div>
@@ -426,19 +439,19 @@ function wordCount(text) {
         <template v-else-if="sectionType === 'publications'">
           <div class="grid grid-cols-2 gap-2">
             <div class="col-span-2">
-              <label class="text-xs text-gray-500">Title</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Title</label>
               <input v-model="draft.pubTitle" placeholder="The Future of AI" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Publisher</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Publisher</label>
               <input v-model="draft.publisher" placeholder="Medium / IEEE" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Date</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Date</label>
               <input v-model="draft.pubDate" type="month" class="input" />
             </div>
             <div class="col-span-2">
-              <label class="text-xs text-gray-500">URL</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">URL</label>
               <input v-model="draft.pubUrl" placeholder="https://..." class="input" />
             </div>
           </div>
@@ -448,23 +461,23 @@ function wordCount(text) {
         <template v-else-if="sectionType === 'references'">
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-gray-500">Full Name</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Full Name</label>
               <input v-model="draft.refName" placeholder="Jane Smith" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Job Title</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Job Title</label>
               <input v-model="draft.refJobTitle" placeholder="Engineering Manager" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Company</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Company</label>
               <input v-model="draft.refCompany" placeholder="Acme Corp" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Email</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Email</label>
               <input v-model="draft.refEmail" placeholder="jane@acme.com" class="input" />
             </div>
             <div>
-              <label class="text-xs text-gray-500">Phone</label>
+              <label class="text-xs text-gray-500 dark:text-gray-400">Phone</label>
               <input v-model="draft.refPhone" placeholder="+1 234 567 890" class="input" />
             </div>
           </div>
@@ -472,7 +485,7 @@ function wordCount(text) {
 
         <!-- DECLARATION -->
         <template v-else-if="sectionType === 'declaration'">
-          <label class="text-xs text-gray-500">Declaration Text</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400">Declaration Text</label>
           <textarea
             v-model="draft.content"
             rows="3"
@@ -483,27 +496,29 @@ function wordCount(text) {
 
         <!-- DOB -->
         <template v-else-if="sectionType === 'dob'">
-          <label class="text-xs text-gray-500">Date of Birth</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400">Date of Birth</label>
           <input v-model="draft.dob" type="date" class="input" />
         </template>
 
         <!-- CUSTOM -->
         <template v-else>
-          <label class="text-xs text-gray-500">Title</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400">Title</label>
           <input v-model="draft.title" placeholder="Entry title" class="input" />
-          <label class="text-xs text-gray-500">Content</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400">Content</label>
           <textarea
             v-model="draft.content"
             rows="3"
             placeholder="Entry content..."
             class="input resize-none"
           />
-          <p class="text-xs text-gray-400">{{ wordCount(draft.content) }} words</p>
+          <p class="text-xs text-gray-400 dark:text-gray-500">
+            {{ wordCount(draft.content) }} words
+          </p>
         </template>
 
         <!-- Additional Information (all types) -->
-        <div class="mt-1 pt-3 border-t border-gray-100">
-          <label class="text-xs text-gray-500">Additional Information</label>
+        <div class="mt-1 pt-3 border-t border-gray-100 dark:border-gray-700">
+          <label class="text-xs text-gray-500 dark:text-gray-400">Additional Information</label>
           <textarea
             v-model="draft.information"
             rows="2"
@@ -513,13 +528,13 @@ function wordCount(text) {
           <div class="flex justify-end gap-2">
             <button
               @click="cancelEdit"
-              class="text-xs px-3 py-1.5 border border-gray-200 rounded-md text-gray-500 hover:bg-gray-100"
+              class="text-xs px-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               Cancel
             </button>
             <button
               @click="saveEntry"
-              class="text-xs px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              class="text-xs px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"
             >
               Save
             </button>
@@ -540,11 +555,27 @@ function wordCount(text) {
   padding: 0.375rem 0.75rem;
   margin-top: 0.125rem;
   outline: none;
+  background-color: #ffffff;
+  color: #111827;
 }
 .input:focus {
   border-color: #818cf8;
 }
 .input:disabled {
   opacity: 0.4;
+}
+
+/* Dark mode overrides for scoped .input class */
+:where(.dark, .dark *) .input {
+  background-color: #1f2937; /* gray-800 */
+  border-color: #374151; /* gray-700 */
+  color: #f3f4f6; /* gray-100 */
+}
+:where(.dark, .dark *) .input:focus {
+  border-color: #818cf8; /* indigo-400 */
+}
+:where(.dark, .dark *) .input option {
+  background-color: #1f2937;
+  color: #f3f4f6;
 }
 </style>

@@ -28,6 +28,7 @@ test-results/
 
 # ─── Editor ───────────────────────────────────────────────────────────────────
 .vscode/*
+!.vscode/settings.json
 !.vscode/extensions.json
 .idea
 *.suo
