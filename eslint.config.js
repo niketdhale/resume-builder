@@ -1,19 +1,21 @@
-import { defineConfig, globalIgnores } from 'eslint/config'
-import globals from 'globals'
 import js from '@eslint/js'
 import pluginVue from 'eslint-plugin-vue'
-import pluginOxlint from 'eslint-plugin-oxlint'
-import skipFormatting from 'eslint-config-prettier/flat'
+import globals from 'globals'
 
-export default defineConfig([
+export default [
+  // ─── Node config files ─────────────────────────────────────────────────────
   {
-    name: 'app/files-to-lint',
-    files: ['**/*.{vue,js,mjs,jsx}'],
+    files: ['vite.config.js', 'playwright.config.js', 'eslint.config.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
   },
 
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
-
+  // ─── Vue + JS source files ─────────────────────────────────────────────────
   {
+    files: ['src/**/*.{js,vue}'],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -21,10 +23,32 @@ export default defineConfig([
     },
   },
 
+  // ─── Test files ────────────────────────────────────────────────────────────
+  {
+    files: ['src/**/*.test.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+      },
+    },
+  },
+
+  // ─── E2E test files ────────────────────────────────────────────────────────
+  {
+    files: ['e2e/**/*.spec.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+
+  // ─── Base rules ────────────────────────────────────────────────────────────
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
-
-  ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
-
-  skipFormatting,
-])
+]

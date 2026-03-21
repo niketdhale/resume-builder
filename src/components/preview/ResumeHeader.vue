@@ -1,7 +1,7 @@
 <script setup>
 import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-vue-next'
 
-const props = defineProps({
+defineProps({
   metadata: { type: Object, required: true },
   s: { type: Object, required: true },
   nameStyle: { type: Object, default: () => ({}) },
