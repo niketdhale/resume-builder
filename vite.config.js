@@ -5,6 +5,14 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
 
+  resolve: {
+    alias: {
+      // html2canvas does not support oklch (Tailwind v4 default).
+      // html2canvas-pro is a drop-in replacement that does.
+      'html2canvas': 'html2canvas-pro',
+    },
+  },
+
   test: {
     environment: 'happy-dom',
     globals: true,

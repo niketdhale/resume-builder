@@ -1,11 +1,12 @@
 <script setup>
-import { ref, inject, onMounted } from 'vue'
+import { ref, inject, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import NavBar from '../components/ui/NavBar.vue'
 import SectionList from '../components/editor/SectionList.vue'
 import PreviewPanel from '../components/preview/PreviewPanel.vue'
 import CustomizePanel from '../components/customize/CustomizePanel.vue'
+import { usePdfExport } from '../composables/usePdfExport'
 
 const route = useRoute()
 const router = useRouter()
@@ -14,6 +15,7 @@ const router = useRouter()
 const resumes = inject('resumes')
 const activeResumeId = inject('activeResumeId')
 const activeMetadata = inject('activeMetadata')
+const activePageSize = inject('activePageSize')
 const savedIndicator = inject('savedIndicator')
 const lastSavedTime = inject('lastSavedTime')
 const formatSavedTime = inject('formatSavedTime')
@@ -24,25 +26,22 @@ const addSection = inject('addSection')
 const updateMetadata = inject('updateMetadata')
 const exportJSON = inject('exportJSON')
 const onFileSelected = inject('onFileSelected')
-const printResume = () => {
-  const activePageSize = inject('activePageSize')
-  const size = activePageSize?.value || 'A4'
-  const existing = document.getElementById('__print_size__')
-  if (existing) existing.remove()
-  const style = document.createElement('style')
-  style.id = '__print_size__'
-  style.innerHTML = `@media print { @page { size: ${size}; margin: 0; } }`
-  document.head.appendChild(style)
-  setTimeout(() => window.print(), 100)
-}
 
-// ─── Import/Export modal state ────────────────────────────────────────────────
+// ─── Import modal state ───────────────────────────────────────────────────────
 const showImportModal = inject('showImportModal')
 const importData = inject('importData')
 const importError = inject('importError')
 const importMode = inject('importMode')
 const confirmImport = inject('confirmImport')
 const cancelImport = inject('cancelImport')
+
+// ─── Active resume (for PDF filename) ────────────────────────────────────────
+const activeResume = computed(() =>
+  resumes.value.find((r) => r.id === activeResumeId.value) ?? null,
+)
+
+// ─── PDF Export ───────────────────────────────────────────────────────────────
+const { exportPdf } = usePdfExport(activePageSize, activeResume)
 
 // ─── Active tab ───────────────────────────────────────────────────────────────
 const activeTab = ref('content')
@@ -76,7 +75,7 @@ onMounted(() => {
       </button>
       <div class="h-4 w-px bg-gray-200 dark:bg-gray-700" />
       <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-        {{ resumes.find((r) => r.id === activeResumeId)?.title || 'Resume' }}
+        {{ activeResume?.title || 'Resume' }}
       </span>
       <Transition
         enter-active-class="transition duration-200 ease-out"
@@ -182,7 +181,7 @@ onMounted(() => {
               📤 Export JSON
             </button>
             <button
-              @click="printResume"
+              @click="exportPdf"
               class="text-xs px-2.5 py-1.5 rounded-md transition whitespace-nowrap bg-gray-800 text-white hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600"
             >
               🖨️ Export PDF
@@ -223,7 +222,9 @@ onMounted(() => {
             v-if="importData"
             class="mb-4 rounded-xl p-4 bg-gray-50 border border-gray-100 dark:bg-gray-800 dark:border-gray-700"
           >
-            <p class="text-xs mb-2 font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <p
+              class="text-xs mb-2 font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
               File Preview
             </p>
             <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
