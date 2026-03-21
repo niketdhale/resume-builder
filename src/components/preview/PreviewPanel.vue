@@ -62,15 +62,16 @@ onMounted(() => measureAndSplit())
     ══════════════════════════════════════ -->
     <div
       v-if="!hasMetadata && previewSections.length === 0"
-      class="bg-white shadow-md rounded-xl flex flex-col items-center justify-center py-24 text-gray-300"
+      class="bg-white dark:bg-gray-800 shadow-md rounded-xl flex flex-col items-center justify-center py-24 text-gray-300 dark:text-gray-600"
     >
       <span class="text-5xl mb-4">📄</span>
-      <p class="text-sm font-medium text-gray-400">Your resume preview will appear here</p>
-      <p class="text-xs text-gray-300 mt-1">Fill in Resume Info and add entries to get started</p>
+      <p class="text-sm font-medium text-gray-400 dark:text-gray-500">Your resume preview will appear here</p>
+      <p class="text-xs text-gray-300 dark:text-gray-600 mt-1">Fill in Resume Info and add entries to get started</p>
     </div>
 
     <!-- ══════════════════════════════════════
          PAGES
+         ResumePage itself stays white — no dark classes needed there
     ══════════════════════════════════════ -->
     <ResumePage
       v-for="(page, index) in pages"

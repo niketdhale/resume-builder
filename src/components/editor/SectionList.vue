@@ -16,7 +16,7 @@ function onDragEnd() {
     <!-- Empty state -->
     <div
       v-if="activeSections.length === 0"
-      class="flex flex-col items-center justify-center py-20 text-gray-400"
+      class="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-600"
     >
       <span class="text-4xl mb-3">📂</span>
       <p class="text-sm font-medium">No sections yet</p>

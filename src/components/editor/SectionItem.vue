@@ -51,15 +51,15 @@ const totalCount = computed(() => props.section.entries.length)
 
 <template>
   <div
-    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-shadow hover:shadow-md"
+    class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-shadow hover:shadow-md"
   >
     <!-- Section Header -->
     <div
-      class="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100"
+      class="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-gray-50 to-white dark:from-gray-700/60 dark:to-gray-800 border-b border-gray-100 dark:border-gray-700"
     >
       <!-- Drag handle -->
       <span
-        class="section-drag-handle cursor-grab text-gray-300 hover:text-indigo-400 transition-colors flex-shrink-0"
+        class="section-drag-handle cursor-grab text-gray-300 dark:text-gray-600 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors flex-shrink-0"
       >
         <GripVertical :size="15" />
       </span>
@@ -67,7 +67,7 @@ const totalCount = computed(() => props.section.entries.length)
       <!-- Collapse toggle -->
       <button
         @click="toggleSectionCollapse(section.id)"
-        class="text-gray-400 hover:text-indigo-500 transition-colors flex-shrink-0"
+        class="text-gray-400 dark:text-gray-500 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors flex-shrink-0"
       >
         <ChevronDown v-if="!section.isCollapsed" :size="15" />
         <ChevronRight v-else :size="15" />
@@ -80,12 +80,12 @@ const totalCount = computed(() => props.section.entries.length)
         v-model="draftTitle"
         @blur="commitRename"
         @keydown="onRenameKeydown"
-        class="flex-1 text-sm font-semibold border border-indigo-300 rounded-md px-2 py-0.5 outline-none bg-white"
+        class="flex-1 text-sm font-semibold border border-indigo-300 dark:border-indigo-500 rounded-md px-2 py-0.5 outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
       />
       <span
         v-else
         @dblclick="startRename"
-        class="flex-1 text-sm font-semibold text-gray-800 truncate cursor-pointer select-none"
+        class="flex-1 text-sm font-semibold text-gray-800 dark:text-gray-100 truncate cursor-pointer select-none"
         title="Double click to rename"
       >
         {{ section.title }}
@@ -94,7 +94,7 @@ const totalCount = computed(() => props.section.entries.length)
       <!-- Shared badge -->
       <span
         v-if="section.sharedAcrossViews"
-        class="flex items-center gap-1 text-xs text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full flex-shrink-0"
+        class="flex items-center gap-1 text-xs text-indigo-500 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/40 px-2 py-0.5 rounded-full flex-shrink-0"
         title="Shared across all resumes"
       >
         <Link2 :size="10" /> Shared
@@ -102,7 +102,7 @@ const totalCount = computed(() => props.section.entries.length)
 
       <!-- Visible count badge -->
       <span
-        class="text-xs text-gray-400 whitespace-nowrap flex-shrink-0 bg-gray-100 px-2 py-0.5 rounded-full"
+        class="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap flex-shrink-0 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full"
       >
         {{ visibleCount }}/{{ totalCount }}
       </span>
@@ -110,7 +110,7 @@ const totalCount = computed(() => props.section.entries.length)
       <!-- Rename -->
       <button
         @click="startRename"
-        class="p-1 text-gray-300 hover:text-indigo-500 transition-colors flex-shrink-0"
+        class="p-1 text-gray-300 dark:text-gray-600 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors flex-shrink-0"
         title="Rename"
       >
         <Pencil :size="13" />
@@ -119,7 +119,7 @@ const totalCount = computed(() => props.section.entries.length)
       <!-- Delete -->
       <button
         @click="deleteSection(section.id)"
-        class="p-1 text-gray-300 hover:text-red-500 transition-colors flex-shrink-0"
+        class="p-1 text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition-colors flex-shrink-0"
         title="Delete section"
       >
         <Trash2 :size="13" />
@@ -127,7 +127,7 @@ const totalCount = computed(() => props.section.entries.length)
 
       <!-- Share checkbox -->
       <label
-        class="flex items-center gap-1 text-xs text-gray-400 cursor-pointer whitespace-nowrap flex-shrink-0"
+        class="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 cursor-pointer whitespace-nowrap flex-shrink-0"
       >
         <input
           type="checkbox"
@@ -141,7 +141,9 @@ const totalCount = computed(() => props.section.entries.length)
 
     <!-- Section description -->
     <div v-if="section.description && !section.isCollapsed" class="px-4 pt-3 pb-0">
-      <p class="text-xs text-gray-400 italic leading-relaxed">{{ section.description }}</p>
+      <p class="text-xs text-gray-400 dark:text-gray-500 italic leading-relaxed">
+        {{ section.description }}
+      </p>
     </div>
 
     <!-- Section Body -->
@@ -149,7 +151,7 @@ const totalCount = computed(() => props.section.entries.length)
       <EntryList :section="section" :sectionType="section.type" />
       <button
         @click="addEntry(section.id)"
-        class="flex items-center gap-1.5 text-xs font-medium text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 px-3 py-2 rounded-lg border border-dashed border-indigo-200 hover:border-indigo-400 transition-all w-full justify-center"
+        class="flex items-center gap-1.5 text-xs font-medium text-indigo-500 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 px-3 py-2 rounded-lg border border-dashed border-indigo-200 dark:border-indigo-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition-all w-full justify-center"
       >
         <Plus :size="13" /> Add Entry
       </button>

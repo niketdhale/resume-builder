@@ -11,47 +11,15 @@ const fontCategories = [
 ]
 
 const fontFamilies = {
-  serif: [
-    'Georgia',
-    'Merriweather',
-    'Playfair Display',
-    'Lora',
-    'EB Garamond',
-    'Libre Baskerville',
-  ],
-  sans: [
-    'Source Sans Pro',
-    'Karla',
-    'Mulish',
-    'Lato',
-    'Roboto',
-    'Titillium Web',
-    'Barlow',
-    'Jost',
-    'Fira Sans',
-    'Rubik',
-    'Nunito',
-    'Open Sans',
-  ],
+  serif: ['Georgia', 'Merriweather', 'Playfair Display', 'Lora', 'EB Garamond', 'Libre Baskerville'],
+  sans: ['Source Sans Pro', 'Karla', 'Mulish', 'Lato', 'Roboto', 'Titillium Web', 'Barlow', 'Jost', 'Fira Sans', 'Rubik', 'Nunito', 'Open Sans'],
   mono: ['Fira Code', 'JetBrains Mono', 'IBM Plex Mono', 'Courier Prime', 'Space Mono'],
 }
 
 const presetColors = [
-  '#111827',
-  '#374151',
-  '#4B5563',
-  '#0F766E',
-  '#0E7490',
-  '#1D4ED8',
-  '#4338CA',
-  '#6D28D9',
-  '#7C3AED',
-  '#0EA5E9',
-  '#7C2D12',
-  '#9F1239',
-  '#BE185D',
-  '#DC2626',
-  '#D97706',
+  '#111827', '#374151', '#4B5563', '#0F766E', '#0E7490',
+  '#1D4ED8', '#4338CA', '#6D28D9', '#7C3AED', '#0EA5E9',
+  '#7C2D12', '#9F1239', '#BE185D', '#DC2626', '#D97706',
 ]
 
 const accentApplyOptions = [
@@ -82,8 +50,8 @@ const headingStyles = [
   <div class="p-5 flex flex-col gap-6">
     <!-- Font -->
     <div>
-      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Font</h3>
-      <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col gap-4">
+      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Font</h3>
+      <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm flex flex-col gap-4">
         <div class="grid grid-cols-3 gap-2">
           <button
             v-for="cat in fontCategories"
@@ -92,22 +60,22 @@ const headingStyles = [
             :class="[
               'flex flex-col items-center py-3 rounded-xl border-2 transition-all',
               activeSettings.fontCategory === cat.value
-                ? 'border-indigo-500 bg-indigo-50'
-                : 'border-gray-200 hover:border-gray-300',
+                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
+                : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500',
             ]"
           >
             <span
               :class="[
                 'text-xl font-bold',
                 cat.style,
-                activeSettings.fontCategory === cat.value ? 'text-indigo-600' : 'text-gray-600',
+                activeSettings.fontCategory === cat.value ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-600 dark:text-gray-400',
               ]"
               >Aa</span
             >
             <span
               :class="[
                 'text-xs mt-1',
-                activeSettings.fontCategory === cat.value ? 'text-indigo-500' : 'text-gray-400',
+                activeSettings.fontCategory === cat.value ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500',
               ]"
               >{{ cat.label }}</span
             >
@@ -122,8 +90,8 @@ const headingStyles = [
             :class="[
               'text-xs px-2 py-2 rounded-lg border-2 transition-all truncate',
               activeSettings.fontFamily === font
-                ? 'border-indigo-500 bg-indigo-50 text-indigo-600 font-semibold'
-                : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50',
+                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-semibold'
+                : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700',
             ]"
             :style="{ fontFamily: font }"
           >
@@ -135,11 +103,11 @@ const headingStyles = [
 
     <!-- Colors -->
     <div>
-      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Colors</h3>
-      <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col gap-4">
+      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Colors</h3>
+      <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm flex flex-col gap-4">
         <!-- Accent color -->
         <div>
-          <label class="text-xs font-medium text-gray-600 mb-2 block">Accent Color</label>
+          <label class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 block">Accent Color</label>
           <div class="flex flex-wrap gap-2 mb-2">
             <button
               v-for="color in presetColors"
@@ -154,7 +122,7 @@ const headingStyles = [
               ]"
             />
             <label
-              class="relative w-6 h-6 rounded-full border-2 border-gray-300 overflow-hidden cursor-pointer flex items-center justify-center"
+              class="relative w-6 h-6 rounded-full border-2 border-gray-300 dark:border-gray-600 overflow-hidden cursor-pointer flex items-center justify-center"
               title="Custom color"
             >
               <input
@@ -163,35 +131,35 @@ const headingStyles = [
                 @input="updateSetting('accentColor', $event.target.value)"
                 class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
               />
-              <span class="text-gray-400 text-xs pointer-events-none">+</span>
+              <span class="text-gray-400 dark:text-gray-500 text-xs pointer-events-none">+</span>
             </label>
           </div>
           <div class="flex items-center gap-2 mt-1">
             <div
-              class="w-5 h-5 rounded-full border border-gray-200"
+              class="w-5 h-5 rounded-full border border-gray-200 dark:border-gray-600"
               :style="{ backgroundColor: activeSettings.accentColor }"
             />
-            <span class="text-xs text-gray-500 font-mono">{{ activeSettings.accentColor }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ activeSettings.accentColor }}</span>
           </div>
         </div>
 
         <!-- Border color -->
         <div>
-          <label class="text-xs font-medium text-gray-600 mb-2 block">Border Color</label>
+          <label class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 block">Border Color</label>
           <div class="flex items-center gap-2">
             <input
               type="color"
               :value="activeSettings.borderColor"
               @input="updateSetting('borderColor', $event.target.value)"
-              class="w-8 h-8 rounded cursor-pointer border border-gray-200"
+              class="w-8 h-8 rounded cursor-pointer border border-gray-200 dark:border-gray-600"
             />
-            <span class="text-xs text-gray-500 font-mono">{{ activeSettings.borderColor }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ activeSettings.borderColor }}</span>
           </div>
         </div>
 
         <!-- Apply accent to -->
         <div>
-          <label class="text-xs font-medium text-gray-600 mb-2 block">Apply Accent Color To</label>
+          <label class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 block">Apply Accent Color To</label>
           <div class="grid grid-cols-2 gap-x-4 gap-y-2">
             <label
               v-for="opt in accentApplyOptions"
@@ -204,7 +172,7 @@ const headingStyles = [
                 @change="updateSetting(opt.key, $event.target.checked)"
                 class="accent-indigo-600 w-3.5 h-3.5"
               />
-              <span class="text-xs text-gray-600">{{ opt.label }}</span>
+              <span class="text-xs text-gray-600 dark:text-gray-400">{{ opt.label }}</span>
             </label>
           </div>
         </div>
@@ -213,13 +181,13 @@ const headingStyles = [
 
     <!-- Section Headings -->
     <div>
-      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
+      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
         Section Headings
       </h3>
-      <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col gap-4">
+      <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm flex flex-col gap-4">
         <!-- Style -->
         <div>
-          <label class="text-xs font-medium text-gray-600 mb-2 block">Style</label>
+          <label class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 block">Style</label>
           <div class="grid grid-cols-4 gap-2">
             <button
               v-for="style in headingStyles"
@@ -228,13 +196,13 @@ const headingStyles = [
               :class="[
                 'flex flex-col items-center gap-1.5 py-2.5 px-1 rounded-lg border-2 transition-all',
                 activeSettings.headingStyle === style.value
-                  ? 'border-indigo-500 bg-indigo-50'
-                  : 'border-gray-200 hover:border-gray-300',
+                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
+                  : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500',
               ]"
             >
               <div class="w-full flex flex-col items-start px-1">
                 <div
-                  class="text-xs w-full text-gray-600 leading-none"
+                  class="text-xs w-full text-gray-600 dark:text-gray-300 leading-none"
                   :style="{
                     borderBottom: ['underline', 'dotted'].includes(style.value)
                       ? `2px ${style.value === 'dotted' ? 'dotted' : 'solid'} currentColor`
@@ -252,14 +220,14 @@ const headingStyles = [
                   HEADING
                 </div>
               </div>
-              <span class="text-xs text-gray-400">{{ style.label }}</span>
+              <span class="text-xs text-gray-400 dark:text-gray-500">{{ style.label }}</span>
             </button>
           </div>
         </div>
 
         <!-- Capitalization -->
         <div>
-          <label class="text-xs font-medium text-gray-600 mb-2 block">Capitalization</label>
+          <label class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 block">Capitalization</label>
           <div class="grid grid-cols-2 gap-2">
             <button
               v-for="cap in ['capitalize', 'uppercase']"
@@ -268,8 +236,8 @@ const headingStyles = [
               :class="[
                 'py-2 text-xs rounded-lg border-2 font-medium transition-all',
                 activeSettings.headingCapitalization === cap
-                  ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
-                  : 'border-gray-200 text-gray-600 hover:border-gray-300',
+                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+                  : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500',
               ]"
             >
               {{ cap.charAt(0).toUpperCase() + cap.slice(1) }}
@@ -279,7 +247,7 @@ const headingStyles = [
 
         <!-- Size -->
         <div>
-          <label class="text-xs font-medium text-gray-600 mb-2 block">Size</label>
+          <label class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 block">Size</label>
           <div class="grid grid-cols-4 gap-2">
             <button
               v-for="size in ['S', 'M', 'L', 'XL']"
@@ -288,8 +256,8 @@ const headingStyles = [
               :class="[
                 'py-2 text-xs rounded-lg border-2 font-semibold transition-all',
                 activeSettings.headingSize === size
-                  ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
-                  : 'border-gray-200 text-gray-600 hover:border-gray-300',
+                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+                  : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500',
               ]"
             >
               {{ size }}
@@ -299,7 +267,7 @@ const headingStyles = [
 
         <!-- Icons -->
         <div>
-          <label class="text-xs font-medium text-gray-600 mb-2 block">Icons</label>
+          <label class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 block">Icons</label>
           <div class="grid grid-cols-3 gap-2">
             <button
               v-for="icon in ['none', 'outline', 'filled']"
@@ -308,8 +276,8 @@ const headingStyles = [
               :class="[
                 'py-2 text-xs rounded-lg border-2 font-medium transition-all capitalize',
                 activeSettings.headingIcons === icon
-                  ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
-                  : 'border-gray-200 text-gray-600 hover:border-gray-300',
+                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+                  : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500',
               ]"
             >
               {{ icon }}
@@ -321,8 +289,8 @@ const headingStyles = [
 
     <!-- Link Styling -->
     <div>
-      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Link Styling</h3>
-      <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col gap-3">
+      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Link Styling</h3>
+      <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm flex flex-col gap-3">
         <label
           v-for="opt in [
             { key: 'linkUnderline', label: 'Underline links' },
@@ -338,7 +306,7 @@ const headingStyles = [
             @change="updateSetting(opt.key, $event.target.checked)"
             class="accent-indigo-600 w-3.5 h-3.5"
           />
-          <span class="text-xs text-gray-600">{{ opt.label }}</span>
+          <span class="text-xs text-gray-600 dark:text-gray-400">{{ opt.label }}</span>
         </label>
       </div>
     </div>
