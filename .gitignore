@@ -1,0 +1,56 @@
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ─── Dependencies ─────────────────────────────────────────────────────────────
+node_modules
+
+# ─── Build output ─────────────────────────────────────────────────────────────
+dist
+dist-ssr
+
+# ─── Environment files ────────────────────────────────────────────────────────
+# Never commit real env files — only .env.example is committed
+.env
+.env.local
+.env.*.local
+
+# ─── Test artifacts ───────────────────────────────────────────────────────────
+coverage
+__screenshots__/
+playwright-report/
+test-results/
+
+# ─── Editor ───────────────────────────────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ─── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── TypeScript ───────────────────────────────────────────────────────────────
+*.tsbuildinfo
+
+# ─── Cache ────────────────────────────────────────────────────────────────────
+.eslintcache
+
+# ─── Vite ─────────────────────────────────────────────────────────────────────
+*.timestamp-*-*.mjs
+
+# ─── Cypress (if added later) ─────────────────────────────────────────────────
+/cypress/videos/
+/cypress/screenshots/
+
+# NOTE: bun.lockb should be committed — it locks dependency versions
