@@ -1,76 +1,44 @@
 <script setup>
 import { provide } from 'vue'
 
-// ─── State ────────────────────────────────────────────────────────────────────
 import {
-  resumes,
-  sections,
-  activeResumeId,
-  activeSections,
-  activeMetadata,
-  activeSettings,
-  activePageSize,
+  resumes, sections, activeResumeId, activeSections,
+  activeMetadata, activeSettings, activePageSize,
 } from './composables/useResumeState'
 
-// ─── Storage ──────────────────────────────────────────────────────────────────
 import {
-  hydrateFromStorage,
-  setupStorageWatchers,
-  savedIndicator,
-  lastSavedTime,
-  formatSavedTime,
+  hydrateFromStorage, setupStorageWatchers,
+  savedIndicator, lastSavedTime, formatSavedTime,
 } from './composables/useStorage'
 
-// ─── Actions ──────────────────────────────────────────────────────────────────
 import {
-  addResume,
-  renameResume,
-  duplicateResume,
-  deleteResume,
-  setActiveResume,
-  updateMetadata,
-  updateSetting,
-  updatePageSize,
-  addLanguageVariant,
-  setBaseResume,
+  addResume, renameResume, duplicateResume, deleteResume,
+  setActiveResume, updateMetadata, updateSetting, updatePageSize,
+  addLanguageVariant, setBaseResume,
 } from './composables/useResumeActions'
 
 import {
-  addSection,
-  renameSection,
-  deleteSection,
-  toggleSectionCollapse,
-  toggleSectionHidden,
-  toggleSectionSharing,
-  updateSectionOrder,
-  setSectionColumn,
+  addSection, renameSection, deleteSection,
+  toggleSectionCollapse, toggleSectionHidden, toggleSectionSharing,
+  updateSectionOrder, setSectionColumn,
 } from './composables/useSectionActions'
 
 import {
-  addEntry,
-  updateEntry,
-  deleteEntry,
-  duplicateEntry,
-  toggleEntryVisibility,
-  updateEntryOrder,
+  addEntry, updateEntry, deleteEntry, duplicateEntry,
+  toggleEntryVisibility, updateEntryOrder,
 } from './composables/useEntryActions'
 
 import {
-  showImportModal,
-  importData,
-  importError,
-  importMode,
-  exportJSON,
-  onFileSelected,
-  confirmImport,
-  cancelImport,
+  showImportModal, importData, importError, importMode,
+  exportJSON, onFileSelected, confirmImport, cancelImport,
 } from './composables/useImportExport'
 
-// ─── Startup ──────────────────────────────────────────────────────────────────
+import { setupDebugGlobal } from './utils/useDebugLogger'
+
 hydrateFromStorage()
 setupStorageWatchers()
+setupDebugGlobal({ resumes, sections, activeResumeId, activeSettings })
 
-// ─── Provide everything to child components ───────────────────────────────────
 provide('resumes', resumes)
 provide('sections', sections)
 provide('activeResumeId', activeResumeId)
@@ -120,6 +88,5 @@ provide('cancelImport', cancelImport)
 </script>
 
 <template>
-  <!-- All UI is handled by RouterView → views/ -->
   <RouterView />
 </template>
