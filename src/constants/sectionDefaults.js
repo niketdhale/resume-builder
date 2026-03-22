@@ -89,13 +89,17 @@ export function defaultSections(resumeId) {
     sharedAcrossViews: false,
     viewIds: [resumeId],
     isCollapsed: true,
-    isHidden: false,
     entries: [],
     createdAt: now(),
     updatedAt: now(),
   })
 
   return [
+    make(
+      'Summary',
+      'summary',
+      'Add a short professional summary or personal statement at the top of your resume.',
+    ),
     make(
       'Professional Experience',
       'experience',
@@ -233,7 +237,7 @@ export function defaultEntry(sectionId) {
     refCompany: '',
     refEmail: '',
     refPhone: '',
-    // dob
-    dob: '',
+    // summary
+    summary: '',
   }
 }

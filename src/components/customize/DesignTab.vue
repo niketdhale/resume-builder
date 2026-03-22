@@ -16,6 +16,24 @@ const fontFamilies = {
   mono: ['Fira Code', 'JetBrains Mono', 'IBM Plex Mono', 'Courier Prime', 'Space Mono'],
 }
 
+const colorThemes = [
+  { name: 'Indigo',    accent: '#6366f1', border: '#e5e7eb' },
+  { name: 'Ocean',     accent: '#0E7490', border: '#cffafe' },
+  { name: 'Forest',    accent: '#15803d', border: '#dcfce7' },
+  { name: 'Rose',      accent: '#be185d', border: '#fce7f3' },
+  { name: 'Slate',     accent: '#334155', border: '#e2e8f0' },
+  { name: 'Amber',     accent: '#b45309', border: '#fef3c7' },
+  { name: 'Crimson',   accent: '#b91c1c', border: '#fee2e2' },
+  { name: 'Violet',    accent: '#7c3aed', border: '#ede9fe' },
+  { name: 'Teal',      accent: '#0f766e', border: '#ccfbf1' },
+  { name: 'Graphite',  accent: '#374151', border: '#f3f4f6' },
+]
+
+function applyTheme(theme) {
+  updateSetting('accentColor', theme.accent)
+  updateSetting('borderColor', theme.border)
+}
+
 const presetColors = [
   '#111827', '#374151', '#4B5563', '#0F766E', '#0E7490',
   '#1D4ED8', '#4338CA', '#6D28D9', '#7C3AED', '#0EA5E9',
@@ -105,6 +123,31 @@ const headingStyles = [
     <div>
       <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Colors</h3>
       <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm flex flex-col gap-4">
+        <!-- Theme palettes -->
+        <div>
+          <label class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 block">Theme</label>
+          <div class="grid grid-cols-5 gap-2">
+            <button
+              v-for="theme in colorThemes"
+              :key="theme.name"
+              @click="applyTheme(theme)"
+              :title="theme.name"
+              :class="[
+                'flex flex-col items-center gap-1.5 py-2 px-1 rounded-lg border-2 transition-all',
+                activeSettings.accentColor === theme.accent
+                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
+                  : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500',
+              ]"
+            >
+              <div class="flex gap-0.5">
+                <div class="w-3.5 h-3.5 rounded-full" :style="{ backgroundColor: theme.accent }" />
+                <div class="w-3.5 h-3.5 rounded-full border border-gray-200" :style="{ backgroundColor: theme.border }" />
+              </div>
+              <span class="text-[10px] text-gray-500 dark:text-gray-400 leading-none">{{ theme.name }}</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Accent color -->
         <div>
           <label class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 block">Accent Color</label>
