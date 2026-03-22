@@ -40,6 +40,7 @@ import {
   toggleSectionCollapse,
   toggleSectionSharing,
   updateSectionOrder,
+  setSectionColumn,
 } from './composables/useSectionActions'
 
 import {
@@ -93,6 +94,7 @@ provide('deleteSection', deleteSection)
 provide('toggleSectionCollapse', toggleSectionCollapse)
 provide('toggleSectionSharing', toggleSectionSharing)
 provide('updateSectionOrder', updateSectionOrder)
+provide('setSectionColumn', setSectionColumn)
 
 provide('addEntry', addEntry)
 provide('updateEntry', updateEntry)
