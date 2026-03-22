@@ -31,6 +31,8 @@ import {
   updateMetadata,
   updateSetting,
   updatePageSize,
+  addLanguageVariant,
+  setBaseResume,
 } from './composables/useResumeActions'
 
 import {
@@ -88,6 +90,8 @@ provide('setActiveResume', setActiveResume)
 provide('updateMetadata', updateMetadata)
 provide('updateSetting', updateSetting)
 provide('updatePageSize', updatePageSize)
+provide('addLanguageVariant', addLanguageVariant)
+provide('setBaseResume', setBaseResume)
 
 provide('addSection', addSection)
 provide('renameSection', renameSection)

@@ -1,12 +1,53 @@
 <script setup>
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { resumes } from '../composables/useResumeState'
-import { addResume } from '../composables/useResumeActions'
+import { inject } from 'vue'
 import NavBar from '../components/ui/NavBar.vue'
 
 const router = useRouter()
+const resumes = inject('resumes')
+const setActiveResume = inject('setActiveResume')
+const deleteResume = inject('deleteResume')
+const duplicateResume = inject('duplicateResume')
+const addResume = inject('addResume')
+
+// ─── Language flag map ────────────────────────────────────────────────────────
+const LANG_FLAG = {
+  'English':    'GB',
+  'French':     'FR',
+  'German':     'DE',
+  'Spanish':    'ES',
+  'Italian':    'IT',
+  'Portuguese': 'PT',
+  'Dutch':      'NL',
+  'Japanese':   'JP',
+  'Chinese':    'CN',
+  'Korean':     'KR',
+  'Arabic':     'AR',
+  'Russian':    'RU',
+  'Hindi':      'HI',
+}
+
+function flagCode(language) {
+  return LANG_FLAG[language] || language?.slice(0, 2).toUpperCase() || 'GB'
+}
+
+// ─── Only show base resumes in the grid ──────────────────────────────────────
+const baseResumes = computed(() => resumes.value.filter((r) => !r.variantOf))
+
+// ─── Get all variants for a base resume ──────────────────────────────────────
+function variantsOf(baseId) {
+  return resumes.value.filter((r) => r.variantOf === baseId)
+}
+
+// ─── All languages for a base resume (base + variants) ───────────────────────
+function languagesFor(resume) {
+  const all = [resume, ...variantsOf(resume.id)]
+  return all.map((r) => ({ code: flagCode(r.language), label: r.language, id: r.id }))
+}
 
 function openResume(id) {
+  setActiveResume(id)
   router.push({ name: 'editor', params: { id } })
 }
 
@@ -14,6 +55,33 @@ function createResume() {
   addResume()
   const newResume = resumes.value[resumes.value.length - 1]
   router.push({ name: 'editor', params: { id: newResume.id } })
+}
+
+function handleDelete(resumeId) {
+  deleteResume(resumeId)
+}
+
+function handleDuplicate(resumeId) {
+  duplicateResume(resumeId)
+}
+
+function timeAgo(isoString) {
+  if (!isoString) return ''
+  const diff = Date.now() - new Date(isoString).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return 'Just now'
+  if (mins < 60) return `${mins} min ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs === 1 ? '1 hour' : hrs + ' hours'} ago`
+  const days = Math.floor(hrs / 24)
+  if (days === 1) return 'Yesterday'
+  return `${days} days ago`
+}
+
+function sectionCount(resumeId) {
+  return resumes.value
+    .find((r) => r.id === resumeId)
+    ?.sections?.length ?? 0
 }
 </script>
 
@@ -27,7 +95,7 @@ function createResume() {
         <div>
           <h1 class="text-xl font-bold text-gray-900 dark:text-gray-50">My Resumes</h1>
           <p class="text-sm mt-0.5 text-gray-400 dark:text-gray-500">
-            {{ resumes.length }} resumes
+            {{ baseResumes.length }} {{ baseResumes.length === 1 ? 'resume' : 'resumes' }}
           </p>
         </div>
         <button
@@ -53,9 +121,9 @@ function createResume() {
           <span class="text-sm font-medium text-gray-500 dark:text-gray-400">New Resume</span>
         </div>
 
-        <!-- Resume cards -->
+        <!-- Resume cards (base resumes only) -->
         <div
-          v-for="resume in resumes"
+          v-for="resume in baseResumes"
           :key="resume.id"
           class="border rounded-xl overflow-hidden transition cursor-pointer bg-white border-gray-200 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:hover:border-indigo-500"
           @click="openResume(resume.id)"
@@ -88,19 +156,32 @@ function createResume() {
               {{ resume.title }}
             </p>
             <p class="text-xs mt-0.5 truncate text-gray-400 dark:text-gray-500">
-              {{ resume.metadata?.fullName || 'No name set' }}
-            </p>
-            <p class="text-xs mt-0.5 truncate text-gray-400 dark:text-gray-500">
               {{ resume.metadata?.jobTitle || 'No title set' }}
             </p>
-            <div class="flex items-center gap-1 mt-2">
-              <span class="text-base">🇬🇧</span>
-              <span class="text-xs text-gray-400 dark:text-gray-500">English</span>
+
+            <!-- Language flags row -->
+            <div class="flex items-center gap-1.5 mt-2 flex-wrap">
+              <span
+                v-for="lang in languagesFor(resume)"
+                :key="lang.id"
+                :title="lang.label"
+                class="text-xs font-medium px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+              >
+                {{ lang.code }}
+              </span>
+              <span
+                v-if="languagesFor(resume).length > 1"
+                class="text-xs text-gray-400 dark:text-gray-500"
+              >
+                {{ languagesFor(resume).length }} languages
+              </span>
             </div>
+
+            <!-- Updated + sections -->
             <div class="flex items-center justify-between mt-2">
-              <span class="text-xs text-gray-400 dark:text-gray-500">{{
-                resume.pageSize || 'A4'
-              }}</span>
+              <span class="text-xs text-gray-400 dark:text-gray-500">
+                {{ timeAgo(resume.updatedAt) }}
+              </span>
               <span
                 class="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
               >
@@ -110,22 +191,24 @@ function createResume() {
           </div>
 
           <!-- Actions -->
-          <div class="flex gap-1 px-3 pb-3">
+          <div class="flex gap-1 px-3 pb-3" @click.stop>
             <button
-              @click.stop="openResume(resume.id)"
+              @click="openResume(resume.id)"
               class="flex-1 text-xs bg-indigo-600 hover:bg-indigo-700 text-white py-1.5 rounded-lg transition"
             >
               Open
             </button>
             <button
-              @click.stop
+              @click="handleDuplicate(resume.id)"
               class="text-xs border px-2 py-1.5 rounded-lg transition border-gray-200 text-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-500 dark:hover:bg-gray-700"
+              title="Duplicate"
             >
               ⧉
             </button>
             <button
-              @click.stop
+              @click="handleDelete(resume.id)"
               class="text-xs border px-2 py-1.5 rounded-lg transition border-gray-200 text-gray-400 hover:bg-red-50 hover:text-red-400 dark:border-gray-600 dark:text-gray-500 dark:hover:bg-red-900/30 dark:hover:text-red-400"
+              title="Delete"
             >
               ✕
             </button>
