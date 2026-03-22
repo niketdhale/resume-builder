@@ -22,6 +22,7 @@ export function addSection(type = 'custom') {
     sharedAcrossViews: false,
     viewIds: [resumeId],
     isCollapsed: false,
+    isHidden: false,
     entries: [],
     createdAt: now(),
     updatedAt: now(),
@@ -44,6 +45,14 @@ export function toggleSectionCollapse(sectionId) {
   const s = sections.value.find((s) => s.id === sectionId)
   if (s) {
     s.isCollapsed = !s.isCollapsed
+    s.updatedAt = now()
+  }
+}
+
+export function toggleSectionHidden(sectionId) {
+  const s = sections.value.find((s) => s.id === sectionId)
+  if (s) {
+    s.isHidden = !s.isHidden
     s.updatedAt = now()
   }
 }
@@ -73,6 +82,6 @@ export function setSectionColumn(sectionId, column) {
   const s = sections.value.find((s) => s.id === sectionId)
   if (s) {
     s.column = column
-    s.updatedAt = new Date().toISOString()
+    s.updatedAt = now()
   }
 }

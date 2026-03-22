@@ -38,6 +38,7 @@ import {
   renameSection,
   deleteSection,
   toggleSectionCollapse,
+  toggleSectionHidden,
   toggleSectionSharing,
   updateSectionOrder,
   setSectionColumn,
@@ -92,6 +93,7 @@ provide('addSection', addSection)
 provide('renameSection', renameSection)
 provide('deleteSection', deleteSection)
 provide('toggleSectionCollapse', toggleSectionCollapse)
+provide('toggleSectionHidden', toggleSectionHidden)
 provide('toggleSectionSharing', toggleSectionSharing)
 provide('updateSectionOrder', updateSectionOrder)
 provide('setSectionColumn', setSectionColumn)
