@@ -78,11 +78,8 @@ function timeAgo(isoString) {
   return `${days} days ago`
 }
 
-function sectionCount(resumeId) {
-  return resumes.value
-    .find((r) => r.id === resumeId)
-    ?.sections?.length ?? 0
-}
+
+
 </script>
 
 <template>
