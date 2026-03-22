@@ -32,6 +32,7 @@ export function defaultSettings() {
     dateFormat: 'DD/MM/YYYY',
     // Layout
     columns: 'one',
+    columnLayout: { left: [], right: [] },
     headerPosition: 'top',
     headerLayout: 'classic',
     showEmail: true,

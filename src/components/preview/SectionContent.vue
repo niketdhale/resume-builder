@@ -214,12 +214,7 @@ defineProps({
     <!-- REFERENCES -->
     <template v-else-if="section.type === 'references'">
       <div class="grid grid-cols-2 gap-2">
-        <div
-          v-for="e in section.visibleEntries"
-          :key="e.id"
-          class="border rounded-lg p-2"
-          :style="{ borderColor: s.borderColor }"
-        >
+        <div v-for="e in section.visibleEntries" :key="e.id">
           <p class="text-sm font-semibold text-gray-800">{{ e.refName }}</p>
           <p class="text-xs" :style="subtitleStyle">
             {{ e.refJobTitle }}{{ e.refCompany ? `, ${e.refCompany}` : '' }}

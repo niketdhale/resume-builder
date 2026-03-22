@@ -1,0 +1,262 @@
+{
+  "version": "1.0",
+  "exportedAt": "2026-03-22T10:00:00Z",
+  "resume": {
+    "id": "888",
+    "title": "Test Column Layout",
+    "pageSize": "A4",
+    "settings": {
+      "language": "English (UK)",
+      "dateFormat": "MMM YYYY",
+      "columns": "two",
+      "columnLayout": {
+        "left": ["sec1", "sec2", "sec3", "sec4"],
+        "right": ["sec5", "sec6", "sec7"]
+      },
+      "headerPosition": "top",
+      "headerLayout": "classic",
+      "showEmail": true,
+      "showPhone": true,
+      "showLocation": true,
+      "showLinkedin": true,
+      "showWebsite": true,
+      "fontSize": 9.5,
+      "lineHeight": 1.15,
+      "marginX": 12,
+      "marginY": 12,
+      "entrySpacing": 8,
+      "fontCategory": "sans",
+      "fontFamily": "Source Sans Pro",
+      "accentColor": "#6366f1",
+      "borderColor": "#e5e7eb",
+      "accentName": false,
+      "accentJobTitle": false,
+      "accentHeadings": false,
+      "accentHeadingLine": true,
+      "accentDots": true,
+      "accentDates": false,
+      "accentSubtitle": false,
+      "accentLinkIcons": false,
+      "accentHeaderIcons": false,
+      "headingStyle": "underline",
+      "headingCapitalization": "uppercase",
+      "headingSize": "M",
+      "headingIcons": "none",
+      "linkUnderline": false,
+      "linkBlueColor": false,
+      "linkIcon": true,
+      "linkIconStyle": "external"
+    },
+    "metadata": {
+      "fullName": "Test User",
+      "jobTitle": "Software Engineer",
+      "email": "test@example.com",
+      "phone": "+44 7700 900000",
+      "location": "London, UK",
+      "linkedin": "linkedin.com/in/test",
+      "website": "test.dev"
+    }
+  },
+  "sections": [
+    {
+      "id": "sec1",
+      "resumeId": "888",
+      "userId": "local",
+      "title": "Experience",
+      "type": "experience",
+      "description": "Work experience",
+      "sharedAcrossViews": false,
+      "viewIds": ["888"],
+      "isCollapsed": false,
+      "entries": [
+        {
+          "id": "entry1",
+          "sectionId": "sec1",
+          "userId": "local",
+          "isVisible": true,
+          "isEditing": false,
+          "information": "",
+          "role": "Software Engineer",
+          "company": "Tech Company",
+          "startDate": "2020-01",
+          "endDate": "",
+          "currentlyWorking": true,
+          "description": "Building software.",
+          "createdAt": "2026-03-22T00:00:00Z",
+          "updatedAt": "2026-03-22T00:00:00Z"
+        }
+      ],
+      "createdAt": "2026-03-22T00:00:00Z",
+      "updatedAt": "2026-03-22T00:00:00Z"
+    },
+    {
+      "id": "sec2",
+      "resumeId": "888",
+      "userId": "local",
+      "title": "Education",
+      "type": "education",
+      "description": "Education history",
+      "sharedAcrossViews": false,
+      "viewIds": ["888"],
+      "isCollapsed": false,
+      "entries": [
+        {
+          "id": "entry2",
+          "sectionId": "sec2",
+          "userId": "local",
+          "isVisible": true,
+          "isEditing": false,
+          "information": "",
+          "degree": "BSc Computer Science",
+          "institution": "University",
+          "startDate": "2016-09",
+          "endDate": "2020-06",
+          "honors": "First Class",
+          "createdAt": "2026-03-22T00:00:00Z",
+          "updatedAt": "2026-03-22T00:00:00Z"
+        }
+      ],
+      "createdAt": "2026-03-22T00:00:00Z",
+      "updatedAt": "2026-03-22T00:00:00Z"
+    },
+    {
+      "id": "sec3",
+      "resumeId": "888",
+      "userId": "local",
+      "title": "Skills",
+      "type": "skills",
+      "description": "Technical skills",
+      "sharedAcrossViews": false,
+      "viewIds": ["888"],
+      "isCollapsed": false,
+      "entries": [
+        {
+          "id": "entry3",
+          "sectionId": "sec3",
+          "userId": "local",
+          "isVisible": true,
+          "isEditing": false,
+          "information": "",
+          "skill": "JavaScript",
+          "level": "Expert",
+          "createdAt": "2026-03-22T00:00:00Z",
+          "updatedAt": "2026-03-22T00:00:00Z"
+        }
+      ],
+      "createdAt": "2026-03-22T00:00:00Z",
+      "updatedAt": "2026-03-22T00:00:00Z"
+    },
+    {
+      "id": "sec4",
+      "resumeId": "888",
+      "userId": "local",
+      "title": "Languages",
+      "type": "languages",
+      "description": "Language skills",
+      "sharedAcrossViews": false,
+      "viewIds": ["888"],
+      "isCollapsed": false,
+      "entries": [
+        {
+          "id": "entry4",
+          "sectionId": "sec4",
+          "userId": "local",
+          "isVisible": true,
+          "isEditing": false,
+          "information": "",
+          "language": "English",
+          "proficiency": "Native",
+          "createdAt": "2026-03-22T00:00:00Z",
+          "updatedAt": "2026-03-22T00:00:00Z"
+        }
+      ],
+      "createdAt": "2026-03-22T00:00:00Z",
+      "updatedAt": "2026-03-22T00:00:00Z"
+    },
+    {
+      "id": "sec5",
+      "resumeId": "888",
+      "userId": "local",
+      "title": "Projects",
+      "type": "projects",
+      "description": "Side projects",
+      "sharedAcrossViews": false,
+      "viewIds": ["888"],
+      "isCollapsed": false,
+      "entries": [
+        {
+          "id": "entry5",
+          "sectionId": "sec5",
+          "userId": "local",
+          "isVisible": true,
+          "isEditing": false,
+          "information": "",
+          "projectName": "Resume Builder",
+          "projectRole": "Lead Developer",
+          "startDate": "2025-01",
+          "endDate": "2025-06",
+          "description": "Built a resume builder app.",
+          "createdAt": "2026-03-22T00:00:00Z",
+          "updatedAt": "2026-03-22T00:00:00Z"
+        }
+      ],
+      "createdAt": "2026-03-22T00:00:00Z",
+      "updatedAt": "2026-03-22T00:00:00Z"
+    },
+    {
+      "id": "sec6",
+      "resumeId": "888",
+      "userId": "local",
+      "title": "Certificates",
+      "type": "certificates",
+      "description": "Professional certificates",
+      "sharedAcrossViews": false,
+      "viewIds": ["888"],
+      "isCollapsed": false,
+      "entries": [
+        {
+          "id": "entry6",
+          "sectionId": "sec6",
+          "userId": "local",
+          "isVisible": true,
+          "isEditing": false,
+          "information": "",
+          "certName": "AWS Certified",
+          "issuer": "Amazon",
+          "dateEarned": "2024-01",
+          "createdAt": "2026-03-22T00:00:00Z",
+          "updatedAt": "2026-03-22T00:00:00Z"
+        }
+      ],
+      "createdAt": "2026-03-22T00:00:00Z",
+      "updatedAt": "2026-03-22T00:00:00Z"
+    },
+    {
+      "id": "sec7",
+      "resumeId": "888",
+      "userId": "local",
+      "title": "Interests",
+      "type": "interests",
+      "description": "Personal interests",
+      "sharedAcrossViews": false,
+      "viewIds": ["888"],
+      "isCollapsed": false,
+      "entries": [
+        {
+          "id": "entry7",
+          "sectionId": "sec7",
+          "userId": "local",
+          "isVisible": true,
+          "isEditing": false,
+          "information": "",
+          "title": "Open Source",
+          "content": "Contributing to open source projects.",
+          "createdAt": "2026-03-22T00:00:00Z",
+          "updatedAt": "2026-03-22T00:00:00Z"
+        }
+      ],
+      "createdAt": "2026-03-22T00:00:00Z",
+      "updatedAt": "2026-03-22T00:00:00Z"
+    }
+  ]
+}

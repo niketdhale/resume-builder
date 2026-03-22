@@ -18,6 +18,7 @@ export function addSection(type = 'custom') {
     title: type === 'custom' ? 'Custom Section' : type.charAt(0).toUpperCase() + type.slice(1),
     type,
     description: '',
+    column: 'left',
     sharedAcrossViews: false,
     viewIds: [resumeId],
     isCollapsed: false,
@@ -66,4 +67,12 @@ export function updateSectionOrder(newSections) {
     (s) => !s.sharedAcrossViews && !s.viewIds.includes(activeResumeId.value),
   )
   sections.value = [...newSections, ...inactive]
+}
+
+export function setSectionColumn(sectionId, column) {
+  const s = sections.value.find((s) => s.id === sectionId)
+  if (s) {
+    s.column = column
+    s.updatedAt = new Date().toISOString()
+  }
 }

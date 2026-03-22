@@ -16,6 +16,7 @@ const props = defineProps({
   headerLayout: { type: String, default: 'classic' },
   isTwoCol: { type: Boolean, default: false },
   isMixCol: { type: Boolean, default: false },
+  columnLayout: { type: Object, default: () => ({ left: [], right: [] }) },
   show: { type: Function, required: true },
   sectionContentProps: { type: Object, required: true },
   metadata: { type: Object, default: () => ({}) },
@@ -42,8 +43,41 @@ const pageStyle = computed(() => {
   }
 })
 
-const evenSections = computed(() => props.sections.filter((_, i) => i % 2 === 0))
-const oddSections = computed(() => props.sections.filter((_, i) => i % 2 !== 0))
+// ─── Column splitting ─────────────────────────────────────────────────────────
+// Priority: use columnLayout ID arrays (preserves drag order) → fall back to
+// section.column field → fall back to even/odd split.
+// Sections are sorted by their position in the IDs array so drag order is respected.
+
+const leftSections = computed(() => {
+  const ids = props.columnLayout?.left || []
+  if (ids.length > 0) {
+    // Sort by position in the ids array to preserve drag order
+    return ids
+      .map((id) => props.sections.find((s) => s.id === id))
+      .filter(Boolean)
+  }
+  // Fallback: use section.column field
+  const byField = props.sections.filter((s) => s.column === 'left')
+  if (byField.length > 0) return byField
+  // Last resort: even-index
+  return props.sections.filter((_, i) => i % 2 === 0)
+})
+
+const rightSections = computed(() => {
+  const ids = props.columnLayout?.right || []
+  if (ids.length > 0) {
+    return ids
+      .map((id) => props.sections.find((s) => s.id === id))
+      .filter(Boolean)
+  }
+  const byField = props.sections.filter((s) => s.column === 'right')
+  if (byField.length > 0) return byField
+  return props.sections.filter((_, i) => i % 2 !== 0)
+})
+
+const fullWidthSections = computed(() =>
+  props.sections.filter((s) => s.column === 'full'),
+)
 </script>
 
 <template>
@@ -126,39 +160,61 @@ const oddSections = computed(() => props.sections.filter((_, i) => i % 2 !== 0))
       </div>
 
       <!-- Two columns -->
-      <div v-if="isTwoCol" class="grid grid-cols-2 gap-4">
-        <div class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
-          <div v-for="section in evenSections" :key="section.id">
-            <span :style="headingStyle">{{ section.title }}</span>
-            <SectionContent :section="section" v-bind="sectionContentProps" />
-          </div>
+      <div v-if="isTwoCol" class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+        <!-- Full-width sections above columns -->
+        <div
+          v-for="section in fullWidthSections"
+          :key="section.id"
+        >
+          <span :style="headingStyle">{{ section.title }}</span>
+          <SectionContent :section="section" v-bind="sectionContentProps" />
         </div>
-        <div class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
-          <div v-for="section in oddSections" :key="section.id">
-            <span :style="headingStyle">{{ section.title }}</span>
-            <SectionContent :section="section" v-bind="sectionContentProps" />
+        <!-- Side-by-side columns -->
+        <div class="grid grid-cols-2 gap-4 overflow-hidden">
+          <div class="flex flex-col overflow-hidden" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+            <div v-for="section in leftSections" :key="section.id">
+              <span :style="headingStyle">{{ section.title }}</span>
+              <SectionContent :section="section" v-bind="sectionContentProps" />
+            </div>
+          </div>
+          <div class="flex flex-col overflow-hidden" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+            <div v-for="section in rightSections" :key="section.id">
+              <span :style="headingStyle">{{ section.title }}</span>
+              <SectionContent :section="section" v-bind="sectionContentProps" />
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Mix columns -->
-      <div v-else-if="isMixCol" class="grid gap-4" style="grid-template-columns: 2fr 3fr">
-        <div class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
-          <div v-for="section in evenSections" :key="section.id">
-            <span :style="headingStyle">{{ section.title }}</span>
-            <SectionContent :section="section" v-bind="sectionContentProps" />
-          </div>
+      <!-- Mix columns (2fr left / 3fr right) -->
+      <div v-else-if="isMixCol" class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+        <!-- Full-width sections above columns -->
+        <div
+          v-for="section in fullWidthSections"
+          :key="section.id"
+        >
+          <span :style="headingStyle">{{ section.title }}</span>
+          <SectionContent :section="section" v-bind="sectionContentProps" />
         </div>
-        <div class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
-          <div v-for="section in oddSections" :key="section.id">
-            <span :style="headingStyle">{{ section.title }}</span>
-            <SectionContent :section="section" v-bind="sectionContentProps" />
+        <!-- Side-by-side mix columns -->
+        <div class="grid gap-4 overflow-hidden" style="grid-template-columns: 2fr 3fr">
+          <div class="flex flex-col overflow-hidden" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+            <div v-for="section in leftSections" :key="section.id">
+              <span :style="headingStyle">{{ section.title }}</span>
+              <SectionContent :section="section" v-bind="sectionContentProps" />
+            </div>
+          </div>
+          <div class="flex flex-col overflow-hidden" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+            <div v-for="section in rightSections" :key="section.id">
+              <span :style="headingStyle">{{ section.title }}</span>
+              <SectionContent :section="section" v-bind="sectionContentProps" />
+            </div>
           </div>
         </div>
       </div>
 
       <!-- One column -->
-      <div v-else class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+      <div v-else class="flex flex-col overflow-hidden" :style="{ gap: s.entrySpacing * 2 + 'px' }">
         <div v-for="section in sections" :key="section.id">
           <span :style="headingStyle">{{ section.title }}</span>
           <SectionContent :section="section" v-bind="sectionContentProps" />
