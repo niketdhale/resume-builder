@@ -232,6 +232,13 @@ defineProps({
       </div>
     </template>
 
+    <!-- SUMMARY -->
+    <template v-else-if="section.type === 'summary'">
+      <div v-for="e in section.visibleEntries" :key="e.id">
+        <p class="text-xs leading-relaxed whitespace-pre-wrap" :style="{ color: s.textColor || 'inherit' }">{{ e.summary }}</p>
+      </div>
+    </template>
+
     <!-- DECLARATION -->
     <template v-else-if="section.type === 'declaration'">
       <div v-for="e in section.visibleEntries" :key="e.id">

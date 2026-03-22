@@ -57,6 +57,8 @@ function getPreviewLabel(e, type) {
       return e.pubTitle || 'New Publication'
     case 'references':
       return e.refName || 'New Reference'
+    case 'summary':
+      return 'Summary'
     case 'declaration':
       return 'Declaration'
     case 'dob':
@@ -481,6 +483,17 @@ function wordCount(text) {
               <input v-model="draft.refPhone" placeholder="+1 234 567 890" class="input" />
             </div>
           </div>
+        </template>
+
+        <!-- SUMMARY -->
+        <template v-else-if="sectionType === 'summary'">
+          <label class="text-xs text-gray-500 dark:text-gray-400">Summary</label>
+          <textarea
+            v-model="draft.summary"
+            rows="5"
+            placeholder="Write a short professional summary or personal statement..."
+            class="input resize-none"
+          />
         </template>
 
         <!-- DECLARATION -->
