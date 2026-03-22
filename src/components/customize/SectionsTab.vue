@@ -1,7 +1,7 @@
 <script setup>
 import { inject, ref, computed, watch } from 'vue'
 import { VueDraggableNext as Draggable } from 'vue-draggable-next'
-import { GripVertical } from 'lucide-vue-next'
+import { GripVertical, EyeOff } from 'lucide-vue-next'
 
 const activeSections = inject('activeSections')
 const activeSettings = inject('activeSettings')
@@ -26,7 +26,9 @@ function rebuildLists(sections) {
   localSections.value = sections.map((s) => ({ ...s }))
   leftList.value  = sections.filter((s) => s.column === 'left').map((s) => ({ ...s }))
   rightList.value = sections.filter((s) => s.column === 'right').map((s) => ({ ...s }))
-  fullList.value  = sections.filter((s) => s.column !== 'left' && s.column !== 'right').map((s) => ({ ...s }))
+  fullList.value  = sections
+    .filter((s) => s.column !== 'left' && s.column !== 'right')
+    .map((s) => ({ ...s }))
 }
 
 watch(activeSections, (val) => rebuildLists(val), { immediate: true, deep: true })
@@ -43,7 +45,7 @@ watch(
   },
 )
 
-// ─── Persist to state + settings ─────────────────────────────────────────────
+// ─── Sync columnLayout to settings ───────────────────────────────────────────
 
 function syncColumnLayout() {
   if (!showColumnZones.value) return
@@ -59,10 +61,7 @@ function onDragEnd() {
   updateSectionOrder(localSections.value)
 }
 
-// ─── Cross-list drag ──────────────────────────────────────────────────────────
-// @add fires when an item arrives into this list FROM another list.
-// We update its column field then sync the layout.
-// @end fires after any drag (reorder within same list) — used to sync order.
+// ─── Cross-list drag — @add fires when item arrives from another list ─────────
 
 function onLeftAdd(evt) {
   const item = leftList.value[evt.newIndex]
@@ -140,21 +139,26 @@ const typeEmoji = {
             v-for="(section, index) in localSections"
             :key="section.id"
             :class="[
-              'flex items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50',
-              index !== localSections.length - 1
-                ? 'border-b border-gray-100 dark:border-gray-700'
-                : '',
+              'flex items-center gap-3 px-4 py-3 transition-all hover:bg-gray-50 dark:hover:bg-gray-700/50',
+              index !== localSections.length - 1 ? 'border-b border-gray-100 dark:border-gray-700' : '',
+              section.isHidden ? 'opacity-40' : '',
             ]"
           >
-            <span
-              class="section-tab-handle cursor-grab text-gray-300 dark:text-gray-600 hover:text-indigo-400 dark:hover:text-indigo-400 flex-shrink-0"
-            >
+            <span class="section-tab-handle cursor-grab text-gray-300 dark:text-gray-600 hover:text-indigo-400 flex-shrink-0">
               <GripVertical :size="14" />
             </span>
             <span class="text-sm">{{ typeEmoji[section.type] || '📄' }}</span>
-            <span class="flex-1 text-sm font-medium text-gray-700 dark:text-gray-200 truncate">
+            <span
+              :class="[
+                'flex-1 text-sm font-medium truncate',
+                section.isHidden
+                  ? 'text-gray-400 dark:text-gray-500 line-through'
+                  : 'text-gray-700 dark:text-gray-200',
+              ]"
+            >
               {{ section.title }}
             </span>
+            <EyeOff v-if="section.isHidden" :size="12" class="text-amber-400 flex-shrink-0" />
           </div>
         </Draggable>
       </div>
@@ -162,15 +166,11 @@ const typeEmoji = {
       <!-- ── 2-col / mix: three drop zones ── -->
       <div v-else class="flex flex-col gap-3">
 
-        <!-- Left + Right side by side -->
         <div class="grid grid-cols-2 gap-3">
-
           <!-- Left column -->
           <div class="flex flex-col gap-1">
             <span class="text-xs font-medium text-gray-400 dark:text-gray-500 px-1">Left</span>
-            <div
-              class="min-h-[120px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden"
-            >
+            <div class="min-h-[120px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
               <Draggable
                 v-model="leftList"
                 group="col-sections"
@@ -181,13 +181,22 @@ const typeEmoji = {
                 <div
                   v-for="section in leftList"
                   :key="section.id"
-                  class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors cursor-grab"
+                  :class="[
+                    'flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg hover:border-indigo-300 dark:hover:border-indigo-600 transition-all cursor-grab',
+                    section.isHidden ? 'opacity-40' : '',
+                  ]"
                 >
                   <GripVertical :size="13" class="text-gray-300 dark:text-gray-600 flex-shrink-0" />
                   <span class="text-sm">{{ typeEmoji[section.type] || '📄' }}</span>
-                  <span class="flex-1 text-xs font-medium text-gray-700 dark:text-gray-200 truncate">
-                    {{ section.title }}
-                  </span>
+                  <span
+                    :class="[
+                      'flex-1 text-xs font-medium truncate',
+                      section.isHidden
+                        ? 'text-gray-400 dark:text-gray-500 line-through'
+                        : 'text-gray-700 dark:text-gray-200',
+                    ]"
+                  >{{ section.title }}</span>
+                  <EyeOff v-if="section.isHidden" :size="11" class="text-amber-400 flex-shrink-0" />
                 </div>
               </Draggable>
               <div
@@ -202,9 +211,7 @@ const typeEmoji = {
           <!-- Right column -->
           <div class="flex flex-col gap-1">
             <span class="text-xs font-medium text-gray-400 dark:text-gray-500 px-1">Right</span>
-            <div
-              class="min-h-[120px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden"
-            >
+            <div class="min-h-[120px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
               <Draggable
                 v-model="rightList"
                 group="col-sections"
@@ -215,13 +222,22 @@ const typeEmoji = {
                 <div
                   v-for="section in rightList"
                   :key="section.id"
-                  class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors cursor-grab"
+                  :class="[
+                    'flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg hover:border-indigo-300 dark:hover:border-indigo-600 transition-all cursor-grab',
+                    section.isHidden ? 'opacity-40' : '',
+                  ]"
                 >
                   <GripVertical :size="13" class="text-gray-300 dark:text-gray-600 flex-shrink-0" />
                   <span class="text-sm">{{ typeEmoji[section.type] || '📄' }}</span>
-                  <span class="flex-1 text-xs font-medium text-gray-700 dark:text-gray-200 truncate">
-                    {{ section.title }}
-                  </span>
+                  <span
+                    :class="[
+                      'flex-1 text-xs font-medium truncate',
+                      section.isHidden
+                        ? 'text-gray-400 dark:text-gray-500 line-through'
+                        : 'text-gray-700 dark:text-gray-200',
+                    ]"
+                  >{{ section.title }}</span>
+                  <EyeOff v-if="section.isHidden" :size="11" class="text-amber-400 flex-shrink-0" />
                 </div>
               </Draggable>
               <div
@@ -237,9 +253,7 @@ const typeEmoji = {
         <!-- Full width zone -->
         <div class="flex flex-col gap-1">
           <span class="text-xs font-medium text-gray-400 dark:text-gray-500 px-1">Full width</span>
-          <div
-            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden"
-          >
+          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
             <Draggable
               v-model="fullList"
               group="col-sections"
@@ -250,18 +264,27 @@ const typeEmoji = {
               <div
                 v-for="section in fullList"
                 :key="section.id"
-                class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors cursor-grab"
+                :class="[
+                  'flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg hover:border-indigo-300 dark:hover:border-indigo-600 transition-all cursor-grab',
+                  section.isHidden ? 'opacity-40' : '',
+                ]"
               >
                 <GripVertical :size="13" class="text-gray-300 dark:text-gray-600 flex-shrink-0" />
                 <span class="text-sm">{{ typeEmoji[section.type] || '📄' }}</span>
-                <span class="flex-1 text-xs font-medium text-gray-700 dark:text-gray-200 truncate">
-                  {{ section.title }}
-                </span>
+                <span
+                  :class="[
+                    'flex-1 text-xs font-medium truncate',
+                    section.isHidden
+                      ? 'text-gray-400 dark:text-gray-500 line-through'
+                      : 'text-gray-700 dark:text-gray-200',
+                  ]"
+                >{{ section.title }}</span>
+                <EyeOff v-if="section.isHidden" :size="11" class="text-amber-400 flex-shrink-0" />
               </div>
             </Draggable>
             <div
               v-if="fullList.length === 0"
-              class="mx-2 mb-2 flex items-center justify-center h-[36px] text-xs text-gray-300 dark:text-gray-600 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg pointer-events-none"
+              class="mx-2 mb-2 flex items-center justify-center h-[44px] text-xs text-gray-300 dark:text-gray-600 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg pointer-events-none"
             >
               Drop here — spans both columns
             </div>
@@ -275,9 +298,7 @@ const typeEmoji = {
 
       <!-- Page break placeholder -->
       <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-        <div
-          class="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg opacity-50"
-        >
+        <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg opacity-50">
           <GripVertical :size="14" class="text-gray-300 dark:text-gray-600" />
           <span class="text-sm text-gray-400 dark:text-gray-500">Page break</span>
         </div>

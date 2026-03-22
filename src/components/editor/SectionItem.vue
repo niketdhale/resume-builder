@@ -8,6 +8,8 @@ import {
   Pencil,
   Trash2,
   Plus,
+  Eye,
+  EyeOff,
 } from 'lucide-vue-next'
 import EntryList from './EntryList.vue'
 
@@ -18,6 +20,7 @@ const props = defineProps({
 const renameSection = inject('renameSection')
 const deleteSection = inject('deleteSection')
 const toggleSectionCollapse = inject('toggleSectionCollapse')
+const toggleSectionHidden = inject('toggleSectionHidden')
 const toggleSectionSharing = inject('toggleSectionSharing')
 const addEntry = inject('addEntry')
 
@@ -47,11 +50,15 @@ function onRenameKeydown(e) {
 // ─── Computed ─────────────────────────────────────────────────────────────────
 const visibleCount = computed(() => props.section.entries.filter((e) => e.isVisible).length)
 const totalCount = computed(() => props.section.entries.length)
+const isHidden = computed(() => !!props.section.isHidden)
 </script>
 
 <template>
   <div
-    class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-shadow hover:shadow-md"
+    :class="[
+      'bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-all hover:shadow-md',
+      isHidden ? 'opacity-50' : '',
+    ]"
   >
     <!-- Section Header -->
     <div
@@ -85,10 +92,23 @@ const totalCount = computed(() => props.section.entries.length)
       <span
         v-else
         @dblclick="startRename"
-        class="flex-1 text-sm font-semibold text-gray-800 dark:text-gray-100 truncate cursor-pointer select-none"
+        :class="[
+          'flex-1 text-sm font-semibold truncate cursor-pointer select-none transition-colors',
+          isHidden
+            ? 'text-gray-400 dark:text-gray-500 line-through'
+            : 'text-gray-800 dark:text-gray-100',
+        ]"
         title="Double click to rename"
       >
         {{ section.title }}
+      </span>
+
+      <!-- Hidden from preview badge -->
+      <span
+        v-if="isHidden"
+        class="text-xs text-amber-500 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap"
+      >
+        Hidden from preview
       </span>
 
       <!-- Shared badge -->
@@ -114,6 +134,21 @@ const totalCount = computed(() => props.section.entries.length)
         title="Rename"
       >
         <Pencil :size="13" />
+      </button>
+
+      <!-- Hide / Show toggle -->
+      <button
+        @click="toggleSectionHidden(section.id)"
+        :class="[
+          'p-1 transition-colors flex-shrink-0',
+          isHidden
+            ? 'text-amber-400 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300'
+            : 'text-gray-300 dark:text-gray-600 hover:text-amber-500 dark:hover:text-amber-400',
+        ]"
+        :title="isHidden ? 'Show in preview' : 'Hide from preview'"
+      >
+        <EyeOff v-if="isHidden" :size="13" />
+        <Eye v-else :size="13" />
       </button>
 
       <!-- Delete -->

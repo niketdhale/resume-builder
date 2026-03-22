@@ -33,80 +33,63 @@ const pageStyle = computed(() => {
   const config = pageSizeConfig[props.pageSize] || pageSizeConfig.A4
   return {
     width: '100%',
-    aspectRatio: `${config.width} / ${config.height}`,
+    minHeight: `${config.height}mm`,
     padding: `${props.s.marginY}mm ${props.s.marginX}mm`,
     fontFamily: props.s.fontFamily + ', sans-serif',
     fontSize: props.s.fontSize + 'pt',
     lineHeight: props.s.lineHeight,
     boxSizing: 'border-box',
-    overflow: 'hidden',
   }
 })
 
-// ─── Column splitting ─────────────────────────────────────────────────────────
-// Priority: use columnLayout ID arrays (preserves drag order) → fall back to
-// section.column field → fall back to even/odd split.
-// Sections are sorted by their position in the IDs array so drag order is respected.
+// Ensure every section has visibleEntries even if PreviewPanel didn't add it
+// (defensive — PreviewPanel always adds it, but ResumePage should be safe standalone)
+const safeSections = computed(() =>
+  props.sections.map((s) => ({
+    ...s,
+    visibleEntries: s.visibleEntries ?? s.entries?.filter((e) => e.isVisible) ?? [],
+  })),
+)
 
+// Column splitting — prefers columnLayout ID arrays (preserves drag order)
 const leftSections = computed(() => {
   const ids = props.columnLayout?.left || []
   if (ids.length > 0) {
-    // Sort by position in the ids array to preserve drag order
-    return ids
-      .map((id) => props.sections.find((s) => s.id === id))
-      .filter(Boolean)
+    return ids.map((id) => safeSections.value.find((s) => s.id === id)).filter(Boolean)
   }
-  // Fallback: use section.column field
-  const byField = props.sections.filter((s) => s.column === 'left')
+  const byField = safeSections.value.filter((s) => s.column === 'left')
   if (byField.length > 0) return byField
-  // Last resort: even-index
-  return props.sections.filter((_, i) => i % 2 === 0)
+  return safeSections.value.filter((_, i) => i % 2 === 0)
 })
 
 const rightSections = computed(() => {
   const ids = props.columnLayout?.right || []
   if (ids.length > 0) {
-    return ids
-      .map((id) => props.sections.find((s) => s.id === id))
-      .filter(Boolean)
+    return ids.map((id) => safeSections.value.find((s) => s.id === id)).filter(Boolean)
   }
-  const byField = props.sections.filter((s) => s.column === 'right')
+  const byField = safeSections.value.filter((s) => s.column === 'right')
   if (byField.length > 0) return byField
-  return props.sections.filter((_, i) => i % 2 !== 0)
+  return safeSections.value.filter((_, i) => i % 2 !== 0)
 })
 
 const fullWidthSections = computed(() =>
-  props.sections.filter((s) => s.column === 'full'),
+  safeSections.value.filter((s) => s.column === 'full'),
 )
 </script>
 
 <template>
   <div
-    class="resume-page bg-white shadow-md rounded-lg text-gray-800 print:shadow-none print:rounded-none print:break-after-page"
+    class="resume-page relative bg-white shadow-md rounded-lg text-gray-800 print:shadow-none print:rounded-none print:break-after-page"
     :style="pageStyle"
   >
-    <!-- ══ HEADER LEFT ══ -->
+    <!-- HEADER LEFT -->
     <template v-if="isFirstPage && headerPos === 'left'">
       <div class="flex gap-4 h-full">
-        <div
-          class="w-2/5 pr-4 flex-shrink-0"
-          :style="{ borderRight: `2px solid ${s.borderColor}` }"
-        >
-          <ResumeHeader
-            :metadata="metadata"
-            :s="s"
-            :nameStyle="nameStyle"
-            :jobTitleStyle="jobTitleStyle"
-            :iconStyle="iconStyle"
-            headerLayout="classic"
-            :show="show"
-          />
+        <div class="w-2/5 pr-4 flex-shrink-0" :style="{ borderRight: `2px solid ${s.borderColor}` }">
+          <ResumeHeader :metadata="metadata" :s="s" :nameStyle="nameStyle" :jobTitleStyle="jobTitleStyle" :iconStyle="iconStyle" headerLayout="classic" :show="show" />
         </div>
-        <div
-          class="w-3/5 flex flex-col overflow-hidden"
-          :style="{ gap: s.entrySpacing * 2 + 'px' }"
-        >
-          <div v-for="section in sections" :key="section.id">
+        <div class="w-3/5 flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+          <div v-for="section in safeSections" :key="section.id">
             <span :style="headingStyle">{{ section.title }}</span>
             <SectionContent :section="section" v-bind="sectionContentProps" />
           </div>
@@ -114,70 +97,41 @@ const fullWidthSections = computed(() =>
       </div>
     </template>
 
-    <!-- ══ HEADER RIGHT ══ -->
+    <!-- HEADER RIGHT -->
     <template v-else-if="isFirstPage && headerPos === 'right'">
       <div class="flex gap-4 h-full">
-        <div
-          class="w-3/5 flex flex-col overflow-hidden"
-          :style="{ gap: s.entrySpacing * 2 + 'px' }"
-        >
-          <div v-for="section in sections" :key="section.id">
+        <div class="w-3/5 flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+          <div v-for="section in safeSections" :key="section.id">
             <span :style="headingStyle">{{ section.title }}</span>
             <SectionContent :section="section" v-bind="sectionContentProps" />
           </div>
         </div>
         <div class="w-2/5 pl-4 flex-shrink-0" :style="{ borderLeft: `2px solid ${s.borderColor}` }">
-          <ResumeHeader
-            :metadata="metadata"
-            :s="s"
-            :nameStyle="nameStyle"
-            :jobTitleStyle="jobTitleStyle"
-            :iconStyle="iconStyle"
-            headerLayout="classic"
-            :show="show"
-          />
+          <ResumeHeader :metadata="metadata" :s="s" :nameStyle="nameStyle" :jobTitleStyle="jobTitleStyle" :iconStyle="iconStyle" headerLayout="classic" :show="show" />
         </div>
       </div>
     </template>
 
-    <!-- ══ HEADER TOP ══ -->
+    <!-- HEADER TOP -->
     <template v-else>
-      <!-- Header — first page only -->
-      <div
-        v-if="isFirstPage"
-        class="mb-4 pb-4 flex-shrink-0"
-        :style="{ borderBottom: `2px solid ${s.borderColor}` }"
-      >
-        <ResumeHeader
-          :metadata="metadata"
-          :s="s"
-          :nameStyle="nameStyle"
-          :jobTitleStyle="jobTitleStyle"
-          :iconStyle="iconStyle"
-          :headerLayout="headerLayout"
-          :show="show"
-        />
+      <div v-if="isFirstPage" class="mb-4 pb-4 flex-shrink-0" :style="{ borderBottom: `2px solid ${s.borderColor}` }">
+        <ResumeHeader :metadata="metadata" :s="s" :nameStyle="nameStyle" :jobTitleStyle="jobTitleStyle" :iconStyle="iconStyle" :headerLayout="headerLayout" :show="show" />
       </div>
 
       <!-- Two columns -->
       <div v-if="isTwoCol" class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
-        <!-- Full-width sections above columns -->
-        <div
-          v-for="section in fullWidthSections"
-          :key="section.id"
-        >
+        <div v-for="section in fullWidthSections" :key="section.id">
           <span :style="headingStyle">{{ section.title }}</span>
           <SectionContent :section="section" v-bind="sectionContentProps" />
         </div>
-        <!-- Side-by-side columns -->
-        <div class="grid grid-cols-2 gap-4 overflow-hidden">
-          <div class="flex flex-col overflow-hidden" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
             <div v-for="section in leftSections" :key="section.id">
               <span :style="headingStyle">{{ section.title }}</span>
               <SectionContent :section="section" v-bind="sectionContentProps" />
             </div>
           </div>
-          <div class="flex flex-col overflow-hidden" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+          <div class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
             <div v-for="section in rightSections" :key="section.id">
               <span :style="headingStyle">{{ section.title }}</span>
               <SectionContent :section="section" v-bind="sectionContentProps" />
@@ -186,25 +140,20 @@ const fullWidthSections = computed(() =>
         </div>
       </div>
 
-      <!-- Mix columns (2fr left / 3fr right) -->
+      <!-- Mix columns -->
       <div v-else-if="isMixCol" class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
-        <!-- Full-width sections above columns -->
-        <div
-          v-for="section in fullWidthSections"
-          :key="section.id"
-        >
+        <div v-for="section in fullWidthSections" :key="section.id">
           <span :style="headingStyle">{{ section.title }}</span>
           <SectionContent :section="section" v-bind="sectionContentProps" />
         </div>
-        <!-- Side-by-side mix columns -->
-        <div class="grid gap-4 overflow-hidden" style="grid-template-columns: 2fr 3fr">
-          <div class="flex flex-col overflow-hidden" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+        <div class="grid gap-4" style="grid-template-columns: 2fr 3fr">
+          <div class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
             <div v-for="section in leftSections" :key="section.id">
               <span :style="headingStyle">{{ section.title }}</span>
               <SectionContent :section="section" v-bind="sectionContentProps" />
             </div>
           </div>
-          <div class="flex flex-col overflow-hidden" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+          <div class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
             <div v-for="section in rightSections" :key="section.id">
               <span :style="headingStyle">{{ section.title }}</span>
               <SectionContent :section="section" v-bind="sectionContentProps" />
@@ -214,8 +163,8 @@ const fullWidthSections = computed(() =>
       </div>
 
       <!-- One column -->
-      <div v-else class="flex flex-col overflow-hidden" :style="{ gap: s.entrySpacing * 2 + 'px' }">
-        <div v-for="section in sections" :key="section.id">
+      <div v-else class="flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+        <div v-for="section in safeSections" :key="section.id">
           <span :style="headingStyle">{{ section.title }}</span>
           <SectionContent :section="section" v-bind="sectionContentProps" />
         </div>

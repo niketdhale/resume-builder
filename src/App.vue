@@ -31,6 +31,8 @@ import {
   updateMetadata,
   updateSetting,
   updatePageSize,
+  addLanguageVariant,
+  setBaseResume,
 } from './composables/useResumeActions'
 
 import {
@@ -38,6 +40,7 @@ import {
   renameSection,
   deleteSection,
   toggleSectionCollapse,
+  toggleSectionHidden,
   toggleSectionSharing,
   updateSectionOrder,
   setSectionColumn,
@@ -87,11 +90,14 @@ provide('setActiveResume', setActiveResume)
 provide('updateMetadata', updateMetadata)
 provide('updateSetting', updateSetting)
 provide('updatePageSize', updatePageSize)
+provide('addLanguageVariant', addLanguageVariant)
+provide('setBaseResume', setBaseResume)
 
 provide('addSection', addSection)
 provide('renameSection', renameSection)
 provide('deleteSection', deleteSection)
 provide('toggleSectionCollapse', toggleSectionCollapse)
+provide('toggleSectionHidden', toggleSectionHidden)
 provide('toggleSectionSharing', toggleSectionSharing)
 provide('updateSectionOrder', updateSectionOrder)
 provide('setSectionColumn', setSectionColumn)

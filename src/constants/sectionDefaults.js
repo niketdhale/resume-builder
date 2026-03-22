@@ -77,6 +77,7 @@ export function defaultSettings() {
 // ─── Default sections ─────────────────────────────────────────────────────────
 
 export function defaultSections(resumeId) {
+  let _idx = 0
   const make = (title, type, description) => ({
     id: uid(),
     userId: userId(),
@@ -84,9 +85,11 @@ export function defaultSections(resumeId) {
     title,
     type,
     description,
+    column: _idx++ % 2 === 0 ? 'left' : 'right',
     sharedAcrossViews: false,
     viewIds: [resumeId],
     isCollapsed: true,
+    isHidden: false,
     entries: [],
     createdAt: now(),
     updatedAt: now(),

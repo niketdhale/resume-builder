@@ -6,13 +6,11 @@ import SectionContent from './SectionContent.vue'
 import { usePreviewStyles } from './usePreviewStyles'
 import { usePagination } from '../../composables/usePagination'
 
-// ─── Injected state ───────────────────────────────────────────────────────────
 const activeSections = inject('activeSections')
 const activeMetadata = inject('activeMetadata')
 const activePageSize = inject('activePageSize')
 const activeSettings = inject('activeSettings')
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
 const {
   s,
   headingStyle,
@@ -27,29 +25,24 @@ const {
   sectionContentProps,
 } = usePreviewStyles(activeSettings)
 
-// ─── columnLayout reactive ────────────────────────────────────────────────────
 const columnLayout = computed(
   () => activeSettings.value?.columnLayout || { left: [], right: [] },
 )
 
-// ─── Filtered sections (only sections with at least one visible entry) ────────
 const previewSections = computed(() =>
   activeSections.value
+    .filter((sec) => !sec.isHidden)
     .map((sec) => ({ ...sec, visibleEntries: sec.entries.filter((e) => e.isVisible) }))
     .filter((sec) => sec.visibleEntries.length > 0),
 )
 
 const hasMetadata = computed(() => {
   const m = activeMetadata.value
-  return (
-    m && (m.fullName || m.jobTitle || m.email || m.phone || m.location || m.linkedin || m.website)
-  )
+  return m && (m.fullName || m.jobTitle || m.email || m.phone || m.location || m.linkedin || m.website)
 })
 
-// ─── Measurement container ref ────────────────────────────────────────────────
 const measureContainer = ref(null)
 
-// ─── Pagination ───────────────────────────────────────────────────────────────
 const { pages, measureAndSplit } = usePagination(
   previewSections,
   activePageSize,
@@ -59,7 +52,6 @@ const { pages, measureAndSplit } = usePagination(
 
 onMounted(() => measureAndSplit())
 
-// ─── Zoom modal ───────────────────────────────────────────────────────────────
 const showZoomModal = ref(false)
 function openZoom() { showZoomModal.value = true }
 function closeZoom() { showZoomModal.value = false }
@@ -68,21 +60,15 @@ function closeZoom() { showZoomModal.value = false }
 <template>
   <div class="flex flex-col gap-4">
 
-    <!-- ══ EMPTY STATE ══ -->
     <div
       v-if="!hasMetadata && previewSections.length === 0"
       class="bg-white dark:bg-gray-800 shadow-md rounded-xl flex flex-col items-center justify-center py-24 text-gray-300 dark:text-gray-600"
     >
       <span class="text-5xl mb-4">📄</span>
-      <p class="text-sm font-medium text-gray-400 dark:text-gray-500">
-        Your resume preview will appear here
-      </p>
-      <p class="text-xs text-gray-300 dark:text-gray-600 mt-1">
-        Fill in Resume Info and add entries to get started
-      </p>
+      <p class="text-sm font-medium text-gray-400 dark:text-gray-500">Your resume preview will appear here</p>
+      <p class="text-xs text-gray-300 dark:text-gray-600 mt-1">Fill in Resume Info and add entries to get started</p>
     </div>
 
-    <!-- ══ PAGES ══ -->
     <div class="preview-pages-wrapper flex flex-col gap-4">
       <div v-for="(page, index) in pages" :key="index" class="cursor-zoom-in" @click="openZoom">
         <ResumePage
@@ -106,7 +92,6 @@ function closeZoom() { showZoomModal.value = false }
       </div>
     </div>
 
-    <!-- ══ ZOOM MODAL ══ -->
     <Teleport to="body">
       <Transition
         enter-active-class="transition duration-200 ease-out"
@@ -158,17 +143,13 @@ function closeZoom() { showZoomModal.value = false }
       </Transition>
     </Teleport>
 
-    <!-- ══ HIDDEN MEASUREMENT CONTAINER ══
-         Renders each section individually at page width so usePagination
-         can measure real heights. Do NOT render full ResumePage here —
-         that creates a circular dependency (pages depends on heights,
-         heights measured from pages).
-    ══ -->
+    <!-- Hidden measurement container: renders each section individually -->
+    <!-- Never render ResumePage here — circular dependency with pages computed -->
     <div
       ref="measureContainer"
       class="fixed top-0 left-0 opacity-0 pointer-events-none"
-      style="z-index: -1"
       :style="{
+        zIndex: -1,
         width: activePageSize === 'A3' ? '420px' : activePageSize === 'Letter' ? '384px' : '360px',
         fontSize: s.fontSize + 'pt',
         fontFamily: s.fontFamily + ', sans-serif',
@@ -176,7 +157,6 @@ function closeZoom() { showZoomModal.value = false }
       }"
       aria-hidden="true"
     >
-      <!-- Measure header -->
       <div data-measure="header">
         <ResumeHeader
           :metadata="activeMetadata"
@@ -189,16 +169,13 @@ function closeZoom() { showZoomModal.value = false }
         />
       </div>
 
-      <!-- Measure each section individually -->
       <div
         v-for="section in previewSections"
         :key="section.id"
         :data-measure="`section-${section.id}`"
         style="padding-bottom: 4px"
       >
-        <!-- Section heading -->
         <span :style="headingStyle">{{ section.title }}</span>
-        <!-- Section content at actual width -->
         <SectionContent :section="section" v-bind="sectionContentProps" />
       </div>
     </div>

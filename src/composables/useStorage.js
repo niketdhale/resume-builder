@@ -25,8 +25,24 @@ export async function hydrateFromStorage() {
   const savedSections = await storage.load(KEYS.sections)
   const savedActive = await storage.load(KEYS.active)
 
-  if (savedResumes) resumes.value = savedResumes
-  if (savedSections) sections.value = savedSections
+  if (savedResumes) {
+    savedResumes.forEach((r) => {
+      // Migration: language variant fields (phase 3.2)
+      if (r.variantOf === undefined) r.variantOf = null
+      if (!r.language) r.language = 'English'
+    })
+    resumes.value = savedResumes
+  }
+
+  if (savedSections) {
+    savedSections.forEach((s, i) => {
+      // Migration: column field (phase 3.1)
+      if (!s.column) s.column = i % 2 === 0 ? 'left' : 'right'
+      // Migration: isHidden field (phase 3.3)
+      if (s.isHidden === undefined) s.isHidden = false
+    })
+    sections.value = savedSections
+  }
 
   if (savedActive && resumes.value.find((r) => r.id === savedActive)) {
     activeResumeId.value = savedActive
