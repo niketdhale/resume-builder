@@ -5,15 +5,17 @@ import LayoutTab from './LayoutTab.vue'
 import DesignTab from './DesignTab.vue'
 import HeaderTab from './HeaderTab.vue'
 import SectionsTab from './SectionsTab.vue'
+import TemplatesTab from './TemplatesTab.vue'
 
-const activeSubTab = ref('basics')
+const activeSubTab = ref('templates')
 
 const subTabs = [
-  { value: 'basics', label: 'Basics' },
-  { value: 'layout', label: 'Layout & Spacing' },
-  { value: 'design', label: 'Design' },
-  { value: 'header', label: 'Header' },
-  { value: 'sections', label: 'Sections' },
+  { value: 'templates', label: 'Templates' },
+  { value: 'basics',   label: 'Basics'    },
+  { value: 'layout',   label: 'Layout'    },
+  { value: 'design',   label: 'Design'    },
+  { value: 'header',   label: 'Header'    },
+  { value: 'sections', label: 'Sections'  },
 ]
 </script>
 
@@ -40,7 +42,8 @@ const subTabs = [
 
     <!-- Tab content -->
     <div class="flex-1 overflow-y-auto">
-      <BasicsTab v-if="activeSubTab === 'basics'" />
+      <TemplatesTab v-if="activeSubTab === 'templates'" />
+      <BasicsTab v-else-if="activeSubTab === 'basics'" />
       <LayoutTab v-else-if="activeSubTab === 'layout'" />
       <DesignTab v-else-if="activeSubTab === 'design'" />
       <HeaderTab v-else-if="activeSubTab === 'header'" />
