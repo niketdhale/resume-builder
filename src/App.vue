@@ -35,9 +35,12 @@ import {
 
 import { setupDebugGlobal } from './utils/useDebugLogger'
 import { undo, redo, canUndo, canRedo } from './composables/useHistory'
+import { hydrateJobs, setupJobStorageWatcher } from './jobs/composables/useJobStorage'
 
 hydrateFromStorage()
 setupStorageWatchers()
+hydrateJobs()
+setupJobStorageWatcher()
 setupDebugGlobal({ resumes, sections, activeResumeId, activeSettings })
 
 provide('undo', undo)
