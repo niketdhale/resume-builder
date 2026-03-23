@@ -150,5 +150,69 @@ const orderedFields = computed({
       </div>
     </div>
 
+    <!-- Photo settings -->
+    <div>
+      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Profile Photo</h3>
+      <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm flex flex-col gap-4">
+
+        <!-- Show toggle -->
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            :checked="activeSettings.showPhoto !== false"
+            @change="updateSetting('showPhoto', $event.target.checked)"
+            class="accent-indigo-600 w-3.5 h-3.5"
+          />
+          <span class="text-xs text-gray-600 dark:text-gray-400">Show photo in preview</span>
+        </label>
+
+        <!-- Shape -->
+        <div>
+          <label class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 block">Shape</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              v-for="shape in ['circle', 'rounded', 'square']"
+              :key="shape"
+              @click="updateSetting('photoShape', shape)"
+              :class="[
+                'flex flex-col items-center gap-1.5 py-2.5 rounded-lg border-2 transition-all',
+                activeSettings.photoShape === shape
+                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
+                  : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500',
+              ]"
+            >
+              <div
+                class="w-7 h-7 bg-gray-300 dark:bg-gray-500"
+                :style="{
+                  borderRadius: shape === 'circle' ? '50%' : shape === 'rounded' ? '6px' : '2px'
+                }"
+              />
+              <span class="text-[10px] text-gray-500 dark:text-gray-400 capitalize">{{ shape }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Size -->
+        <div>
+          <label class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 block">Size</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              v-for="size in ['S', 'M', 'L']"
+              :key="size"
+              @click="updateSetting('photoSize', size)"
+              :class="[
+                'py-1.5 text-xs rounded-lg border-2 font-semibold transition-all',
+                activeSettings.photoSize === size
+                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+                  : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500',
+              ]"
+            >
+              {{ size }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>

@@ -21,7 +21,30 @@ const lastSavedTime = inject('lastSavedTime')
 const formatSavedTime = inject('formatSavedTime')
 const showMetadataModal = ref(false)
 
-// ─── Info Presets ─────────────────────────────────────────────────────────────
+// ─── Photo upload ─────────────────────────────────────────────────────────────
+const photoInput = ref(null)
+const photoDragOver = ref(false)
+
+function handlePhotoFile(file) {
+  if (!file || !file.type.startsWith('image/')) return
+  const reader = new FileReader()
+  reader.onload = (e) => updateMetadata('photo', e.target.result)
+  reader.readAsDataURL(file)
+}
+
+function onPhotoInputChange(e) {
+  handlePhotoFile(e.target.files[0])
+}
+
+function onPhotoDrop(e) {
+  photoDragOver.value = false
+  handlePhotoFile(e.dataTransfer.files[0])
+}
+
+function removePhoto() {
+  updateMetadata('photo', '')
+  if (photoInput.value) photoInput.value.value = ''
+}
 const SAMPLE_DATA = {
   fullName: 'Alex Johnson',
   jobTitle: 'Senior Software Engineer',
@@ -34,13 +57,8 @@ const SAMPLE_DATA = {
 
 function applyPreset(preset) {
   const fields = preset === 'sample' ? SAMPLE_DATA : {
-    fullName: '',
-    jobTitle: '',
-    email: '',
-    phone: '',
-    location: '',
-    linkedin: '',
-    website: '',
+    fullName: '', jobTitle: '', email: '', phone: '',
+    location: '', linkedin: '', website: '', photo: '',
   }
   Object.entries(fields).forEach(([key, val]) => updateMetadata(key, val))
 }
@@ -345,6 +363,63 @@ onMounted(() => {
               >
                 🗑 Clear
               </button>
+            </div>
+          </div>
+
+          <!-- Photo upload -->
+          <div class="mb-4">
+            <label class="text-xs text-gray-500 dark:text-gray-400 mb-2 block">Profile Photo</label>
+            <div class="flex items-center gap-3">
+              <!-- Preview / drop zone -->
+              <div
+                v-if="activeMetadata.photo"
+                class="relative flex-shrink-0"
+              >
+                <img
+                  :src="activeMetadata.photo"
+                  class="w-16 h-16 rounded-xl object-cover border border-gray-200 dark:border-gray-600"
+                />
+                <button
+                  @click="removePhoto"
+                  class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center hover:bg-red-600 transition leading-none"
+                >✕</button>
+              </div>
+
+              <div
+                v-else
+                @dragover.prevent="photoDragOver = true"
+                @dragleave="photoDragOver = false"
+                @drop.prevent="onPhotoDrop"
+                @click="photoInput.click()"
+                :class="[
+                  'flex-shrink-0 w-16 h-16 rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-colors',
+                  photoDragOver
+                    ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-950/40'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-700 hover:bg-gray-50 dark:hover:bg-gray-800',
+                ]"
+              >
+                <span class="text-xl">📷</span>
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <button
+                  @click="photoInput.click()"
+                  class="text-xs px-3 py-1.5 rounded-lg border transition border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:border-indigo-300 dark:hover:border-indigo-700 hover:text-indigo-600 dark:hover:text-indigo-400"
+                >
+                  {{ activeMetadata.photo ? 'Change photo' : 'Upload photo' }}
+                </button>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                  JPG, PNG or WebP · drag & drop or click
+                </p>
+              </div>
+
+              <input
+                ref="photoInput"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                class="hidden"
+                @change="onPhotoInputChange"
+              />
             </div>
           </div>
 
