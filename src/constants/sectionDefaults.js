@@ -20,6 +20,7 @@ export function defaultMetadata() {
     location: '',
     linkedin: '',
     website: '',
+    photo: '',
   }
 }
 
@@ -42,6 +43,10 @@ export function defaultSettings() {
     showWebsite: true,
     showHeaderIcons: true,
     headerFieldOrder: ['email', 'phone', 'location', 'linkedin', 'website'],
+    // Photo
+    showPhoto: true,
+    photoSize: 'M',
+    photoShape: 'circle',
     fontSize: 9.5,
     lineHeight: 1.15,
     marginX: 12,
