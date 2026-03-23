@@ -2,6 +2,7 @@ import { uid } from '../utils/uid'
 import { defaultMetadata, defaultSettings, defaultSections } from '../constants/sectionDefaults'
 import { resumes, sections, activeResumeId } from './useResumeState'
 import { getAuthService } from '../services/auth/index.js'
+import { pushHistory, clearHistory } from './useHistory'
 
 function now() {
   return new Date().toISOString()
@@ -11,6 +12,7 @@ function userId() {
 }
 
 export function addResume() {
+  pushHistory(true)
   const newId = uid()
   resumes.value.push({
     id: newId,
@@ -29,6 +31,7 @@ export function addResume() {
 }
 
 export function renameResume(resumeId, newTitle) {
+  pushHistory(true)
   const r = resumes.value.find((r) => r.id === resumeId)
   if (r) {
     r.title = newTitle.trim() || r.title
@@ -208,10 +211,12 @@ export function deleteResume(resumeId) {
 }
 
 export function setActiveResume(resumeId) {
+  clearHistory()
   activeResumeId.value = resumeId
 }
 
 export function updateMetadata(field, value) {
+  pushHistory()  // debounced — typing
   const r = resumes.value.find((r) => r.id === activeResumeId.value)
   if (r) {
     r.metadata[field] = value
@@ -220,6 +225,7 @@ export function updateMetadata(field, value) {
 }
 
 export function updateSetting(key, value) {
+  pushHistory(true)
   const r = resumes.value.find((r) => r.id === activeResumeId.value)
   if (r) {
     r.settings[key] = value

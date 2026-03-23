@@ -1,6 +1,7 @@
 import { uid } from '../utils/uid'
 import { resumes, sections, activeResumeId } from './useResumeState'
 import { getAuthService } from '../services/auth/index.js'
+import { pushHistory } from './useHistory'
 
 function now() {
   return new Date().toISOString()
@@ -10,6 +11,7 @@ function userId() {
 }
 
 export function addSection(type = 'custom') {
+  pushHistory(true)
   const resumeId = activeResumeId.value
   sections.value.push({
     id: uid(),
@@ -22,7 +24,6 @@ export function addSection(type = 'custom') {
     sharedAcrossViews: false,
     viewIds: [resumeId],
     isCollapsed: false,
-    isHidden: false,
     entries: [],
     createdAt: now(),
     updatedAt: now(),
@@ -30,6 +31,7 @@ export function addSection(type = 'custom') {
 }
 
 export function renameSection(sectionId, newTitle) {
+  pushHistory()  // debounced
   const s = sections.value.find((s) => s.id === sectionId)
   if (s) {
     s.title = newTitle.trim() || s.title
@@ -38,6 +40,7 @@ export function renameSection(sectionId, newTitle) {
 }
 
 export function deleteSection(sectionId) {
+  pushHistory(true)
   sections.value = sections.value.filter((s) => s.id !== sectionId)
 }
 
@@ -50,6 +53,7 @@ export function toggleSectionCollapse(sectionId) {
 }
 
 export function toggleSectionHidden(sectionId) {
+  pushHistory(true)
   const s = sections.value.find((s) => s.id === sectionId)
   if (s) {
     s.isHidden = !s.isHidden
@@ -82,6 +86,6 @@ export function setSectionColumn(sectionId, column) {
   const s = sections.value.find((s) => s.id === sectionId)
   if (s) {
     s.column = column
-    s.updatedAt = now()
+    s.updatedAt = new Date().toISOString()
   }
 }

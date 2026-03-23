@@ -1,6 +1,7 @@
 <script setup>
 import { ref, inject, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useKeyboardShortcuts } from '../composables/useKeyboardShortcuts'
 
 import NavBar from '../components/ui/NavBar.vue'
 import SectionList from '../components/editor/SectionList.vue'
@@ -69,6 +70,22 @@ const updateMetadata = inject('updateMetadata')
 const exportJSON = inject('exportJSON')
 const onFileSelected = inject('onFileSelected')
 
+// ─── Undo / Redo ──────────────────────────────────────────────────────────────
+const undo    = inject('undo')
+const redo    = inject('redo')
+const canUndo = inject('canUndo')
+const canRedo = inject('canRedo')
+
+// ─── Shortcuts modal ──────────────────────────────────────────────────────────
+const showShortcutsModal = ref(false)
+
+useKeyboardShortcuts({
+  undo,
+  redo,
+  save: () => {},
+  openShortcuts: () => { showShortcutsModal.value = true },
+})
+
 // ─── Import modal state ───────────────────────────────────────────────────────
 const showImportModal = inject('showImportModal')
 const importData = inject('importData')
@@ -101,7 +118,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col h-screen w-screen overflow-hidden bg-gray-50 dark:bg-gray-950">
+  <div
+    class="flex flex-col h-screen w-screen overflow-hidden bg-gray-50 dark:bg-gray-950"
+    @keydown.esc="showShortcutsModal = false; showMetadataModal = false"
+  >
     <!-- Top NavBar -->
     <NavBar />
 
@@ -134,6 +154,42 @@ onMounted(() => {
           ✓ Saved at {{ formatSavedTime(lastSavedTime) }}
         </span>
       </Transition>
+
+      <div class="flex-1" />
+
+      <!-- Undo / Redo — pill joined button -->
+      <div class="flex items-center rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+        <button
+          @click="undo"
+          :disabled="!canUndo"
+          :class="[
+            'flex items-center justify-center w-8 h-8 transition text-base',
+            canUndo
+              ? 'text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'
+              : 'text-gray-300 dark:text-gray-600 cursor-not-allowed',
+          ]"
+          title="Undo (Ctrl+Z)"
+        >↩</button>
+        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 flex-shrink-0" />
+        <button
+          @click="redo"
+          :disabled="!canRedo"
+          :class="[
+            'flex items-center justify-center w-8 h-8 transition text-base',
+            canRedo
+              ? 'text-gray-500 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'
+              : 'text-gray-300 dark:text-gray-600 cursor-not-allowed',
+          ]"
+          title="Redo (Ctrl+Shift+Z)"
+        >↪</button>
+      </div>
+
+      <!-- Shortcuts hint -->
+      <button
+        @click="showShortcutsModal = true"
+        class="flex items-center justify-center w-7 h-7 rounded-lg text-xs font-bold transition text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-gray-800"
+        title="Keyboard shortcuts (?)"
+      >?</button>
     </div>
 
     <!-- Split Panel -->
@@ -495,6 +551,49 @@ onMounted(() => {
             >
               Done
             </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- ── Keyboard Shortcuts Modal ── -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 scale-95"
+      enter-to-class="opacity-100 scale-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div
+        v-if="showShortcutsModal"
+        class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center"
+        @click.self="showShortcutsModal = false"
+      >
+        <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-semibold text-gray-800 dark:text-gray-100">Keyboard Shortcuts</h2>
+            <button @click="showShortcutsModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg leading-none">✕</button>
+          </div>
+          <div class="flex flex-col gap-1">
+            <div v-for="s in [
+              { keys: ['Ctrl', 'Z'],        label: 'Undo'                },
+              { keys: ['Ctrl', 'Shift', 'Z'], label: 'Redo'             },
+              { keys: ['Ctrl', 'Y'],        label: 'Redo (alternate)'    },
+              { keys: ['Ctrl', 'S'],        label: 'Save (auto-saved)'   },
+              { keys: ['?'],               label: 'Show this help'        },
+              { keys: ['Esc'],             label: 'Close modal'           },
+            ]" :key="s.label"
+              class="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800 last:border-0"
+            >
+              <span class="text-xs text-gray-600 dark:text-gray-400">{{ s.label }}</span>
+              <div class="flex items-center gap-1">
+                <kbd
+                  v-for="k in s.keys" :key="k"
+                  class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700"
+                >{{ k }}</kbd>
+              </div>
+            </div>
           </div>
         </div>
       </div>

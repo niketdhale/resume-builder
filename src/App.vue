@@ -34,10 +34,16 @@ import {
 } from './composables/useImportExport'
 
 import { setupDebugGlobal } from './utils/useDebugLogger'
+import { undo, redo, canUndo, canRedo } from './composables/useHistory'
 
 hydrateFromStorage()
 setupStorageWatchers()
 setupDebugGlobal({ resumes, sections, activeResumeId, activeSettings })
+
+provide('undo', undo)
+provide('redo', redo)
+provide('canUndo', canUndo)
+provide('canRedo', canRedo)
 
 provide('resumes', resumes)
 provide('sections', sections)
