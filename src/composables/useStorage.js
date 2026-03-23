@@ -1,6 +1,7 @@
 import { ref, watch } from 'vue'
 import { getStorageAdapter } from '../services/storage/index.js'
 import { resumes, sections, activeResumeId } from './useResumeState'
+import { isRestoring } from './useHistory'
 
 const storage = getStorageAdapter()
 
@@ -25,21 +26,11 @@ export async function hydrateFromStorage() {
   const savedSections = await storage.load(KEYS.sections)
   const savedActive = await storage.load(KEYS.active)
 
-  if (savedResumes) {
-    savedResumes.forEach((r) => {
-      // Migration: language variant fields (phase 3.2)
-      if (r.variantOf === undefined) r.variantOf = null
-      if (!r.language) r.language = 'English'
-    })
-    resumes.value = savedResumes
-  }
-
+  if (savedResumes) resumes.value = savedResumes
   if (savedSections) {
+    // Migration: assign column to any section that doesn't have one yet
     savedSections.forEach((s, i) => {
-      // Migration: column field (phase 3.1)
       if (!s.column) s.column = i % 2 === 0 ? 'left' : 'right'
-      // Migration: isHidden field (phase 3.3)
-      if (s.isHidden === undefined) s.isHidden = false
     })
     sections.value = savedSections
   }
@@ -78,7 +69,7 @@ export function formatSavedTime(date) {
 // ─── Watchers ─────────────────────────────────────────────────────────────────
 
 export function setupStorageWatchers() {
-  watch(resumes, () => triggerSave(), { deep: true })
-  watch(sections, () => triggerSave(), { deep: true })
+  watch(resumes, () => { if (!isRestoring.value) triggerSave() }, { deep: true })
+  watch(sections, () => { if (!isRestoring.value) triggerSave() }, { deep: true })
   watch(activeResumeId, () => saveToStorage())
 }

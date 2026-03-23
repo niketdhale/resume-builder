@@ -1,12 +1,14 @@
 import { uid } from '../utils/uid'
 import { defaultEntry } from '../constants/sectionDefaults'
 import { sections } from './useResumeState'
+import { pushHistory } from './useHistory'
 
 function now() {
   return new Date().toISOString()
 }
 
 export function addEntry(sectionId) {
+  pushHistory(true)
   const s = sections.value.find((s) => s.id === sectionId)
   if (!s) return
   s.entries.push(defaultEntry(sectionId))
@@ -14,6 +16,7 @@ export function addEntry(sectionId) {
 }
 
 export function updateEntry(sectionId, entryId, updates) {
+  pushHistory()  // debounced — typing
   const s = sections.value.find((s) => s.id === sectionId)
   if (!s) return
   const e = s.entries.find((e) => e.id === entryId)
@@ -25,6 +28,7 @@ export function updateEntry(sectionId, entryId, updates) {
 }
 
 export function deleteEntry(sectionId, entryId) {
+  pushHistory(true)
   const s = sections.value.find((s) => s.id === sectionId)
   if (s) {
     s.entries = s.entries.filter((e) => e.id !== entryId)
@@ -33,6 +37,7 @@ export function deleteEntry(sectionId, entryId) {
 }
 
 export function duplicateEntry(sectionId, entryId) {
+  pushHistory(true)
   const s = sections.value.find((s) => s.id === sectionId)
   if (!s) return
   const idx = s.entries.findIndex((e) => e.id === entryId)
