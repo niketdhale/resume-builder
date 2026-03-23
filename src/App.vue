@@ -88,5 +88,27 @@ provide('cancelImport', cancelImport)
 </script>
 
 <template>
-  <RouterView />
+  <RouterView v-slot="{ Component, route }">
+    <Transition
+      :name="route.meta.transition || 'fade'"
+      mode="out-in"
+    >
+      <component :is="Component" :key="route.path" />
+    </Transition>
+  </RouterView>
 </template>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+</style>

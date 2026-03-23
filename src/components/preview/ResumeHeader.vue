@@ -1,15 +1,39 @@
 <script setup>
+import { computed } from 'vue'
 import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-vue-next'
 
-defineProps({
+const props = defineProps({
   metadata: { type: Object, required: true },
-  s: { type: Object, required: true },
-  nameStyle: { type: Object, default: () => ({}) },
+  s:        { type: Object, required: true },
+  nameStyle:     { type: Object, default: () => ({}) },
   jobTitleStyle: { type: Object, default: () => ({}) },
-  iconStyle: { type: Object, default: () => ({}) },
-  headerLayout: { type: String, default: 'classic' },
-  show: { type: Function, required: true },
+  iconStyle:     { type: Object, default: () => ({}) },
+  headerLayout:  { type: String, default: 'classic' },
+  show:          { type: Function, required: true },
 })
+
+// ─── Contact field config ─────────────────────────────────────────────────────
+const FIELD_CONFIG = {
+  email:    { icon: Mail,     label: (m) => m.email,    href: (m) => `mailto:${m.email}`,           show: 'showEmail'    },
+  phone:    { icon: Phone,    label: (m) => m.phone,    href: (m) => `tel:${m.phone}`,               show: 'showPhone'    },
+  location: { icon: MapPin,   label: (m) => m.location, href: () => null,                            show: 'showLocation' },
+  linkedin: { icon: Linkedin, label: (m) => m.linkedin, href: (m) => `https://${m.linkedin.replace(/^https?:\/\//, '')}`, show: 'showLinkedin' },
+  website:  { icon: Globe,    label: (m) => m.website,  href: (m) => `https://${m.website.replace(/^https?:\/\//, '')}`,  show: 'showWebsite'  },
+}
+
+// Order from settings, fallback to default order
+const fieldOrder = computed(() =>
+  props.s.headerFieldOrder || ['email', 'phone', 'location', 'linkedin', 'website'],
+)
+
+const showIcons = computed(() => props.s.showHeaderIcons !== false)
+
+// Build visible contact items in drag order
+const contactItems = computed(() =>
+  fieldOrder.value
+    .map((key) => ({ key, ...FIELD_CONFIG[key] }))
+    .filter(({ key, show }) => props.metadata[key] && props.show(show)),
+)
 </script>
 
 <template>
@@ -23,31 +47,19 @@ defineProps({
         {{ metadata.jobTitle }}
       </p>
       <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-1">
-        <span
-          v-if="metadata.email && show('showEmail')"
-          class="flex items-center gap-1 text-xs text-gray-500"
-          ><Mail :size="11" :style="iconStyle" /> {{ metadata.email }}</span
+        <component
+          v-for="item in contactItems"
+          :key="item.key"
+          :is="item.href(metadata) ? 'a' : 'span'"
+          :href="item.href(metadata) || undefined"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+          :style="item.href(metadata) ? { cursor: 'pointer' } : {}"
         >
-        <span
-          v-if="metadata.phone && show('showPhone')"
-          class="flex items-center gap-1 text-xs text-gray-500"
-          ><Phone :size="11" :style="iconStyle" /> {{ metadata.phone }}</span
-        >
-        <span
-          v-if="metadata.location && show('showLocation')"
-          class="flex items-center gap-1 text-xs text-gray-500"
-          ><MapPin :size="11" :style="iconStyle" /> {{ metadata.location }}</span
-        >
-        <span
-          v-if="metadata.linkedin && show('showLinkedin')"
-          class="flex items-center gap-1 text-xs text-gray-500"
-          ><Linkedin :size="11" :style="iconStyle" /> {{ metadata.linkedin }}</span
-        >
-        <span
-          v-if="metadata.website && show('showWebsite')"
-          class="flex items-center gap-1 text-xs text-gray-500"
-          ><Globe :size="11" :style="iconStyle" /> {{ metadata.website }}</span
-        >
+          <component v-if="showIcons" :is="item.icon" :size="11" :style="iconStyle" />
+          {{ item.label(metadata) }}
+        </component>
       </div>
     </div>
   </template>
@@ -64,31 +76,18 @@ defineProps({
       </p>
     </div>
     <div class="flex flex-wrap gap-x-4 gap-y-1 mt-1">
-      <span
-        v-if="metadata.email && show('showEmail')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><Mail :size="11" :style="iconStyle" /> {{ metadata.email }}</span
+      <component
+        v-for="item in contactItems"
+        :key="item.key"
+        :is="item.href(metadata) ? 'a' : 'span'"
+        :href="item.href(metadata) || undefined"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
       >
-      <span
-        v-if="metadata.phone && show('showPhone')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><Phone :size="11" :style="iconStyle" /> {{ metadata.phone }}</span
-      >
-      <span
-        v-if="metadata.location && show('showLocation')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><MapPin :size="11" :style="iconStyle" /> {{ metadata.location }}</span
-      >
-      <span
-        v-if="metadata.linkedin && show('showLinkedin')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><Linkedin :size="11" :style="iconStyle" /> {{ metadata.linkedin }}</span
-      >
-      <span
-        v-if="metadata.website && show('showWebsite')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><Globe :size="11" :style="iconStyle" /> {{ metadata.website }}</span
-      >
+        <component v-if="showIcons" :is="item.icon" :size="11" :style="iconStyle" />
+        {{ item.label(metadata) }}
+      </component>
     </div>
   </template>
 
@@ -102,31 +101,18 @@ defineProps({
       {{ metadata.jobTitle }}
     </p>
     <div class="flex flex-wrap gap-x-4 gap-y-1">
-      <span
-        v-if="metadata.email && show('showEmail')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><Mail :size="11" :style="iconStyle" /> {{ metadata.email }}</span
+      <component
+        v-for="item in contactItems"
+        :key="item.key"
+        :is="item.href(metadata) ? 'a' : 'span'"
+        :href="item.href(metadata) || undefined"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
       >
-      <span
-        v-if="metadata.phone && show('showPhone')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><Phone :size="11" :style="iconStyle" /> {{ metadata.phone }}</span
-      >
-      <span
-        v-if="metadata.location && show('showLocation')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><MapPin :size="11" :style="iconStyle" /> {{ metadata.location }}</span
-      >
-      <span
-        v-if="metadata.linkedin && show('showLinkedin')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><Linkedin :size="11" :style="iconStyle" /> {{ metadata.linkedin }}</span
-      >
-      <span
-        v-if="metadata.website && show('showWebsite')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><Globe :size="11" :style="iconStyle" /> {{ metadata.website }}</span
-      >
+        <component v-if="showIcons" :is="item.icon" :size="11" :style="iconStyle" />
+        {{ item.label(metadata) }}
+      </component>
     </div>
   </template>
 
@@ -139,31 +125,18 @@ defineProps({
       {{ metadata.jobTitle }}
     </p>
     <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
-      <span
-        v-if="metadata.email && show('showEmail')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><Mail :size="11" :style="iconStyle" /> {{ metadata.email }}</span
+      <component
+        v-for="item in contactItems"
+        :key="item.key"
+        :is="item.href(metadata) ? 'a' : 'span'"
+        :href="item.href(metadata) || undefined"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
       >
-      <span
-        v-if="metadata.phone && show('showPhone')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><Phone :size="11" :style="iconStyle" /> {{ metadata.phone }}</span
-      >
-      <span
-        v-if="metadata.location && show('showLocation')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><MapPin :size="11" :style="iconStyle" /> {{ metadata.location }}</span
-      >
-      <span
-        v-if="metadata.linkedin && show('showLinkedin')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><Linkedin :size="11" :style="iconStyle" /> {{ metadata.linkedin }}</span
-      >
-      <span
-        v-if="metadata.website && show('showWebsite')"
-        class="flex items-center gap-1 text-xs text-gray-500"
-        ><Globe :size="11" :style="iconStyle" /> {{ metadata.website }}</span
-      >
+        <component v-if="showIcons" :is="item.icon" :size="11" :style="iconStyle" />
+        {{ item.label(metadata) }}
+      </component>
     </div>
   </template>
 </template>

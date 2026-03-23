@@ -1,27 +1,44 @@
 <script setup>
+import { computed } from 'vue'
 import { inject } from 'vue'
+import { VueDraggableNext as Draggable } from 'vue-draggable-next'
 
 const activeSettings = inject('activeSettings')
-const updateSetting = inject('updateSetting')
+const updateSetting  = inject('updateSetting')
 
 const headerLayouts = [
-  { value: 'classic', label: 'Classic' },
+  { value: 'classic',  label: 'Classic'  },
   { value: 'centered', label: 'Centered' },
-  { value: 'compact', label: 'Compact' },
-  { value: 'bold', label: 'Bold' },
+  { value: 'compact',  label: 'Compact'  },
+  { value: 'bold',     label: 'Bold'     },
 ]
 
-const contactFields = [
-  { key: 'showEmail', label: '📧 Email' },
-  { key: 'showPhone', label: '📞 Phone' },
-  { key: 'showLocation', label: '📍 Location' },
-  { key: 'showLinkedin', label: '💼 LinkedIn' },
-  { key: 'showWebsite', label: '🌐 Website' },
-]
+const FIELD_META = {
+  email:    { label: 'Email',    icon: '✉' },
+  phone:    { label: 'Phone',    icon: '📞' },
+  location: { label: 'Location', icon: '📍' },
+  linkedin: { label: 'LinkedIn', icon: '💼' },
+  website:  { label: 'Website',  icon: '🌐' },
+}
+
+const SHOW_KEY = {
+  email:    'showEmail',
+  phone:    'showPhone',
+  location: 'showLocation',
+  linkedin: 'showLinkedin',
+  website:  'showWebsite',
+}
+
+// Ordered list of field keys — synced to settings
+const orderedFields = computed({
+  get: () => activeSettings.value.headerFieldOrder || ['email', 'phone', 'location', 'linkedin', 'website'],
+  set: (val) => updateSetting('headerFieldOrder', val),
+})
 </script>
 
 <template>
   <div class="p-5 flex flex-col gap-6">
+
     <!-- Header Layout -->
     <div>
       <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Header Layout</h3>
@@ -39,7 +56,6 @@ const contactFields = [
             ]"
           >
             <div class="w-full px-2 flex flex-col gap-1">
-              <!-- Classic -->
               <template v-if="layout.value === 'classic'">
                 <div class="flex items-center justify-between">
                   <div class="h-2 bg-gray-700 dark:bg-gray-300 rounded w-2/5" />
@@ -51,8 +67,6 @@ const contactFields = [
                 <div class="h-1 bg-gray-300 dark:bg-gray-600 rounded w-1/3" />
                 <div class="h-px bg-gray-200 dark:bg-gray-600 w-full mt-1" />
               </template>
-
-              <!-- Centered -->
               <template v-else-if="layout.value === 'centered'">
                 <div class="flex flex-col items-center gap-1">
                   <div class="h-2 bg-gray-700 dark:bg-gray-300 rounded w-2/5" />
@@ -64,8 +78,6 @@ const contactFields = [
                   </div>
                 </div>
               </template>
-
-              <!-- Compact -->
               <template v-else-if="layout.value === 'compact'">
                 <div class="flex items-center gap-2">
                   <div class="h-2 bg-gray-700 dark:bg-gray-300 rounded w-1/3" />
@@ -75,8 +87,6 @@ const contactFields = [
                 </div>
                 <div class="h-1 bg-gray-300 dark:bg-gray-600 rounded w-1/4 mt-0.5" />
               </template>
-
-              <!-- Bold -->
               <template v-else-if="layout.value === 'bold'">
                 <div class="h-3 bg-gray-800 dark:bg-gray-200 rounded w-3/5" />
                 <div class="h-1.5 bg-indigo-400 rounded w-1/4 mt-0.5" />
@@ -87,13 +97,7 @@ const contactFields = [
                 </div>
               </template>
             </div>
-
-            <span
-              :class="[
-                'text-xs font-medium',
-                activeSettings.headerLayout === layout.value ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400',
-              ]"
-            >
+            <span :class="['text-xs font-medium', activeSettings.headerLayout === layout.value ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400']">
               {{ layout.label }}
             </span>
           </button>
@@ -101,24 +105,50 @@ const contactFields = [
       </div>
     </div>
 
-    <!-- Show in Header -->
+    <!-- Contact Fields — visibility + order -->
     <div>
-      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Show in Header</h3>
-      <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm flex flex-col gap-3">
-        <label
-          v-for="field in contactFields"
-          :key="field.key"
-          class="flex items-center gap-2 cursor-pointer"
-        >
+      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Contact Fields</h3>
+      <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm flex flex-col gap-1">
+        <p class="text-xs text-gray-400 dark:text-gray-500 mb-2">Drag to reorder · Toggle to show/hide</p>
+        <Draggable v-model="orderedFields" handle=".field-drag" item-key="key" animation="150">
+          <div
+            v-for="key in orderedFields"
+            :key="key"
+            class="flex items-center gap-2 py-2 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group"
+          >
+            <!-- Drag handle -->
+            <span class="field-drag cursor-grab text-gray-300 dark:text-gray-600 hover:text-gray-400 dark:hover:text-gray-400 select-none text-xs leading-none">⠿</span>
+            <!-- Icon -->
+            <span class="text-sm w-5 text-center leading-none">{{ FIELD_META[key].icon }}</span>
+            <!-- Label -->
+            <span class="flex-1 text-xs text-gray-600 dark:text-gray-400">{{ FIELD_META[key].label }}</span>
+            <!-- Toggle -->
+            <input
+              type="checkbox"
+              :checked="activeSettings[SHOW_KEY[key]] !== false"
+              @change="updateSetting(SHOW_KEY[key], $event.target.checked)"
+              class="accent-indigo-600 w-3.5 h-3.5"
+            />
+          </div>
+        </Draggable>
+      </div>
+    </div>
+
+    <!-- Icon toggle -->
+    <div>
+      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Icons</h3>
+      <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm">
+        <label class="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
-            :checked="activeSettings[field.key] !== false"
-            @change="updateSetting(field.key, $event.target.checked)"
+            :checked="activeSettings.showHeaderIcons !== false"
+            @change="updateSetting('showHeaderIcons', $event.target.checked)"
             class="accent-indigo-600 w-3.5 h-3.5"
           />
-          <span class="text-xs text-gray-600 dark:text-gray-400">{{ field.label }}</span>
+          <span class="text-xs text-gray-600 dark:text-gray-400">Show icons next to contact fields</span>
         </label>
       </div>
     </div>
+
   </div>
 </template>

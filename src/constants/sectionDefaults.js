@@ -40,6 +40,8 @@ export function defaultSettings() {
     showLocation: true,
     showLinkedin: true,
     showWebsite: true,
+    showHeaderIcons: true,
+    headerFieldOrder: ['email', 'phone', 'location', 'linkedin', 'website'],
     fontSize: 9.5,
     lineHeight: 1.15,
     marginX: 12,
