@@ -1,19 +1,15 @@
 /**
- * Auth service selector
- *
- * Returns the appropriate auth implementation.
- * Currently always returns guestAuth.
- *
- * Future:
- *   import { supabaseAuth } from './supabaseAuth.js'
- *   if (import.meta.env.VITE_SUPABASE_URL) return supabaseAuth
+ * Auth service selector.
+ * Uses supabaseAuth when VITE_SUPABASE_URL is set, otherwise falls back to guestAuth.
  */
 
 import { guestAuth } from './guestAuth.js'
+import { supabaseAuth } from './supabaseAuth.js'
+
+const hasSupabase = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export function getAuthService() {
-  // TODO: return supabaseAuth when ready
-  return guestAuth
+  return hasSupabase ? supabaseAuth : guestAuth
 }
 
-export { guestAuth }
+export { guestAuth, supabaseAuth }
