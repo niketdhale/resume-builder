@@ -18,7 +18,6 @@ const email    = ref('')
 const password = ref('')
 const loading  = ref(false)
 const error    = ref(null)
-const success  = ref(null)   // confirmation message
 const magicSent = ref(false) // magic link sent state
 
 const TABS = [
@@ -37,7 +36,6 @@ const formValid     = computed(() => {
 function switchMode(m) {
   mode.value     = m
   error.value    = null
-  success.value  = null
   magicSent.value = false
 }
 
@@ -46,7 +44,6 @@ async function submit() {
   if (!formValid.value || loading.value) return
   loading.value = true
   error.value   = null
-  success.value = null
 
   if (mode.value === 'magic') {
     const { error: err } = await supabaseAuth.sendMagicLink(email.value.trim())
@@ -68,9 +65,7 @@ async function submit() {
     const { error: err } = await supabaseAuth.signUp(email.value.trim(), password.value)
     loading.value = false
     if (err) { error.value = friendlyError(err.message); return }
-    success.value  = 'Account created! Check your inbox to confirm, then sign in.'
-    mode.value     = 'signin'
-    password.value = ''
+    router.replace('/')
   }
 }
 
@@ -168,15 +163,6 @@ const submitLabel = computed(() => {
 
       <!-- Form -->
       <template v-else>
-        <!-- Success banner -->
-        <div
-          v-if="success"
-          class="text-sm px-4 py-3 rounded-xl"
-          :class="isDark ? 'bg-green-900/30 text-green-400' : 'bg-green-50 text-green-700'"
-        >
-          {{ success }}
-        </div>
-
         <div class="flex flex-col gap-4">
           <!-- Email -->
           <div class="flex flex-col gap-1.5">
