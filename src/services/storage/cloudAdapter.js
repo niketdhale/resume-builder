@@ -47,16 +47,24 @@ async function flushQueue(userId) {
 }
 
 // ── Key constants ─────────────────────────────────────────────────────────────
+// Accept both short keys ('resumes') and full keys ('resume_builder_resumes')
+// to stay compatible with localAdapter callers.
+const PREFIX = 'resume_builder_'
+function normalise(key) {
+  return key.startsWith(PREFIX) ? key : PREFIX + key
+}
+
 const RESUME_KEY         = 'resume_builder_resumes'
 const SECTIONS_KEY       = 'resume_builder_sections'
 const JOBS_KEY           = 'resume_builder_jobs'
 const CUSTOM_COLUMNS_KEY = 'resume_builder_jobs_custom_columns'
 
 function keyToTable(key) {
-  if (key === RESUME_KEY)         return 'resumes'
-  if (key === SECTIONS_KEY)       return 'sections'
-  if (key === JOBS_KEY)           return 'jobs'
-  if (key === CUSTOM_COLUMNS_KEY) return 'custom_columns'
+  const k = normalise(key)
+  if (k === RESUME_KEY)         return 'resumes'
+  if (k === SECTIONS_KEY)       return 'sections'
+  if (k === JOBS_KEY)           return 'jobs'
+  if (k === CUSTOM_COLUMNS_KEY) return 'custom_columns'
   return null
 }
 
@@ -169,9 +177,10 @@ async function upsertEntries(sections, userId) {
 
 // ── Internal save ─────────────────────────────────────────────────────────────
 
-async function _save(key, data, userId) {
+async function _save(rawKey, data, userId) {
   const arr = data ?? []
 
+  const key = normalise(rawKey)
   if (key === RESUME_KEY) {
     const rows = arr.map(r => resumeToRow(r, userId))
     if (rows.length) await upsertRows('resumes', rows)
@@ -221,12 +230,13 @@ export const cloudAdapter = {
     }
   },
 
-  async load(key) {
+  async load(rawKey) {
     const userId = this._userId
     if (!userId || !hasSupabaseConfig) return null
 
     try {
-      if (key === RESUME_KEY) {
+      const key = normalise(rawKey)
+  if (key === RESUME_KEY) {
         const { data, error } = await supabase.from('resumes').select('*').eq('user_id', userId)
         if (error) throw error
         return (data ?? []).map(rowToResume)

@@ -3,8 +3,6 @@ import { getStorageAdapter } from '../services/storage/index.js'
 import { resumes, sections, activeResumeId } from './useResumeState'
 import { isRestoring } from './useHistory'
 
-const storage = getStorageAdapter()
-
 const KEYS = {
   resumes: 'resumes',
   sections: 'sections',
@@ -14,17 +12,17 @@ const KEYS = {
 // ─── Save ─────────────────────────────────────────────────────────────────────
 
 export async function saveToStorage() {
-  await storage.save(KEYS.resumes, resumes.value)
-  await storage.save(KEYS.sections, sections.value)
-  await storage.save(KEYS.active, activeResumeId.value)
+  await getStorageAdapter().save(KEYS.resumes, resumes.value)
+  await getStorageAdapter().save(KEYS.sections, sections.value)
+  await getStorageAdapter().save(KEYS.active, activeResumeId.value)
 }
 
 // ─── Load ─────────────────────────────────────────────────────────────────────
 
 export async function hydrateFromStorage() {
-  const savedResumes = await storage.load(KEYS.resumes)
-  const savedSections = await storage.load(KEYS.sections)
-  const savedActive = await storage.load(KEYS.active)
+  const savedResumes = await getStorageAdapter().load(KEYS.resumes)
+  const savedSections = await getStorageAdapter().load(KEYS.sections)
+  const savedActive = await getStorageAdapter().load(KEYS.active)
 
   if (savedResumes) resumes.value = savedResumes
   if (savedSections) {
