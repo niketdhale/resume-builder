@@ -1,75 +1,90 @@
 /**
  * supabaseAuth.js
- * Auth service backed by Supabase — magic link only.
- * Mirrors the guestAuth interface so nothing else needs to change.
+ * Auth service backed by Supabase — email + password.
+ * All methods are no-ops when Supabase is not configured.
  */
 
-import { supabase } from '../../lib/supabase.js'
+import { supabase, hasSupabaseConfig } from '../../lib/supabase.js'
 
 export const supabaseAuth = {
-  // ── Session ────────────────────────────────────────────────
-
   async getSession() {
+    if (!hasSupabaseConfig) return null
     const { data } = await supabase.auth.getSession()
     return data.session ?? null
   },
 
   async getUser() {
+    if (!hasSupabaseConfig) return null
     const { data } = await supabase.auth.getUser()
     return data.user ?? null
   },
 
-  isLoggedIn() {
-    // Synchronous check — relies on the cached session in localStorage
-    // For reactive state, use useAuth() composable instead
-    const raw = localStorage.getItem('sb-' + import.meta.env.VITE_SUPABASE_URL?.split('//')[1]?.split('.')[0] + '-auth-token')
-    return !!raw
+  /**
+   * Sign up with email + password.
+   * @returns {{ user, error }}
+   */
+  async signUp(email, password) {
+    if (!hasSupabaseConfig) return { user: null, error: new Error('Supabase not configured') }
+    const { data, error } = await supabase.auth.signUp({ email, password })
+    return { user: data?.user ?? null, error }
   },
-
-  getUserId() {
-    // Best-effort sync read; use useAuth().userId for reactive access
-    try {
-      const raw = Object.keys(localStorage).find(k => k.includes('-auth-token'))
-      if (!raw) return null
-      const parsed = JSON.parse(localStorage.getItem(raw))
-      return parsed?.user?.id ?? null
-    } catch {
-      return null
-    }
-  },
-
-  // ── Magic Link ─────────────────────────────────────────────
 
   /**
-   * Send magic link email.
-   * @param {string} email
-   * @param {string} [redirectTo]  defaults to current origin + /auth/callback
-   * @returns {{ error: Error|null }}
+   * Sign in with email + password.
+   * @returns {{ user, error }}
    */
-  async sendMagicLink(email, redirectTo) {
-    const redirect = redirectTo ?? `${window.location.origin}/auth/callback`
+  async signIn(email, password) {
+    if (!hasSupabaseConfig) return { user: null, error: new Error('Supabase not configured') }
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    return { user: data?.user ?? null, error }
+  },
+
+  /**
+   * Send a magic link (passwordless) to the given email.
+   * @returns {{ error }}
+   */
+  async sendMagicLink(email) {
+    if (!hasSupabaseConfig) return { error: new Error('Supabase not configured') }
+    const redirectTo = `${window.location.origin}/auth/callback`
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: redirect },
+      options: { emailRedirectTo: redirectTo },
     })
     return { error }
   },
 
-  // ── Sign out ───────────────────────────────────────────────
+  /**
+   * Synchronous best-effort user ID.
+   * Returns 'local' until the async session resolves.
+   * Use useAuth().userId for the reactive version.
+   */
+  getUserId() {
+    try {
+      const key = Object.keys(localStorage).find(k => k.includes('-auth-token'))
+      if (!key) return 'local'
+      const parsed = JSON.parse(localStorage.getItem(key))
+      return parsed?.user?.id ?? 'local'
+    } catch {
+      return 'local'
+    }
+  },
+
+  /**
+   * Synchronous best-effort login check.
+   * Use useAuth().isLoggedIn for the reactive version.
+   */
+  isLoggedIn() {
+    return this.getUserId() !== 'local'
+  },
 
   async signOut() {
+    if (!hasSupabaseConfig) return { error: null }
     const { error } = await supabase.auth.signOut()
     return { error }
   },
 
-  // ── Auth state change listener ─────────────────────────────
-
-  /**
-   * Subscribe to auth state changes.
-   * Returns an unsubscribe function.
-   * @param {(event: string, session: object|null) => void} callback
-   */
   onAuthStateChange(callback) {
+    if (!hasSupabaseConfig) return () => {}
     const { data } = supabase.auth.onAuthStateChange(callback)
     return () => data.subscription.unsubscribe()
   },
