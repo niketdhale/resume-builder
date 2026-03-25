@@ -1,5 +1,5 @@
 <script setup>
-import { provide } from 'vue'
+import { provide, watch } from 'vue'
 
 import {
   resumes, sections, activeResumeId, activeSections,
@@ -36,6 +36,12 @@ import {
 import { setupDebugGlobal } from './utils/useDebugLogger'
 import { undo, redo, canUndo, canRedo } from './composables/useHistory'
 import { hydrateJobs, setupJobStorageWatcher } from './jobs/composables/useJobStorage'
+import { useAuth } from './composables/useAuth.js'
+import { setStorageUserId } from './services/storage/index.js'
+
+// Keep storage adapter in sync with the logged-in user
+const { userId } = useAuth()
+watch(userId, (id) => setStorageUserId(id), { immediate: true })
 
 hydrateFromStorage()
 setupStorageWatchers()

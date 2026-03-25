@@ -29,6 +29,9 @@ jobs:
 
       - name: Build
         run: bun run build
+        env:
+          VITE_SUPABASE_URL: https://placeholder.supabase.co
+          VITE_SUPABASE_ANON_KEY: placeholder-anon-key
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -90,6 +93,9 @@ jobs:
 
       - name: Run E2E tests
         run: bun run test:e2e
+        env:
+          VITE_SUPABASE_URL: https://placeholder.supabase.co
+          VITE_SUPABASE_ANON_KEY: placeholder-anon-key
 
       - name: Upload Playwright report
         if: failure()
@@ -120,6 +126,9 @@ jobs:
 
       - name: Build
         run: bun run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       # Deploy to production on main
       - name: Deploy to Production

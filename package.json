@@ -19,6 +19,7 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.100.0",
     "@vueuse/core": "^14.2.1",
     "chart.js": "^4.5.1",
     "html2canvas-pro": "^2.0.2",

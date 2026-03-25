@@ -23,10 +23,16 @@ const routes = [
     path: '/auth',
     name: 'auth',
     component: () => import('../views/AuthView.vue'),
-    meta: { title: 'Sign In' },
+    meta: { title: 'Sign In', public: true },
   },
   {
-    // Catch all — redirect to overview
+    // Magic link lands here — Supabase exchanges the token then redirects home
+    path: '/auth/callback',
+    name: 'auth-callback',
+    component: () => import('../views/AuthCallbackView.vue'),
+    meta: { title: 'Signing in…', public: true },
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/',
   },
@@ -37,9 +43,16 @@ const router = createRouter({
   routes,
 })
 
-// Update page title on route change
-router.beforeEach((to) => {
+// Update page title
+router.beforeEach(async (to) => {
   document.title = `${to.meta.title || 'Resume Builder'} — Resume Builder`
+
+  // For the callback route, let Supabase handle the token exchange first
+  if (to.name === 'auth-callback') return true
+
+  // All other routes are publicly accessible — we don't force login
+  // (guest users keep full app access; auth is opt-in for cloud sync)
+  return true
 })
 
 export default router
