@@ -1,9 +1,10 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from '../../composables/useTheme.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { migrationState } from '../../composables/useMigration.js'
+import { cloudAdapter } from '../../services/storage/index.js'
 
 const router = useRouter()
 const route  = useRoute()
@@ -11,6 +12,25 @@ const { isDark, toggleTheme } = useTheme()
 const { isLoggedIn, userInitial, userEmail, signOut } = useAuth()
 
 const showUserMenu = ref(false)
+
+// ── Offline queue indicator ────────────────────────────────────────────────────
+const hasPendingWrites = ref(false)
+let _queueInterval = null
+
+function checkQueue() {
+  hasPendingWrites.value = cloudAdapter.hasPendingWrites()
+}
+
+onMounted(() => {
+  checkQueue()
+  _queueInterval = setInterval(checkQueue, 3000)
+  window.addEventListener('online', checkQueue)
+})
+
+onUnmounted(() => {
+  clearInterval(_queueInterval)
+  window.removeEventListener('online', checkQueue)
+})
 
 const navItems = [
   { name: 'overview', label: 'My Resumes', icon: '📄' },
@@ -65,6 +85,24 @@ function closeMenu(e) {
 
     <!-- Right -->
     <div class="flex items-center gap-3">
+      <!-- Offline / pending-writes badge -->
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0 scale-90"
+        enter-to-class="opacity-100 scale-100"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-90"
+      >
+        <div
+          v-if="isLoggedIn && hasPendingWrites"
+          title="Some changes couldn't reach the cloud — they'll sync when you're back online"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 cursor-default select-none"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse inline-block"></span>
+          Pending sync
+        </div>
+      </Transition>
       <!-- Theme toggle -->
       <button
         @click.stop="toggleTheme"

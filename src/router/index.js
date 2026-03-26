@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { getAuthService } from '../services/auth/index.js'
 
 const routes = [
   {
@@ -44,14 +45,16 @@ const router = createRouter({
 })
 
 // Update page title
-router.beforeEach(async (to) => {
+router.beforeEach((to) => {
   document.title = `${to.meta.title || 'Resume Builder'} — Resume Builder`
 
-  // For the callback route, let Supabase handle the token exchange first
+  // Let callback route proceed — Supabase token exchange happens there
   if (to.name === 'auth-callback') return true
 
-  // All other routes are publicly accessible — we don't force login
-  // (guest users keep full app access; auth is opt-in for cloud sync)
+  // Redirect already-logged-in users away from /auth
+  if (to.name === 'auth' && getAuthService().isLoggedIn()) return { name: 'overview' }
+
+  // All routes publicly accessible — guest = full access, auth = opt-in for cloud sync
   return true
 })
 
