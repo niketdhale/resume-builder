@@ -38,10 +38,17 @@ import { undo, redo, canUndo, canRedo } from './composables/useHistory'
 import { hydrateJobs, setupJobStorageWatcher } from './jobs/composables/useJobStorage'
 import { useAuth } from './composables/useAuth.js'
 import { setStorageUserId } from './services/storage/index.js'
+import { setupMigration } from './composables/useMigration.js'
 
 // Keep storage adapter in sync with the logged-in user
 const { userId } = useAuth()
 watch(userId, (id) => setStorageUserId(id), { immediate: true })
+
+// On first login: migrate localStorage → Supabase, then reload from cloud
+setupMigration(async () => {
+  await hydrateFromStorage()
+  await hydrateJobs()
+})
 
 hydrateFromStorage()
 setupStorageWatchers()

@@ -2,7 +2,6 @@ import { watch } from 'vue'
 import { getStorageAdapter } from '../../services/storage/index.js'
 import { jobs, customColumns } from './useJobState'
 
-const storage  = getStorageAdapter()
 const JOBS_KEY = 'jobs'
 const COLS_KEY = 'jobs_custom_columns'
 
@@ -35,14 +34,14 @@ function makeDummyJobs() {
 
 // ─── Save ─────────────────────────────────────────────────────────────────────
 export async function saveJobs() {
-  await storage.save(JOBS_KEY, jobs.value)
-  await storage.save(COLS_KEY, customColumns.value)
+  await getStorageAdapter().save(JOBS_KEY, jobs.value)
+  await getStorageAdapter().save(COLS_KEY, customColumns.value)
 }
 
 // ─── Hydrate ──────────────────────────────────────────────────────────────────
 export async function hydrateJobs() {
-  const savedJobs = await storage.load(JOBS_KEY)
-  const savedCols = await storage.load(COLS_KEY)
+  const savedJobs = await getStorageAdapter().load(JOBS_KEY)
+  const savedCols = await getStorageAdapter().load(COLS_KEY)
 
   if (savedJobs && savedJobs.length > 0) {
     jobs.value = savedJobs.map(j => ({
