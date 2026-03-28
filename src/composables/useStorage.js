@@ -24,8 +24,8 @@ export async function hydrateFromStorage() {
   const savedSections = await getStorageAdapter().load(KEYS.sections)
   const savedActive = await getStorageAdapter().load(KEYS.active)
 
-  if (savedResumes) resumes.value = savedResumes
-  if (savedSections) {
+  if (savedResumes?.length) resumes.value = savedResumes
+  if (savedSections?.length) {
     // Migration: assign column to any section that doesn't have one yet
     savedSections.forEach((s, i) => {
       if (!s.column) s.column = i % 2 === 0 ? 'left' : 'right'

@@ -7,6 +7,7 @@
 import { ref } from 'vue'
 import { supabaseAuth } from '../services/auth/supabaseAuth.js'
 import { localAdapter, cloudAdapter } from '../services/storage/index.js'
+import { setStorageUserId } from '../services/storage/index.js'
 
 const KEYS = {
   resumes:  'resumes',
@@ -19,14 +20,11 @@ export const migrationState = ref('idle') // 'idle' | 'migrating' | 'done' | 'er
 
 let _migrated = false
 
-// ── UUID generator (no external dep) ─────────────────────────────────────────
 function uuid() {
   return crypto.randomUUID()
 }
 
-// ── Remap all local IDs to real UUIDs ────────────────────────────────────────
 function remapIds(resumes, sections, jobs, cols, userId) {
-  // Build ID maps
   const resumeIdMap  = {}
   const sectionIdMap = {}
   const jobIdMap     = {}
@@ -74,12 +72,12 @@ function remapIds(resumes, sections, jobs, cols, userId) {
   return { mappedResumes, mappedSections, mappedJobs, mappedCols }
 }
 
-// ── Core migration ────────────────────────────────────────────────────────────
 async function runMigration(userId, onComplete) {
   if (_migrated) return
   _migrated = true
 
-  cloudAdapter.setUserId(userId)
+  // Ensure storage layer routes to cloud — don't wait for Vue watch microtask
+  setStorageUserId(userId)
 
   // 1. Skip if cloud already has data (returning user / 2nd device)
   const cloudResumes = await cloudAdapter.load(KEYS.resumes)
@@ -100,11 +98,11 @@ async function runMigration(userId, onComplete) {
     onComplete(); return
   }
 
-  // 3. Remap IDs → proper UUIDs
+  // 3. Remap non-UUID local IDs → proper UUIDs
   const { mappedResumes, mappedSections, mappedJobs, mappedCols } =
     remapIds(localResumes, localSections, localJobs, localCols, userId)
 
-  // 4. Upload
+  // 4. Upload to Supabase
   migrationState.value = 'migrating'
   try {
     const writes = []
@@ -123,6 +121,8 @@ async function runMigration(userId, onComplete) {
       localAdapter.delete(KEYS.jobs),
       localAdapter.delete(KEYS.cols),
     ])
+    // Also clear stale offline queue
+    localStorage.removeItem('rb_offline_queue')
 
     migrationState.value = 'done'
     setTimeout(() => { migrationState.value = 'idle' }, 4000)
@@ -130,13 +130,11 @@ async function runMigration(userId, onComplete) {
     console.error('[useMigration] Migration failed:', err)
     migrationState.value = 'error'
     setTimeout(() => { migrationState.value = 'idle' }, 6000)
-    // Local data NOT cleared — safe retry on next login
   }
 
   onComplete()
 }
 
-// ── Public ────────────────────────────────────────────────────────────────────
 export function setupMigration(onComplete) {
   supabaseAuth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session?.user?.id) {
