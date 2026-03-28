@@ -41,6 +41,9 @@ async function runMigration(userId, onComplete) {
   if (_migrated) return
   _migrated = true
 
+  // 0. Ensure cloudAdapter has userId before any operation
+  cloudAdapter.setUserId(userId)
+
   // 1. Check if cloud already has data for this user
   const cloudResumes = await cloudAdapter.load(KEYS.resumes)
   if (cloudResumes && cloudResumes.length > 0) {
