@@ -41,8 +41,15 @@ import { setStorageUserId } from './services/storage/index.js'
 import { setupMigration } from './composables/useMigration.js'
 
 // Keep storage adapter in sync with the logged-in user
+// Re-hydrate when auth resolves (local → real user) so returning users load cloud data
 const { userId } = useAuth()
-watch(userId, (id) => setStorageUserId(id), { immediate: true })
+watch(userId, async (id, oldId) => {
+  setStorageUserId(id)
+  if (oldId === 'local' && id !== 'local') {
+    await hydrateFromStorage()
+    await hydrateJobs()
+  }
+}, { immediate: true })
 
 // On first login: migrate localStorage → Supabase, then reload from cloud
 setupMigration(async () => {

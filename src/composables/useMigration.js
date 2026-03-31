@@ -126,13 +126,14 @@ async function runMigration(userId, onComplete) {
 
     migrationState.value = 'done'
     setTimeout(() => { migrationState.value = 'idle' }, 4000)
+    onComplete()
   } catch (err) {
     console.error('[useMigration] Migration failed:', err)
+    // Revert to local adapter so user still sees their localStorage data
+    setStorageUserId('local')
     migrationState.value = 'error'
     setTimeout(() => { migrationState.value = 'idle' }, 6000)
   }
-
-  onComplete()
 }
 
 export function setupMigration(onComplete) {
