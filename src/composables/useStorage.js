@@ -3,6 +3,9 @@ import { getStorageAdapter } from '../services/storage/index.js'
 import { resumes, sections, activeResumeId } from './useResumeState'
 import { isRestoring } from './useHistory'
 
+// Set to true during migration to prevent stale in-memory data from writing to new user's cloud
+export const suppressSaves = ref(false)
+
 const KEYS = {
   resumes: 'resumes',
   sections: 'sections',
@@ -67,7 +70,7 @@ export function formatSavedTime(date) {
 // ─── Watchers ─────────────────────────────────────────────────────────────────
 
 export function setupStorageWatchers() {
-  watch(resumes, () => { if (!isRestoring.value) triggerSave() }, { deep: true })
-  watch(sections, () => { if (!isRestoring.value) triggerSave() }, { deep: true })
-  watch(activeResumeId, () => saveToStorage())
+  watch(resumes, () => { if (!isRestoring.value && !suppressSaves.value) triggerSave() }, { deep: true })
+  watch(sections, () => { if (!isRestoring.value && !suppressSaves.value) triggerSave() }, { deep: true })
+  watch(activeResumeId, () => { if (!suppressSaves.value) saveToStorage() })
 }

@@ -8,6 +8,7 @@ import { ref } from 'vue'
 import { supabaseAuth } from '../services/auth/supabaseAuth.js'
 import { localAdapter, cloudAdapter } from '../services/storage/index.js'
 import { setStorageUserId } from '../services/storage/index.js'
+import { suppressSaves } from './useStorage.js'
 
 const KEYS = {
   resumes:  'resumes',
@@ -25,6 +26,7 @@ function uuid() {
 }
 
 function remapIds(resumes, sections, jobs, cols, userId) {
+  const now = new Date().toISOString()
   const resumeIdMap  = {}
   const sectionIdMap = {}
   const jobIdMap     = {}
@@ -40,27 +42,37 @@ function remapIds(resumes, sections, jobs, cols, userId) {
     id:        resumeIdMap[r.id],
     userId,
     variantOf: r.variantOf ? (resumeIdMap[r.variantOf] ?? null) : null,
+    createdAt: r.createdAt ?? now,
+    updatedAt: r.updatedAt ?? now,
   }))
 
-  const mappedSections = (sections ?? []).map(s => ({
-    ...s,
-    id:       sectionIdMap[s.id],
-    userId,
-    resumeId: resumeIdMap[s.resumeId] ?? s.resumeId,
-    viewIds:  (s.viewIds ?? []).map(vid => resumeIdMap[vid] ?? vid),
-    entries:  (s.entries ?? []).map(e => ({
-      ...e,
-      id:        uuid(),
+  const mappedSections = (sections ?? [])
+    .filter(s => resumeIdMap[s.resumeId])  // skip orphaned sections with no matching resume
+    .map(s => ({
+      ...s,
+      id:       sectionIdMap[s.id],
       userId,
-      sectionId: sectionIdMap[s.id],
-    })),
-  }))
+      resumeId: resumeIdMap[s.resumeId],
+      viewIds:  (s.viewIds ?? []).map(vid => resumeIdMap[vid] ?? vid),
+      createdAt: s.createdAt ?? now,
+      updatedAt: s.updatedAt ?? now,
+      entries:  (s.entries ?? []).map(e => ({
+        ...e,
+        id:        uuid(),
+        userId,
+        sectionId: sectionIdMap[s.id],
+        createdAt: e.createdAt ?? now,
+        updatedAt: e.updatedAt ?? now,
+      })),
+    }))
 
   const mappedJobs = (jobs ?? []).map(j => ({
     ...j,
     id:       jobIdMap[j.id],
     userId,
     resumeId: j.resumeId ? (resumeIdMap[j.resumeId] ?? null) : null,
+    createdAt: j.createdAt ?? now,
+    updatedAt: j.updatedAt ?? now,
   }))
 
   const mappedCols = (cols ?? []).map(c => ({
@@ -76,12 +88,16 @@ async function runMigration(userId, onComplete) {
   if (_migrated) return
   _migrated = true
 
+  // Suppress watchers so stale in-memory data isn't written to the new user's cloud
+  suppressSaves.value = true
+
   // Ensure storage layer routes to cloud — don't wait for Vue watch microtask
   setStorageUserId(userId)
 
   // 1. Skip if cloud already has data (returning user / 2nd device)
   const cloudResumes = await cloudAdapter.load(KEYS.resumes)
   if (cloudResumes && cloudResumes.length > 0) {
+    suppressSaves.value = false
     onComplete(); return
   }
 
@@ -95,6 +111,7 @@ async function runMigration(userId, onComplete) {
 
   const hasLocalData = (localResumes?.length > 0) || (localJobs?.length > 0)
   if (!hasLocalData) {
+    suppressSaves.value = false
     onComplete(); return
   }
 
@@ -102,17 +119,15 @@ async function runMigration(userId, onComplete) {
   const { mappedResumes, mappedSections, mappedJobs, mappedCols } =
     remapIds(localResumes, localSections, localJobs, localCols, userId)
 
-  // 4. Upload to Supabase
+  // 4. Upload to Supabase — resumes first (sections FK depends on them)
   migrationState.value = 'migrating'
   try {
-    const writes = []
-    if (mappedResumes.length)  writes.push(cloudAdapter.save(KEYS.resumes,  mappedResumes))
-    if (mappedSections.length) writes.push(cloudAdapter.save(KEYS.sections, mappedSections))
-    if (mappedJobs.length)     writes.push(cloudAdapter.save(KEYS.jobs,     mappedJobs))
-    if (mappedCols.length)     writes.push(cloudAdapter.save(KEYS.cols,     mappedCols))
-
-    const results = await Promise.all(writes)
-    if (!results.every(Boolean)) throw new Error('One or more cloud writes failed')
+    if (mappedResumes.length)  await cloudAdapter.save(KEYS.resumes, mappedResumes)
+    await Promise.all([
+      mappedSections.length ? cloudAdapter.save(KEYS.sections, mappedSections) : Promise.resolve(true),
+      mappedJobs.length     ? cloudAdapter.save(KEYS.jobs,     mappedJobs)     : Promise.resolve(true),
+      mappedCols.length     ? cloudAdapter.save(KEYS.cols,     mappedCols)     : Promise.resolve(true),
+    ])
 
     // 5. Clear local only after successful upload
     await Promise.all([
@@ -124,6 +139,7 @@ async function runMigration(userId, onComplete) {
     // Also clear stale offline queue
     localStorage.removeItem('rb_offline_queue')
 
+    suppressSaves.value = false
     migrationState.value = 'done'
     setTimeout(() => { migrationState.value = 'idle' }, 4000)
     onComplete()
@@ -131,6 +147,7 @@ async function runMigration(userId, onComplete) {
     console.error('[useMigration] Migration failed:', err)
     // Revert to local adapter so user still sees their localStorage data
     setStorageUserId('local')
+    suppressSaves.value = false
     migrationState.value = 'error'
     setTimeout(() => { migrationState.value = 'idle' }, 6000)
   }
