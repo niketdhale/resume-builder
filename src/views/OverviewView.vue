@@ -6,10 +6,15 @@ import NavBar from '../components/ui/NavBar.vue'
 
 const router = useRouter()
 const resumes = inject('resumes')
+const sections = inject('sections')
 const setActiveResume = inject('setActiveResume')
 const deleteResume = inject('deleteResume')
 const duplicateResume = inject('duplicateResume')
 const addResume = inject('addResume')
+
+function sectionCount(resumeId) {
+  return sections.value.filter(s => s.viewIds?.includes(resumeId)).length
+}
 
 // ─── Language flag map ────────────────────────────────────────────────────────
 const LANG_FLAG = {
@@ -182,7 +187,7 @@ function timeAgo(isoString) {
               <span
                 class="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
               >
-                {{ resume.sections?.length || 0 }} sections
+                {{ sectionCount(resume.id) }} sections
               </span>
             </div>
           </div>
