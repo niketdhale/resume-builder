@@ -157,6 +157,8 @@ export function setupMigration(onComplete) {
   supabaseAuth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session?.user?.id) {
       await runMigration(session.user.id, onComplete)
+    } else if (event === 'SIGNED_OUT') {
+      _migrated = false
     }
   })
 }
