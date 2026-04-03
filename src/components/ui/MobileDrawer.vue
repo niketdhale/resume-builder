@@ -3,7 +3,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from '../../composables/useTheme.js'
 import { useAuth } from '../../composables/useAuth.js'
 
-const props = defineProps({ open: Boolean })
+defineProps({ open: Boolean })
 const emit = defineEmits(['close'])
 
 const router = useRouter()
