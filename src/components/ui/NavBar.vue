@@ -5,6 +5,8 @@ import { useTheme } from '../../composables/useTheme.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { migrationState } from '../../composables/useMigration.js'
 import { cloudAdapter } from '../../services/storage/index.js'
+import { useBreakpoint } from '../../composables/useBreakpoint.js'
+import MobileDrawer from './MobileDrawer.vue'
 
 const router = useRouter()
 const route  = useRoute()
@@ -12,6 +14,8 @@ const { isDark, toggleTheme } = useTheme()
 const { isLoggedIn, userInitial, userEmail, signOut } = useAuth()
 
 const showUserMenu = ref(false)
+const showDrawer   = ref(false)
+const { isMobile } = useBreakpoint()
 
 // ── Offline queue indicator ────────────────────────────────────────────────────
 const hasPendingWrites = ref(false)
@@ -50,12 +54,25 @@ function closeMenu(e) {
 </script>
 
 <template>
+  <MobileDrawer :open="showDrawer" @close="showDrawer = false" />
+
   <div
-    class="flex items-center justify-between px-6 py-3 border-b flex-shrink-0 bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-800"
+    class="flex items-center justify-between px-4 md:px-6 py-3 border-b flex-shrink-0 bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-800"
     @click="closeMenu"
   >
-    <!-- Left: Logo + Nav -->
-    <div class="flex items-center gap-6">
+    <!-- Left: Hamburger (mobile) + Logo + Nav (desktop) -->
+    <div class="flex items-center gap-3 md:gap-6">
+      <!-- Hamburger — mobile only -->
+      <button
+        class="md:hidden flex flex-col gap-1.5 p-1 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition"
+        @click.stop="showDrawer = true"
+        aria-label="Open menu"
+      >
+        <span class="block w-5 h-0.5 bg-current rounded"></span>
+        <span class="block w-5 h-0.5 bg-current rounded"></span>
+        <span class="block w-5 h-0.5 bg-current rounded"></span>
+      </button>
+
       <div
         class="flex items-center gap-2 cursor-pointer"
         @click.stop="router.push({ name: 'overview' })"
@@ -66,7 +83,8 @@ function closeMenu(e) {
         <span class="font-semibold text-sm text-gray-800 dark:text-gray-100">Resume Builder</span>
       </div>
 
-      <div class="flex items-center gap-1">
+      <!-- Nav items — tablet and desktop only -->
+      <div class="hidden md:flex items-center gap-1">
         <button
           v-for="item in navItems"
           :key="item.name"
@@ -103,11 +121,11 @@ function closeMenu(e) {
           Pending sync
         </div>
       </Transition>
-      <!-- Theme toggle -->
+      <!-- Theme toggle — hidden on mobile (available in drawer) -->
       <button
         @click.stop="toggleTheme"
         :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
-        class="relative w-12 h-6 rounded-full transition-all duration-300 flex items-center flex-shrink-0"
+        class="relative w-12 h-6 rounded-full transition-all duration-300 items-center flex-shrink-0 hidden md:flex"
         :class="isDark ? 'bg-indigo-600' : 'bg-gray-200'"
       >
         <span
