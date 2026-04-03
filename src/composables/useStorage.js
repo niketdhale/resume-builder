@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue'
 import { getStorageAdapter } from '../services/storage/index.js'
-import { resumes, sections, activeResumeId } from './useResumeState'
+import { resumes, sections, activeResumeId, resetResumeState } from './useResumeState'
 import { isRestoring } from './useHistory'
 
 // Set to true during migration to prevent stale in-memory data from writing to new user's cloud
@@ -27,7 +27,14 @@ export async function hydrateFromStorage() {
   const savedSections = await getStorageAdapter().load(KEYS.sections)
   const savedActive = await getStorageAdapter().load(KEYS.active)
 
-  if (savedResumes?.length) resumes.value = savedResumes
+  if (!savedResumes?.length) {
+    // Nothing in storage (e.g. after sign-out with empty local storage) — reset to defaults
+    // so cloud data isn't left visible in guest mode.
+    resetResumeState()
+    return
+  }
+
+  resumes.value = savedResumes
   if (savedSections?.length) {
     // Migration: assign column to any section that doesn't have one yet
     savedSections.forEach((s, i) => {
