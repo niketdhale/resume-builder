@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablet Wireframes (768px) - Resume Builder</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; padding: 40px; display: flex; flex-direction: column; align-items: center; gap: 60px; color: #1a1a2e; }
+  h1 { color: #fff; font-size: 28px; margin-bottom: -20px; }
+  .label { color: #a0a0b8; font-size: 13px; margin-top: -8px; letter-spacing: 0.5px; }
+  .screen { width: 768px; background: #f5f5fa; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+
+  /* Shared */
+  .nav { display: flex; align-items: center; height: 56px; background: #fff; padding: 0 24px; border-bottom: 1px solid #e5e5ea; }
+  .nav .logo { font-weight: 700; color: #6260f1; font-size: 18px; }
+  .nav .links { display: flex; gap: 16px; margin-left: 28px; font-size: 13px; }
+  .nav .links .active { background: #ececfd; color: #6260f1; padding: 6px 14px; border-radius: 7px; font-weight: 600; }
+  .nav .links .inactive { color: #72728a; padding: 6px 8px; }
+  .nav .spacer { flex: 1; }
+  .nav .avatar { width: 28px; height: 28px; background: #6260f1; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; }
+
+  .header { padding: 24px 32px 0; }
+  .header h2 { font-size: 22px; font-weight: 700; }
+  .header p { color: #72728a; font-size: 13px; margin-top: 4px; }
+
+  .btn-primary { background: #6260f1; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-ghost { background: #ececfd; color: #6260f1; border: none; padding: 8px 16px; border-radius: 7px; font-size: 12px; font-weight: 600; }
+
+  /* --- OVERVIEW --- */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding: 20px 32px 32px; }
+  .card { background: #fff; border-radius: 12px; border: 1px solid #e5e5ea; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .card .thumb { height: 120px; background: #f0f0f6; position: relative; padding: 20px; }
+  .card .thumb .line { height: 5px; background: #e0e0e8; border-radius: 3px; margin-bottom: 10px; }
+  .card .thumb .line.accent { background: #6260f1; width: 60%; }
+  .card .info { padding: 14px; }
+  .card .info h3 { font-size: 14px; font-weight: 600; }
+  .card .info .role { font-size: 12px; color: #72728a; margin-top: 2px; }
+  .card .info .meta { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .card .info .tag { background: #ececfd; color: #6260f1; font-size: 9px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
+  .card .info .date { font-size: 10px; color: #a0a0b8; }
+
+  /* --- EDITOR --- */
+  .editor-nav { display: flex; align-items: center; height: 48px; background: #fff; padding: 0 16px; border-bottom: 1px solid #e5e5ea; gap: 12px; }
+  .editor-nav .back { color: #72728a; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .editor-nav .title { font-size: 14px; font-weight: 600; }
+  .editor-nav .saved { color: #2db886; font-size: 11px; }
+  .editor-body { padding: 16px; background: #fff; min-height: 700px; }
+  .tab-bar { display: flex; background: #f0f0f6; border-radius: 8px; padding: 2px; width: 240px; margin-bottom: 16px; }
+  .tab-bar .tab { flex: 1; text-align: center; padding: 7px; font-size: 12px; border-radius: 7px; cursor: pointer; }
+  .tab-bar .tab.active { background: #6260f1; color: #fff; font-weight: 600; }
+  .tab-bar .tab.inactive { color: #72728a; }
+  .info-banner { background: #ececfd; border-radius: 10px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .info-banner span { color: #6260f1; font-weight: 600; font-size: 13px; }
+  .info-banner a { color: #6260f1; font-size: 11px; text-decoration: none; }
+  .add-section { border: 1px solid #e5e5ea; border-radius: 8px; padding: 10px; text-align: center; color: #6260f1; font-weight: 600; font-size: 12px; margin-bottom: 16px; cursor: pointer; }
+  .section-block { margin-bottom: 10px; }
+  .section-header { background: #f5f5fa; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+  .section-header .grip { color: #a0a0b8; font-size: 14px; }
+  .section-header .sec-title { font-weight: 600; font-size: 13px; flex: 1; }
+  .section-header .add-btn { color: #6260f1; font-size: 16px; font-weight: 700; cursor: pointer; }
+  .entry { border: 1px solid #e5e5ea; border-radius: 8px; padding: 10px 14px; margin: 6px 0 6px 8px; background: #fff; }
+  .entry .entry-title { font-size: 12px; font-weight: 600; }
+  .entry .entry-sub { font-size: 10px; color: #72728a; margin-top: 2px; }
+  .preview-hint { background: #ececfd; border-radius: 10px; padding: 20px; text-align: center; margin-top: 24px; }
+  .preview-hint p { color: #6260f1; font-size: 12px; }
+  .preview-hint small { color: #72728a; font-size: 10px; }
+
+  /* --- JOBS --- */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 20px 32px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .stat-card .stat-label { font-size: 10px; color: #72728a; }
+  .stat-card .stat-val { font-size: 20px; font-weight: 700; margin-top: 4px; }
+  .filters { display: flex; gap: 6px; padding: 0 32px 16px; flex-wrap: wrap; }
+  .filters .pill { padding: 6px 14px; border-radius: 7px; font-size: 11px; cursor: pointer; }
+  .filters .pill.active { background: #ececfd; color: #6260f1; font-weight: 600; }
+  .filters .pill.inactive { color: #72728a; }
+  .table-wrap { padding: 0 32px 32px; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; }
+  thead { background: #f5f5fa; }
+  th { text-align: left; padding: 10px 14px; font-size: 11px; color: #72728a; font-weight: 600; }
+  td { padding: 12px 14px; font-size: 12px; border-bottom: 1px solid #f0f0f6; }
+  .badge { padding: 3px 10px; border-radius: 5px; font-size: 10px; font-weight: 600; display: inline-block; }
+  .badge.interview { background: #fff3e0; color: #e68a00; }
+  .badge.applied { background: #e8f0fe; color: #3380e6; }
+  .badge.offered { background: #e6f7ef; color: #2db886; }
+  .badge.rejected { background: #fde8e8; color: #e63333; }
+  .company { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>Tablet Wireframes — 768px</h1>
+<p class="label">Resume Builder Responsive Redesign</p>
+
+<!-- ========== SCREEN 1: OVERVIEW ========== -->
+<p class="label">Screen 1 — Overview / Dashboard</p>
+<div class="screen">
+  <div class="nav">
+    <span class="logo">ResumeBuilder</span>
+    <div class="links">
+      <span class="active">Resumes</span>
+      <span class="inactive">Job Tracker</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="avatar">N</div>
+  </div>
+  <div class="header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+    <div>
+      <h2>My Resumes</h2>
+      <p>Manage your professional resumes</p>
+    </div>
+    <button class="btn-primary" style="margin-top:4px;">+ New Resume</button>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="thumb"><div class="line accent" style="width:55%"></div><div class="line" style="width:80%"></div><div class="line" style="width:65%"></div><div class="line" style="width:70%"></div></div>
+      <div class="info"><h3>Software Engineer</h3><div class="role">Full Stack Developer</div><div class="meta"><span class="tag">EN</span><span class="tag">FR</span><span class="date">Updated 2h ago</span></div></div>
+    </div>
+    <div class="card">
+      <div class="thumb"><div class="line accent" style="width:50%"></div><div class="line" style="width:75%"></div><div class="line" style="width:60%"></div><div class="line" style="width:85%"></div></div>
+      <div class="info"><h3>Product Manager</h3><div class="role">Senior PM</div><div class="meta"><span class="tag">EN</span><span class="date">Updated 1d ago</span></div></div>
+    </div>
+    <div class="card">
+      <div class="thumb"><div class="line accent" style="width:45%"></div><div class="line" style="width:70%"></div><div class="line" style="width:55%"></div><div class="line" style="width:80%"></div></div>
+      <div class="info"><h3>UX Designer</h3><div class="role">Lead Designer</div><div class="meta"><span class="tag">EN</span><span class="tag">DE</span><span class="date">Updated 3d ago</span></div></div>
+    </div>
+    <div class="card">
+      <div class="thumb"><div class="line accent" style="width:60%"></div><div class="line" style="width:85%"></div><div class="line" style="width:50%"></div><div class="line" style="width:72%"></div></div>
+      <div class="info"><h3>Data Scientist</h3><div class="role">ML Engineer</div><div class="meta"><span class="tag">EN</span><span class="date">Updated 1w ago</span></div></div>
+    </div>
+    <div class="card">
+      <div class="thumb"><div class="line accent" style="width:48%"></div><div class="line" style="width:78%"></div><div class="line" style="width:62%"></div><div class="line" style="width:70%"></div></div>
+      <div class="info"><h3>Frontend Dev</h3><div class="role">React Developer</div><div class="meta"><span class="tag">EN</span><span class="tag">ES</span><span class="date">Updated 2w ago</span></div></div>
+    </div>
+    <div class="card">
+      <div class="thumb"><div class="line accent" style="width:52%"></div><div class="line" style="width:68%"></div><div class="line" style="width:82%"></div><div class="line" style="width:58%"></div></div>
+      <div class="info"><h3>DevOps Engineer</h3><div class="role">Cloud Architect</div><div class="meta"><span class="tag">EN</span><span class="date">Updated 1mo ago</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCREEN 2: EDITOR ========== -->
+<p class="label">Screen 2 — Editor (Full-width Content + Preview Toggle)</p>
+<div class="screen">
+  <div class="editor-nav">
+    <span class="back">← Back</span>
+    <span class="title">Software Engineer Resume</span>
+    <span class="saved">✓ Saved</span>
+    <div style="flex:1"></div>
+    <button class="btn-ghost">Show Preview</button>
+  </div>
+  <div class="editor-body">
+    <div class="tab-bar">
+      <div class="tab active">Content</div>
+      <div class="tab inactive">Customize</div>
+    </div>
+    <div class="info-banner">
+      <span>Resume Info</span>
+      <a href="#">Edit →</a>
+    </div>
+    <div class="add-section">+ Add Section</div>
+
+    <div class="section-block">
+      <div class="section-header">
+        <span class="grip">⠿</span>
+        <span class="sec-title">Experience</span>
+        <span class="add-btn">+</span>
+      </div>
+      <div class="entry"><div class="entry-title">Senior Developer</div><div class="entry-sub">Google · 2022 – Present</div></div>
+      <div class="entry"><div class="entry-title">Developer</div><div class="entry-sub">Meta · 2019 – 2022</div></div>
+      <div class="entry"><div class="entry-title">Junior Developer</div><div class="entry-sub">Startup Inc · 2017 – 2019</div></div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-header">
+        <span class="grip">⠿</span>
+        <span class="sec-title">Education</span>
+        <span class="add-btn">+</span>
+      </div>
+      <div class="entry"><div class="entry-title">M.S. Computer Science</div><div class="entry-sub">Stanford University · 2019</div></div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-header">
+        <span class="grip">⠿</span>
+        <span class="sec-title">Skills</span>
+        <span class="add-btn">+</span>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-header">
+        <span class="grip">⠿</span>
+        <span class="sec-title">Projects</span>
+        <span class="add-btn">+</span>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-header">
+        <span class="grip">⠿</span>
+        <span class="sec-title">Certifications</span>
+        <span class="add-btn">+</span>
+      </div>
+    </div>
+
+    <div class="preview-hint">
+      <p>Tap <strong>"Show Preview"</strong> to see live resume preview</p>
+      <small>Preview opens as a slide-over panel from the right (~60% width)</small>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCREEN 3: JOB TRACKER ========== -->
+<p class="label">Screen 3 — Job Tracker (Compact Table)</p>
+<div class="screen">
+  <div class="nav">
+    <span class="logo">ResumeBuilder</span>
+    <div class="links">
+      <span class="inactive">Resumes</span>
+      <span class="active">Job Tracker</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="avatar">N</div>
+  </div>
+  <div class="header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+    <div>
+      <h2>Job Tracker</h2>
+      <p>Track your applications</p>
+    </div>
+    <button class="btn-primary" style="margin-top:4px;">+ Add Application</button>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Total Applied</div><div class="stat-val">24</div></div>
+    <div class="stat-card"><div class="stat-label">Interviewing</div><div class="stat-val" style="color:#e68a00">8</div></div>
+    <div class="stat-card"><div class="stat-label">Offered</div><div class="stat-val" style="color:#2db886">3</div></div>
+    <div class="stat-card"><div class="stat-label">Rejected</div><div class="stat-val" style="color:#e63333">5</div></div>
+  </div>
+  <div class="filters">
+    <span class="pill active">All</span>
+    <span class="pill inactive">Applied</span>
+    <span class="pill inactive">Interview</span>
+    <span class="pill inactive">Offered</span>
+    <span class="pill inactive">Rejected</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Company</th><th>Role</th><th>Status</th><th>Salary</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="company">Google</td><td>Senior SWE</td><td><span class="badge interview">Interview</span></td><td>$180k</td><td>Mar 15</td></tr>
+        <tr><td class="company">Meta</td><td>Staff Engineer</td><td><span class="badge applied">Applied</span></td><td>$200k</td><td>Mar 12</td></tr>
+        <tr><td class="company">Apple</td><td>iOS Developer</td><td><span class="badge offered">Offered</span></td><td>$170k</td><td>Mar 8</td></tr>
+        <tr><td class="company">Netflix</td><td>Backend Dev</td><td><span class="badge rejected">Rejected</span></td><td>$190k</td><td>Feb 28</td></tr>
+        <tr><td class="company">Stripe</td><td>Full Stack</td><td><span class="badge interview">Interview</span></td><td>$175k</td><td>Mar 20</td></tr>
+        <tr><td class="company">Airbnb</td><td>Frontend Dev</td><td><span class="badge applied">Applied</span></td><td>$165k</td><td>Mar 22</td></tr>
+        <tr><td class="company">Spotify</td><td>Data Engineer</td><td><span class="badge applied">Applied</span></td><td>$160k</td><td>Mar 25</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<p class="label" style="margin-bottom: 40px;">End of Tablet Wireframes</p>
+</body>
+</html>

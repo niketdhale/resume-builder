@@ -149,10 +149,10 @@ const canSave = computed(() => form.value.title.trim() && form.value.company.tri
   >
     <div
       v-if="show"
-      class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center"
+      class="fixed inset-0 bg-black/40 z-50 flex items-end sm:items-center justify-center"
       @click.self="$emit('close')"
     >
-      <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] flex flex-col">
+      <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-lg sm:mx-4 max-h-[90vh] flex flex-col">
 
         <!-- Header -->
         <div class="flex items-center justify-between px-6 pt-6 pb-4 flex-shrink-0">
@@ -164,7 +164,7 @@ const canSave = computed(() => form.value.title.trim() && form.value.company.tri
 
         <!-- Scrollable body -->
         <div class="flex-1 overflow-y-auto px-6 pb-2">
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
             <!-- Title -->
             <div class="col-span-2">
@@ -307,7 +307,7 @@ const canSave = computed(() => form.value.title.trim() && form.value.company.tri
                 <div class="border-t border-gray-100 dark:border-gray-800 pt-3 mb-3">
                   <p class="text-xs font-semibold text-gray-500 dark:text-gray-400">Custom Fields</p>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div
                     v-for="col in customColumns" :key="col.id"
                     :class="col.type === 'file' ? 'col-span-2' : ''"

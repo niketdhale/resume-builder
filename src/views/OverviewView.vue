@@ -86,29 +86,30 @@ function timeAgo(isoString) {
   <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950">
     <NavBar />
 
-    <div class="max-w-5xl mx-auto px-8 py-8 w-full">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
       <!-- Header -->
       <div class="flex items-end justify-between mb-6">
         <div>
-          <h1 class="text-xl font-bold text-gray-900 dark:text-gray-50">My Resumes</h1>
+          <h1 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-50">My Resumes</h1>
           <p class="text-sm mt-0.5 text-gray-400 dark:text-gray-500">
             {{ baseResumes.length }} {{ baseResumes.length === 1 ? 'resume' : 'resumes' }}
           </p>
         </div>
+        <!-- Desktop button — hidden on mobile (FAB used instead) -->
         <button
           @click="createResume"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-4 py-2 rounded-lg transition font-medium"
+          class="hidden sm:block bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-4 py-2 rounded-lg transition font-medium"
         >
           + New Resume
         </button>
       </div>
 
-      <!-- Cards grid -->
-      <div class="grid grid-cols-4 gap-4">
-        <!-- Create new card -->
+      <!-- Cards grid: 1 col mobile → 2 col tablet → 3 col lg → 4 col xl -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <!-- Create new card — vertical on sm+, hidden on mobile (FAB is used) -->
         <div
           @click="createResume"
-          class="border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-3 cursor-pointer transition min-h-52 border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 dark:border-gray-700 dark:hover:border-indigo-500 dark:hover:bg-indigo-950/30"
+          class="hidden sm:flex border-2 border-dashed rounded-xl flex-col items-center justify-center gap-3 cursor-pointer transition min-h-52 border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 dark:border-gray-700 dark:hover:border-indigo-500 dark:hover:bg-indigo-950/30"
         >
           <div
             class="w-10 h-10 rounded-full flex items-center justify-center text-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400"
@@ -125,65 +126,64 @@ function timeAgo(isoString) {
           class="border rounded-xl overflow-hidden transition cursor-pointer bg-white border-gray-200 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 dark:hover:border-indigo-500"
           @click="openResume(resume.id)"
         >
-          <!-- Thumbnail -->
-          <div
-            class="border-b p-3 bg-gray-50 dark:bg-gray-700 dark:border-gray-600"
-            style="height: 120px"
-          >
-            <div class="rounded shadow-sm p-2 h-full w-full bg-white dark:bg-gray-600">
-              <div class="h-2 rounded w-3/4 mb-1 bg-gray-300 dark:bg-gray-500" />
-              <div class="h-1.5 rounded w-1/2 mb-2 bg-indigo-200 dark:bg-indigo-400/40" />
-              <div class="h-px mb-2 bg-gray-200 dark:bg-gray-500" />
-              <div class="flex gap-1.5">
-                <div class="flex-1 flex flex-col gap-1">
-                  <div class="h-1 rounded bg-gray-200 dark:bg-gray-500" />
-                  <div class="h-1 rounded w-2/3 bg-gray-200 dark:bg-gray-500" />
-                </div>
-                <div class="flex-1 flex flex-col gap-1">
-                  <div class="h-1 rounded bg-gray-200 dark:bg-gray-500" />
-                  <div class="h-1 rounded w-3/4 bg-gray-200 dark:bg-gray-500" />
+          <!-- Mobile: horizontal layout. sm+: vertical layout -->
+          <div class="flex sm:flex-col">
+            <!-- Thumbnail -->
+            <div
+              class="border-r sm:border-r-0 sm:border-b p-3 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 w-24 sm:w-auto flex-shrink-0"
+              style="height: 96px"
+              :style="{ height: undefined }"
+              :class="'sm:h-[120px] h-24'"
+            >
+              <div class="rounded shadow-sm p-2 h-full w-full bg-white dark:bg-gray-600">
+                <div class="h-2 rounded w-3/4 mb-1 bg-gray-300 dark:bg-gray-500" />
+                <div class="h-1.5 rounded w-1/2 mb-2 bg-indigo-200 dark:bg-indigo-400/40" />
+                <div class="h-px mb-2 bg-gray-200 dark:bg-gray-500" />
+                <div class="flex gap-1.5">
+                  <div class="flex-1 flex flex-col gap-1">
+                    <div class="h-1 rounded bg-gray-200 dark:bg-gray-500" />
+                    <div class="h-1 rounded w-2/3 bg-gray-200 dark:bg-gray-500" />
+                  </div>
+                  <div class="flex-1 flex flex-col gap-1">
+                    <div class="h-1 rounded bg-gray-200 dark:bg-gray-500" />
+                    <div class="h-1 rounded w-3/4 bg-gray-200 dark:bg-gray-500" />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Info -->
-          <div class="p-3">
-            <p class="text-sm font-semibold truncate text-gray-800 dark:text-gray-100">
-              {{ resume.title }}
-            </p>
-            <p class="text-xs mt-0.5 truncate text-gray-400 dark:text-gray-500">
-              {{ resume.metadata?.jobTitle || 'No title set' }}
-            </p>
+            <!-- Info -->
+            <div class="p-3 flex-1 min-w-0">
+              <p class="text-sm font-semibold truncate text-gray-800 dark:text-gray-100">
+                {{ resume.title }}
+              </p>
+              <p class="text-xs mt-0.5 truncate text-gray-400 dark:text-gray-500">
+                {{ resume.metadata?.jobTitle || 'No title set' }}
+              </p>
 
-            <!-- Language flags row -->
-            <div class="flex items-center gap-1.5 mt-2 flex-wrap">
-              <span
-                v-for="lang in languagesFor(resume)"
-                :key="lang.id"
-                :title="lang.label"
-                class="text-xs font-medium px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-              >
-                {{ lang.code }}
-              </span>
-              <span
-                v-if="languagesFor(resume).length > 1"
-                class="text-xs text-gray-400 dark:text-gray-500"
-              >
-                {{ languagesFor(resume).length }} languages
-              </span>
-            </div>
+              <!-- Language flags row -->
+              <div class="flex items-center gap-1.5 mt-2 flex-wrap">
+                <span
+                  v-for="lang in languagesFor(resume)"
+                  :key="lang.id"
+                  :title="lang.label"
+                  class="text-xs font-medium px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                >
+                  {{ lang.code }}
+                </span>
+              </div>
 
-            <!-- Updated + sections -->
-            <div class="flex items-center justify-between mt-2">
-              <span class="text-xs text-gray-400 dark:text-gray-500">
-                {{ timeAgo(resume.updatedAt) }}
-              </span>
-              <span
-                class="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
-              >
-                {{ resume.sections?.length || 0 }} sections
-              </span>
+              <!-- Updated + sections -->
+              <div class="flex items-center justify-between mt-2">
+                <span class="text-xs text-gray-400 dark:text-gray-500">
+                  {{ timeAgo(resume.updatedAt) }}
+                </span>
+                <span
+                  class="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
+                >
+                  {{ resume.sections?.length || 0 }} sec
+                </span>
+              </div>
             </div>
           </div>
 
@@ -213,5 +213,12 @@ function timeAgo(isoString) {
         </div>
       </div>
     </div>
+
+    <!-- FAB: mobile only -->
+    <button
+      @click="createResume"
+      class="sm:hidden fixed bottom-6 right-6 z-30 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white text-2xl rounded-2xl shadow-lg shadow-indigo-600/30 flex items-center justify-center transition"
+      aria-label="New Resume"
+    >+</button>
   </div>
 </template>
