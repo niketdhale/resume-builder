@@ -114,13 +114,13 @@ const { isDesktop } = useBreakpoint()
 
 // ─── Set active resume from route ─────────────────────────────────────────────
 onMounted(() => {
-  const id = parseFloat(route.params.id)
-  const found = resumes.value.find((r) => r.id === id)
+  const id = route.params.id
+  const found = resumes.value.find((r) => String(r.id) === String(id))
   if (!found) {
     router.push({ name: 'overview' })
     return
   }
-  activeResumeId.value = id
+  activeResumeId.value = found.id
 })
 </script>
 

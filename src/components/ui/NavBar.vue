@@ -186,34 +186,37 @@ function closeMenu(e) {
         </Transition>
       </div>
     </div>
-  <!-- Migration toast -->
-  <Transition
-    enter-active-class="transition duration-300 ease-out"
-    enter-from-class="opacity-0 translate-y-2"
-    enter-to-class="opacity-100 translate-y-0"
-    leave-active-class="transition duration-200 ease-in"
-    leave-from-class="opacity-100"
-    leave-to-class="opacity-0"
-  >
-    <div
-      v-if="migrationState !== 'idle'"
-      class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2.5 pointer-events-none"
-      :class="{
-        'bg-indigo-600 text-white':          migrationState === 'migrating',
-        'bg-green-600 text-white':           migrationState === 'done',
-        'bg-red-500 text-white':             migrationState === 'error',
-      }"
-    >
-      <span v-if="migrationState === 'migrating'">
-        <svg class="animate-spin w-4 h-4 inline -mt-0.5 mr-1" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-        </svg>
-        Syncing your data to the cloud…
-      </span>
-      <span v-else-if="migrationState === 'done'">✓ Data synced to cloud</span>
-      <span v-else-if="migrationState === 'error'">⚠ Sync failed — your local data is safe</span>
-    </div>
-  </Transition>
   </div>
+
+  <!-- Migration toast (outside nav to avoid transform/overflow issues) -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="opacity-0 translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="migrationState !== 'idle'"
+        class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2.5 pointer-events-none"
+        :class="{
+          'bg-indigo-600 text-white':          migrationState === 'migrating',
+          'bg-green-600 text-white':           migrationState === 'done',
+          'bg-red-500 text-white':             migrationState === 'error',
+        }"
+      >
+        <span v-if="migrationState === 'migrating'">
+          <svg class="animate-spin w-4 h-4 inline -mt-0.5 mr-1" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+          </svg>
+          Syncing your data to the cloud…
+        </span>
+        <span v-else-if="migrationState === 'done'">✓ Data synced to cloud</span>
+        <span v-else-if="migrationState === 'error'">⚠ Sync failed — your local data is safe</span>
+      </div>
+    </Transition>
+  </Teleport>
 </template>

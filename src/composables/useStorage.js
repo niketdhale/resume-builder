@@ -3,6 +3,9 @@ import { getStorageAdapter } from '../services/storage/index.js'
 import { resumes, sections, activeResumeId } from './useResumeState'
 import { isRestoring } from './useHistory'
 
+// Set to true during migration to prevent stale in-memory data from writing to new user's cloud
+export const suppressSaves = ref(false)
+
 const KEYS = {
   resumes: 'resumes',
   sections: 'sections',
@@ -24,8 +27,8 @@ export async function hydrateFromStorage() {
   const savedSections = await getStorageAdapter().load(KEYS.sections)
   const savedActive = await getStorageAdapter().load(KEYS.active)
 
-  if (savedResumes) resumes.value = savedResumes
-  if (savedSections) {
+  if (savedResumes?.length) resumes.value = savedResumes
+  if (savedSections?.length) {
     // Migration: assign column to any section that doesn't have one yet
     savedSections.forEach((s, i) => {
       if (!s.column) s.column = i % 2 === 0 ? 'left' : 'right'
@@ -67,7 +70,7 @@ export function formatSavedTime(date) {
 // ─── Watchers ─────────────────────────────────────────────────────────────────
 
 export function setupStorageWatchers() {
-  watch(resumes, () => { if (!isRestoring.value) triggerSave() }, { deep: true })
-  watch(sections, () => { if (!isRestoring.value) triggerSave() }, { deep: true })
-  watch(activeResumeId, () => saveToStorage())
+  watch(resumes, () => { if (!isRestoring.value && !suppressSaves.value) triggerSave() }, { deep: true })
+  watch(sections, () => { if (!isRestoring.value && !suppressSaves.value) triggerSave() }, { deep: true })
+  watch(activeResumeId, () => { if (!suppressSaves.value) saveToStorage() })
 }

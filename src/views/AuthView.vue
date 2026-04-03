@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabaseAuth } from '../services/auth/supabaseAuth.js'
 import { useAuth } from '../composables/useAuth.js'
@@ -57,7 +57,7 @@ async function submit() {
     const { error: err } = await supabaseAuth.signIn(email.value.trim(), password.value)
     loading.value = false
     if (err) { error.value = friendlyError(err.message); return }
-    router.replace('/')
+    // redirect handled by onAuthStateChange watcher below
     return
   }
 
@@ -65,7 +65,7 @@ async function submit() {
     const { error: err } = await supabaseAuth.signUp(email.value.trim(), password.value)
     loading.value = false
     if (err) { error.value = friendlyError(err.message); return }
-    router.replace('/')
+    // redirect handled by onAuthStateChange watcher below
   }
 }
 
@@ -89,6 +89,8 @@ const submitLabel = computed(() => {
   if (mode.value === 'signin') return 'Sign in'
   return 'Create account'
 })
+// Redirect once auth confirms login (fires after onAuthStateChange propagates)
+watch(isLoggedIn, (val) => { if (val) router.replace('/') })
 </script>
 
 <template>
