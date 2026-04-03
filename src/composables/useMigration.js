@@ -53,7 +53,7 @@ function remapIds(resumes, sections, jobs, cols, userId) {
       id:       sectionIdMap[s.id],
       userId,
       resumeId: resumeIdMap[s.resumeId],
-      viewIds:  (s.viewIds ?? []).map(vid => resumeIdMap[vid] ?? vid),
+      viewIds:  (s.viewIds ?? []).map(vid => resumeIdMap[vid]).filter(Boolean),
       createdAt: s.createdAt ?? now,
       updatedAt: s.updatedAt ?? now,
       entries:  (s.entries ?? []).map(e => ({
