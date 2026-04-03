@@ -1,5 +1,5 @@
 <script setup>
-const props  = defineProps({ activePanel: String })
+defineProps({ activePanel: String })
 const emit   = defineEmits(['update:activePanel'])
 
 const tabs = [
