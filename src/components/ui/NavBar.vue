@@ -15,7 +15,7 @@ const { isLoggedIn, userInitial, userEmail, signOut } = useAuth()
 
 const showUserMenu = ref(false)
 const showDrawer   = ref(false)
-const { isMobile } = useBreakpoint()
+useBreakpoint()
 
 // ── Offline queue indicator ────────────────────────────────────────────────────
 const hasPendingWrites = ref(false)
