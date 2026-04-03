@@ -189,6 +189,7 @@ function timeAgo(isoString) {
                   {{ sectionCount(resume.id) }} sections
                 </span>
               </div>
+            </div>
           </div>
 
           <!-- Actions -->
