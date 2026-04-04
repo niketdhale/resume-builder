@@ -13,12 +13,13 @@ if (isLoggedIn.value) router.replace('/')
 
 // ── State ──────────────────────────────────────────────────────────────────
 // mode: 'signin' | 'signup' | 'magic'
-const mode     = ref('signin')
-const email    = ref('')
-const password = ref('')
-const loading  = ref(false)
-const error    = ref(null)
-const magicSent = ref(false) // magic link sent state
+const mode        = ref('signin')
+const email       = ref('')
+const password    = ref('')
+const showPassword = ref(false)
+const loading     = ref(false)
+const error       = ref(null)
+const magicSent   = ref(false) // magic link sent state
 
 const TABS = [
   { id: 'signin', label: 'Sign in' },
@@ -34,9 +35,10 @@ const formValid     = computed(() => {
 })
 
 function switchMode(m) {
-  mode.value     = m
-  error.value    = null
-  magicSent.value = false
+  mode.value        = m
+  error.value       = null
+  magicSent.value   = false
+  showPassword.value = false
 }
 
 // ── Submit ─────────────────────────────────────────────────────────────────
@@ -165,7 +167,7 @@ watch(isLoggedIn, (val) => { if (val) router.replace('/') })
 
       <!-- Form -->
       <template v-else>
-        <div class="flex flex-col gap-4">
+        <form class="flex flex-col gap-4" @submit.prevent="submit" novalidate>
           <!-- Email -->
           <div class="flex flex-col gap-1.5">
             <label class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
@@ -176,7 +178,6 @@ watch(isLoggedIn, (val) => { if (val) router.replace('/') })
               type="email"
               placeholder="you@example.com"
               autocomplete="email"
-              @keydown.enter="submit"
               class="w-full px-3.5 py-2.5 rounded-xl text-sm border outline-none transition focus:ring-2 focus:ring-indigo-500/20"
               :class="isDark
                 ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500 focus:border-indigo-500'
@@ -189,17 +190,38 @@ watch(isLoggedIn, (val) => { if (val) router.replace('/') })
             <label class="text-sm font-medium" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
               Password
             </label>
-            <input
-              v-model="password"
-              type="password"
-              :placeholder="mode === 'signup' ? 'At least 6 characters' : 'Your password'"
-              autocomplete="current-password"
-              @keydown.enter="submit"
-              class="w-full px-3.5 py-2.5 rounded-xl text-sm border outline-none transition focus:ring-2 focus:ring-indigo-500/20"
-              :class="isDark
-                ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500 focus:border-indigo-500'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-indigo-500'"
-            />
+            <div class="relative">
+              <input
+                v-model="password"
+                :type="showPassword && password.length > 0 ? 'text' : 'password'"
+                :placeholder="mode === 'signup' ? 'At least 6 characters' : 'Your password'"
+                :autocomplete="mode === 'signup' ? 'new-password' : 'current-password'"
+                class="w-full px-3.5 py-2.5 pr-10 rounded-xl text-sm border outline-none transition focus:ring-2 focus:ring-indigo-500/20"
+                :class="isDark
+                  ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500 focus:border-indigo-500'
+                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-indigo-500'"
+              />
+              <button
+                v-if="password.length > 0"
+                type="button"
+                @click="showPassword = !showPassword"
+                :title="showPassword ? 'Hide password' : 'Show password'"
+                class="absolute inset-y-0 right-0 flex items-center px-3 transition"
+                :class="isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'"
+              >
+                <!-- Eye icon (show) -->
+                <svg v-if="!showPassword" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <!-- Eye-off icon (hide) -->
+                <svg v-else class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              </button>
+            </div>
           </div>
 
           <!-- Magic link hint -->
@@ -212,7 +234,7 @@ watch(isLoggedIn, (val) => { if (val) router.replace('/') })
 
           <!-- Submit -->
           <button
-            @click="submit"
+            type="submit"
             :disabled="!formValid || loading"
             class="w-full py-2.5 rounded-xl text-sm font-semibold transition"
             :class="formValid && !loading
@@ -221,7 +243,7 @@ watch(isLoggedIn, (val) => { if (val) router.replace('/') })
           >
             {{ submitLabel }}
           </button>
-        </div>
+        </form>
 
         <!-- Divider -->
         <div class="flex items-center gap-3">

@@ -93,7 +93,7 @@ export function confirmImport() {
         ...s,
         id: uid(),
         userId: currentUserId,
-        resumeId: targetId,          // must match the existing resume's ID in DB
+        resumeId: targetId,
         viewIds: [targetId],
         sharedAcrossViews: false,
         createdAt: s.createdAt ?? now,
@@ -117,7 +117,7 @@ export function confirmImport() {
         ...s,
         id: uid(),
         userId: currentUserId,
-        resumeId: newId,             // must match the new resume's ID in DB
+        resumeId: newId,
         viewIds: [newId],
         sharedAcrossViews: false,
         createdAt: s.createdAt ?? now,

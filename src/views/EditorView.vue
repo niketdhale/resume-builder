@@ -2,6 +2,7 @@
 import { ref, inject, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useKeyboardShortcuts } from '../composables/useKeyboardShortcuts'
+import { useAuth } from '../composables/useAuth'
 
 import NavBar from '../components/ui/NavBar.vue'
 import SectionList from '../components/editor/SectionList.vue'
@@ -22,6 +23,8 @@ const activePageSize = inject('activePageSize')
 const savedIndicator = inject('savedIndicator')
 const lastSavedTime = inject('lastSavedTime')
 const formatSavedTime = inject('formatSavedTime')
+const syncStatus = inject('syncStatus')
+const { isLoggedIn } = useAuth()
 const showMetadataModal = ref(false)
 
 // ─── Photo upload ─────────────────────────────────────────────────────────────
@@ -147,21 +150,14 @@ onMounted(() => {
       <span class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate flex-1 min-w-0">
         {{ activeResume?.title || 'Resume' }}
       </span>
-      <Transition
-        enter-active-class="transition duration-200 ease-out"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition duration-300 ease-in"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
+      <!-- Guest: show local save indicator -->
+      <span
+        v-if="savedIndicator"
+        class="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ml-1 text-gray-500 bg-gray-100 dark:text-gray-400 dark:bg-gray-800"
+        title="Saved to your browser"
       >
-        <span
-          v-if="savedIndicator"
-          class="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ml-1 text-green-500 bg-green-50 dark:text-green-400 dark:bg-green-950/40"
-        >
-          ✓ Saved at {{ formatSavedTime(lastSavedTime) }}
-        </span>
-      </Transition>
+        ✓ Saved locally
+      </span>
 
       <div class="flex-1" />
 
