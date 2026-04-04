@@ -75,6 +75,13 @@ const rightSections = computed(() => {
 const fullWidthSections = computed(() =>
   safeSections.value.filter((s) => s.column === 'full'),
 )
+
+// Full page height minus margins — used to extend sidebar background to bottom
+const sidebarMinHeight = computed(() => {
+  const config = pageSizeConfig[props.pageSize] || pageSizeConfig.A4
+  const mY = props.s.marginY || 0
+  return `${config.height - mY * 2}mm`
+})
 </script>
 
 <template>
@@ -82,13 +89,39 @@ const fullWidthSections = computed(() =>
     class="resume-page relative bg-white shadow-md rounded-lg text-gray-800 print:shadow-none print:rounded-none print:break-after-page"
     :style="pageStyle"
   >
-    <!-- HEADER LEFT -->
+    <!-- HEADER LEFT (sidebar layout) -->
     <template v-if="isFirstPage && headerPos === 'left'">
-      <div class="flex gap-4 h-full">
-        <div class="w-2/5 pr-4 flex-shrink-0" :style="{ borderRight: `2px solid ${s.borderColor}` }">
-          <ResumeHeader :metadata="metadata" :s="s" :nameStyle="nameStyle" :jobTitleStyle="jobTitleStyle" :iconStyle="iconStyle" headerLayout="classic" :show="show" />
+      <div class="flex" :style="{ minHeight: sidebarMinHeight }">
+        <!-- Sidebar panel -->
+        <div
+          class="flex-shrink-0 flex flex-col"
+          :style="{
+            width: '38%',
+            backgroundColor: s.sidebarBgColor || undefined,
+            color: s.sidebarTextColor || undefined,
+            padding: '10mm 8mm',
+            gap: s.entrySpacing * 2 + 'px',
+          }"
+        >
+          <ResumeHeader
+            :metadata="metadata"
+            :s="s"
+            :nameStyle="s.sidebarTextColor ? { color: s.sidebarTextColor } : nameStyle"
+            :jobTitleStyle="s.sidebarTextColor ? { color: s.sidebarTextColor, opacity: '0.75' } : jobTitleStyle"
+            :iconStyle="s.sidebarTextColor ? { color: s.sidebarTextColor } : iconStyle"
+            :headerLayout="headerLayout"
+            :headerTextColor="s.sidebarTextColor || ''"
+            :show="show"
+          />
         </div>
-        <div class="w-3/5 flex flex-col" :style="{ gap: s.entrySpacing * 2 + 'px' }">
+        <!-- Main content area -->
+        <div
+          class="flex-1 flex flex-col"
+          :style="{
+            padding: '10mm 10mm',
+            gap: s.entrySpacing * 2 + 'px',
+          }"
+        >
           <div v-for="section in safeSections" :key="section.id">
             <span :style="headingStyle">{{ section.title }}</span>
             <SectionContent :section="section" v-bind="sectionContentProps" />
@@ -114,8 +147,36 @@ const fullWidthSections = computed(() =>
 
     <!-- HEADER TOP -->
     <template v-else>
-      <div v-if="isFirstPage" class="mb-4 pb-4 flex-shrink-0" :style="{ borderBottom: `2px solid ${s.borderColor}` }">
-        <ResumeHeader :metadata="metadata" :s="s" :nameStyle="nameStyle" :jobTitleStyle="jobTitleStyle" :iconStyle="iconStyle" :headerLayout="headerLayout" :show="show" />
+      <div v-if="isFirstPage" class="flex-shrink-0">
+        <!-- Two-tone: full-bleed colored header block -->
+        <div
+          v-if="s.headerBgColor"
+          :style="{
+            backgroundColor: s.headerBgColor,
+            marginTop: `-${s.marginY}mm`,
+            marginLeft: `-${s.marginX}mm`,
+            marginRight: `-${s.marginX}mm`,
+            padding: `${s.marginY}mm ${s.marginX}mm`,
+            paddingBottom: `${Math.max(s.marginY * 0.8, 8)}mm`,
+            marginBottom: '4mm',
+          }"
+        >
+          <ResumeHeader
+            :metadata="metadata" :s="s"
+            :nameStyle="nameStyle" :jobTitleStyle="jobTitleStyle" :iconStyle="iconStyle"
+            :headerLayout="headerLayout"
+            :headerTextColor="s.headerTextColor || ''"
+            :show="show"
+          />
+        </div>
+        <!-- Normal header with border -->
+        <div
+          v-else
+          class="mb-4 pb-4"
+          :style="{ borderBottom: `2px solid ${s.borderColor}` }"
+        >
+          <ResumeHeader :metadata="metadata" :s="s" :nameStyle="nameStyle" :jobTitleStyle="jobTitleStyle" :iconStyle="iconStyle" :headerLayout="headerLayout" :show="show" />
+        </div>
       </div>
 
       <!-- Two columns -->

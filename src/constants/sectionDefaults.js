@@ -78,6 +78,13 @@ export function defaultSettings() {
     linkBlueColor: false,
     linkIcon: true,
     linkIconStyle: 'external',
+    // Sidebar layout
+    sidebarBgColor: '',
+    sidebarTextColor: '',
+    contactLayout: 'inline',
+    // Two-tone header
+    headerBgColor: '',
+    headerTextColor: '',
   }
 }
 
