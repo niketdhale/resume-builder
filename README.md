@@ -13,7 +13,7 @@
 
   <!-- Stars -->
   <a href="https://github.com">
-    <img src="https://shields.io" alt="GitHub Stars" />
+    <img src="https://img.shields.io" alt="GitHub Stars" />
   </a>
 
   <!-- Last Commit -->
