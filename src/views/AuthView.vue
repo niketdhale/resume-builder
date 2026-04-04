@@ -193,7 +193,7 @@ watch(isLoggedIn, (val) => { if (val) router.replace('/') })
             <div class="relative">
               <input
                 v-model="password"
-                :type="showPassword ? 'text' : 'password'"
+                :type="showPassword && password.length > 0 ? 'text' : 'password'"
                 :placeholder="mode === 'signup' ? 'At least 6 characters' : 'Your password'"
                 :autocomplete="mode === 'signup' ? 'new-password' : 'current-password'"
                 class="w-full px-3.5 py-2.5 pr-10 rounded-xl text-sm border outline-none transition focus:ring-2 focus:ring-indigo-500/20"
@@ -202,6 +202,7 @@ watch(isLoggedIn, (val) => { if (val) router.replace('/') })
                   : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-indigo-500'"
               />
               <button
+                v-if="password.length > 0"
                 type="button"
                 @click="showPassword = !showPassword"
                 :title="showPassword ? 'Hide password' : 'Show password'"
