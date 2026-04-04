@@ -53,8 +53,55 @@ const { pages, measureAndSplit } = usePagination(
 onMounted(() => measureAndSplit())
 
 const showZoomModal = ref(false)
-function openZoom() { showZoomModal.value = true }
+const userZoom = ref(1)
+const MIN_ZOOM = 0.5
+const MAX_ZOOM = 3
+
+function openZoom() {
+  userZoom.value = 1
+  showZoomModal.value = true
+}
 function closeZoom() { showZoomModal.value = false }
+
+function zoomIn() { userZoom.value = Math.min(MAX_ZOOM, +(userZoom.value + 0.25).toFixed(2)) }
+function zoomOut() { userZoom.value = Math.max(MIN_ZOOM, +(userZoom.value - 0.25).toFixed(2)) }
+function zoomReset() { userZoom.value = 1 }
+
+const zoomPercent = computed(() => Math.round(userZoom.value * 100))
+
+// Ctrl+wheel zoom (desktop)
+function onModalWheel(e) {
+  if (!e.ctrlKey && !e.metaKey) return
+  e.preventDefault()
+  const delta = e.deltaY > 0 ? -0.1 : 0.1
+  userZoom.value = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, +(userZoom.value + delta).toFixed(2)))
+}
+
+// Pinch-to-zoom (mobile)
+let pinchStartDist = 0
+let pinchStartZoom = 1
+
+function getTouchDist(touches) {
+  const dx = touches[0].clientX - touches[1].clientX
+  const dy = touches[0].clientY - touches[1].clientY
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+function onTouchStart(e) {
+  if (e.touches.length === 2) {
+    pinchStartDist = getTouchDist(e.touches)
+    pinchStartZoom = userZoom.value
+  }
+}
+
+function onTouchMove(e) {
+  if (e.touches.length === 2) {
+    e.preventDefault()
+    const dist = getTouchDist(e.touches)
+    const scale = dist / pinchStartDist
+    userZoom.value = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, +(pinchStartZoom * scale).toFixed(2)))
+  }
+}
 
 // ─── Scale-to-fit for mobile ─────────────────────────────────────────────────
 const pageSizePx = { A4: 794, A3: 1123, Letter: 816, Legal: 816 }
@@ -85,12 +132,14 @@ function updateZoomWidth() {
 
 const ZOOM_PADDING = 40 // 20px each side minimum
 
-const zoomScale = computed(() => {
+const baseZoomScale = computed(() => {
   const pageW = pageSizePx[activePageSize.value] || 794
   const available = zoomWidth.value - ZOOM_PADDING
   if (available >= pageW) return 1
   return available / pageW
 })
+
+const zoomScale = computed(() => baseZoomScale.value * userZoom.value)
 
 let resizeObserver = null
 onMounted(() => {
@@ -178,9 +227,17 @@ onUnmounted(() => { resizeObserver?.disconnect() })
         <div
           v-if="showZoomModal"
           class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+          @wheel.prevent="onModalWheel"
+          @touchstart="onTouchStart"
+          @touchmove="onTouchMove"
         >
           <!-- Scrollable area — click on background closes -->
-          <div ref="zoomWrapper" class="h-full overflow-y-auto overflow-x-hidden py-6" @click.self="closeZoom">
+          <div
+            ref="zoomWrapper"
+            class="h-full py-6 pb-20"
+            :class="userZoom > 1 ? 'overflow-auto' : 'overflow-y-auto overflow-x-hidden'"
+            @click.self="closeZoom"
+          >
             <div class="flex flex-col items-center" :style="{ gap: (16 * zoomScale) + 'px' }" @click.self="closeZoom">
               <div
                 v-for="(page, index) in pages"
@@ -224,6 +281,30 @@ onUnmounted(() => { resizeObserver?.disconnect() })
                 />
               </div>
             </div>
+          </div>
+
+          <!-- Zoom controls bar -->
+          <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-1 px-2 py-1.5 rounded-full bg-gray-900/80 backdrop-blur-sm shadow-lg">
+            <button
+              @click="zoomOut"
+              :disabled="userZoom <= MIN_ZOOM"
+              :class="[
+                'w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition',
+                userZoom <= MIN_ZOOM ? 'text-gray-600 cursor-not-allowed' : 'text-white hover:bg-white/20',
+              ]"
+            >-</button>
+            <button
+              @click="zoomReset"
+              class="px-2 h-8 rounded-full text-xs font-medium text-gray-300 hover:bg-white/20 transition min-w-[52px]"
+            >{{ zoomPercent }}%</button>
+            <button
+              @click="zoomIn"
+              :disabled="userZoom >= MAX_ZOOM"
+              :class="[
+                'w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition',
+                userZoom >= MAX_ZOOM ? 'text-gray-600 cursor-not-allowed' : 'text-white hover:bg-white/20',
+              ]"
+            >+</button>
           </div>
         </div>
       </Transition>
