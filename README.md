@@ -1,12 +1,29 @@
 # Resume Builder
 
 <p align="center">
-  <a href="https://github.com"><img src="https://shields.io" alt="License: MIT" /></a>
-  <a href="https://github.com/niketdhale/resume-builder"><img src="https://shields.io" alt="GitHub Stars" /></a>
-  <a href="https://github.com/commits"><img src="https://shields.io" alt="Last Commit" /></a>
-  <a href="https://github.com"><img src="https://github.com/workflows/YOUR_WORKFLOW_FILENAME.yml/badge.svg" alt="Build Status" /></a>
+  <!-- CI/CD Status (Points to the default branch) -->
   <a href="https://github.com">
-  <img src="https://github.com/workflows/main.yml/badge.svg" alt="Build Status" />
+    <img src="https://github.com/workflows/ci.yml/badge.svg" alt="Build Status" />
+  </a>
+
+  <!-- Discord Badge -->
+  <a href="https://discord.gg">
+    <img src="https://shields.io" alt="Discord" />
+  </a>
+
+  <!-- License Badge -->
+  <a href="https://github.com">
+    <img src="https://shields.io" alt="License: MIT" />
+  </a>
+
+  <!-- GitHub Stars -->
+  <a href="https://github.com">
+    <img src="https://shields.io" alt="GitHub Stars" />
+  </a>
+
+  <!-- Last Commit -->
+  <a href="https://github.com/commits">
+    <img src="https://shields.io" alt="Last Commit" />
   </a>
 </p>
 
