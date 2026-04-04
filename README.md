@@ -2,13 +2,8 @@
 
 <p align="center">
   <!-- License -->
-  <a href="https://github.com">
+  <a href="https://github.com/niketdhale/resume-builder/blob/main/LICENSE">
    <img alt="GitHub License" src="https://img.shields.io/github/license/niketdhale/resume-builder">
-  </a>
-
-  <!-- Stars -->
-  <a href="https://github.com">
-    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/niketdhale/resume-builder">
   </a>
 
   <!-- Last Commit -->
@@ -16,8 +11,14 @@
     <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/niketdhale/resume-builder">
   </a>
 
+  <!-- Github Action Workflow Status -->
   <a href="https://github.com/commits">
     <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/niketdhale/resume-builder/ci.yml">
+  </a>
+
+    <!-- Stars -->
+  <a href="[https://github.com](https://github.com/niketdhale/resume-builder/stargazers)">
+    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/niketdhale/resume-builder">
   </a>
 
 </p>
