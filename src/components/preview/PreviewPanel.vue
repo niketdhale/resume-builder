@@ -1,5 +1,5 @@
 <script setup>
-import { inject, computed, ref, onMounted } from 'vue'
+import { inject, computed, ref, onMounted, onUnmounted } from 'vue'
 import ResumePage from './ResumePage.vue'
 import ResumeHeader from './ResumeHeader.vue'
 import SectionContent from './SectionContent.vue'
@@ -55,6 +55,33 @@ onMounted(() => measureAndSplit())
 const showZoomModal = ref(false)
 function openZoom() { showZoomModal.value = true }
 function closeZoom() { showZoomModal.value = false }
+
+// ─── Scale-to-fit for mobile ─────────────────────────────────────────────────
+const pageSizePx = { A4: 794, A3: 1123, Letter: 816, Legal: 816 }
+const previewWrapper = ref(null)
+const containerWidth = ref(800)
+
+function updateWidth() {
+  if (previewWrapper.value) {
+    containerWidth.value = previewWrapper.value.clientWidth
+  }
+}
+
+const previewScale = computed(() => {
+  const pageW = pageSizePx[activePageSize.value] || 794
+  if (containerWidth.value >= pageW) return 1
+  return containerWidth.value / pageW
+})
+
+let resizeObserver = null
+onMounted(() => {
+  updateWidth()
+  if (previewWrapper.value) {
+    resizeObserver = new ResizeObserver(updateWidth)
+    resizeObserver.observe(previewWrapper.value)
+  }
+})
+onUnmounted(() => { resizeObserver?.disconnect() })
 </script>
 
 <template>
@@ -69,8 +96,19 @@ function closeZoom() { showZoomModal.value = false }
       <p class="text-xs text-gray-300 dark:text-gray-600 mt-1">Fill in Resume Info and add entries to get started</p>
     </div>
 
-    <div class="preview-pages-wrapper flex flex-col gap-4">
-      <div v-for="(page, index) in pages" :key="index" class="cursor-zoom-in" @click="openZoom">
+    <div ref="previewWrapper" class="preview-pages-wrapper flex flex-col items-center" :style="{ gap: (16 * previewScale) + 'px' }">
+      <div
+        v-for="(page, index) in pages"
+        :key="index"
+        class="cursor-zoom-in"
+        :style="{
+          width: (pageSizePx[activePageSize] || 794) + 'px',
+          transform: `scale(${previewScale})`,
+          transformOrigin: 'top center',
+          marginBottom: previewScale < 1 ? `-${(1 - previewScale) * (pageSizePx[activePageSize] || 794) * 1.414}px` : '0',
+        }"
+        @click="openZoom"
+      >
         <ResumePage
           :pageSize="activePageSize"
           :isFirstPage="page.isFirstPage"

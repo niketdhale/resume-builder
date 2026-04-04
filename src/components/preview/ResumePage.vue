@@ -31,13 +31,9 @@ const pageSizeConfig = {
 
 const pageStyle = computed(() => {
   const config = pageSizeConfig[props.pageSize] || pageSizeConfig.A4
-  const aspectRatio = config.width / config.height
   return {
-    width: '100%',
-    maxWidth: `${config.width}mm`,
+    width: `${config.width}mm`,
     minHeight: `${config.height}mm`,
-    aspectRatio: `${aspectRatio}`,
-    margin: '0 auto',
     padding: `${props.s.marginY}mm ${props.s.marginX}mm`,
     fontFamily: props.s.fontFamily + ', sans-serif',
     fontSize: props.s.fontSize + 'pt',
