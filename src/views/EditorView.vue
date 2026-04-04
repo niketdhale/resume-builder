@@ -152,7 +152,7 @@ onMounted(() => {
       </span>
       <!-- Guest: show local save indicator -->
       <span
-        v-if="!isLoggedIn && savedIndicator"
+        v-if="savedIndicator"
         class="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ml-1 text-gray-500 bg-gray-100 dark:text-gray-400 dark:bg-gray-800"
         title="Saved to your browser"
       >
