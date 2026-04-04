@@ -32,7 +32,7 @@ const pageSizeConfig = {
 const pageStyle = computed(() => {
   const config = pageSizeConfig[props.pageSize] || pageSizeConfig.A4
   return {
-    width: '100%',
+    width: `${config.width}mm`,
     minHeight: `${config.height}mm`,
     padding: `${props.s.marginY}mm ${props.s.marginX}mm`,
     fontFamily: props.s.fontFamily + ', sans-serif',

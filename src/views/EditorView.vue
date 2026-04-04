@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useKeyboardShortcuts } from '../composables/useKeyboardShortcuts'
 
 import NavBar from '../components/ui/NavBar.vue'
+import LanguageVariantTabs from '../components/editor/LanguageVariantTabs.vue'
 import SectionList from '../components/editor/SectionList.vue'
 import PreviewPanel from '../components/preview/PreviewPanel.vue'
 import CustomizePanel from '../components/customize/CustomizePanel.vue'
@@ -111,6 +112,8 @@ const mobilePanel = ref('content')
 const { isDesktop } = useBreakpoint()
 
 // ─── Set active resume from route ─────────────────────────────────────────────
+const sections = inject('sections')
+
 onMounted(() => {
   const id = route.params.id
   const found = resumes.value.find((r) => String(r.id) === String(id))
@@ -119,6 +122,11 @@ onMounted(() => {
     return
   }
   activeResumeId.value = found.id
+
+  // Collapse all sections when editor opens
+  sections.value
+    .filter((s) => s.viewIds?.includes(found.id))
+    .forEach((s) => { s.isCollapsed = true })
 })
 </script>
 
@@ -190,6 +198,9 @@ onMounted(() => {
         title="Keyboard shortcuts (?)"
       >?</button>
     </div>
+
+    <!-- Language variant tabs -->
+    <LanguageVariantTabs />
 
     <!-- ═══════════════════════════════════════════════════════════════
          RESPONSIVE SPLIT PANEL
