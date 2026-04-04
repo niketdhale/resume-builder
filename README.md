@@ -1,14 +1,9 @@
 # Resume Builder
 
 <p align="center">
-  <!-- Build Status - Assumes your file is .github/workflows/main.yml -->
-  <a href="https://github.com">
-    <img src="https://github.com/workflows/ci.yml/badge.svg" alt="Build Status" />
-  </a>
-
   <!-- License -->
   <a href="https://github.com">
-    <img src="https://shields.io" alt="License: MIT" />
+   <img alt="GitHub License" src="https://img.shields.io/github/license/niketdhale/resume-builder">
   </a>
 
   <!-- Stars -->
@@ -18,8 +13,13 @@
 
   <!-- Last Commit -->
   <a href="https://github.com/commits">
-    <img src="https://shields.io" alt="Last Commit" />
+    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/niketdhale/resume-builder">
   </a>
+
+  <a href="https://github.com/commits">
+    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/niketdhale/resume-builder/ci.yml">
+  </a>
+
 </p>
 
 
