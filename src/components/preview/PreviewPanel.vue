@@ -174,24 +174,21 @@ onUnmounted(() => { resizeObserver?.disconnect() })
       >
         <div
           v-if="showZoomModal"
-          class="fixed inset-0 z-50 flex flex-col bg-black/60 backdrop-blur-sm"
-          @click.self="closeZoom"
+          class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
         >
-          <!-- Close button -->
-          <div class="flex justify-end p-3 flex-shrink-0">
-            <button
-              @click="closeZoom"
-              class="flex items-center justify-center w-10 h-10 rounded-full bg-white/90 shadow-lg text-gray-600 hover:text-gray-900 hover:bg-white transition"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+          <!-- Close button — fixed top-right -->
+          <button
+            @click="closeZoom"
+            class="fixed top-4 right-4 z-[60] flex items-center justify-center w-10 h-10 rounded-full bg-white/90 shadow-lg text-gray-600 hover:text-gray-900 hover:bg-white transition"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
 
-          <!-- Scrollable scaled pages -->
-          <div ref="zoomWrapper" class="flex-1 overflow-y-auto overflow-x-hidden px-3 pb-6">
-            <div class="flex flex-col items-center" :style="{ gap: (16 * zoomScale) + 'px' }">
+          <!-- Scrollable scaled pages — click on background closes -->
+          <div ref="zoomWrapper" class="h-full overflow-y-auto overflow-x-hidden px-5 sm:px-8 py-6" @click.self="closeZoom">
+            <div class="flex flex-col items-center" :style="{ gap: (16 * zoomScale) + 'px' }" @click.self="closeZoom">
               <div
                 v-for="(page, index) in pages"
                 :key="index"
