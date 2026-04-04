@@ -10,8 +10,10 @@ function applyTemplate(template) {
     'accentColor', 'borderColor', 'fontCategory', 'fontFamily',
     'fontSize', 'lineHeight', 'marginX', 'marginY',
     'headingStyle', 'headingCapitalization', 'headingSize',
-    'headerLayout', 'accentHeadings', 'accentHeadingLine',
+    'headerLayout', 'headerPosition', 'accentHeadings', 'accentHeadingLine',
     'accentName', 'accentJobTitle', 'columns',
+    'sidebarBgColor', 'sidebarTextColor', 'contactLayout',
+    'headerBgColor', 'headerTextColor',
   ]
   keys.forEach((key) => {
     if (template[key] !== undefined) updateSetting(key, template[key])
@@ -22,10 +24,13 @@ function applyTemplate(template) {
 const activeTemplateId = computed(() => {
   const s = activeSettings.value
   const match = TEMPLATES.find((t) =>
-    t.accentColor === s.accentColor &&
-    t.fontFamily  === s.fontFamily  &&
-    t.headingStyle === s.headingStyle &&
-    t.columns      === s.columns,
+    t.accentColor    === s.accentColor &&
+    t.fontFamily     === s.fontFamily  &&
+    t.headingStyle   === s.headingStyle &&
+    t.columns        === s.columns &&
+    (t.headerPosition || 'top') === (s.headerPosition || 'top') &&
+    (t.sidebarBgColor || '') === (s.sidebarBgColor || '') &&
+    (t.headerBgColor  || '') === (s.headerBgColor  || ''),
   )
   return match?.id ?? null
 })
@@ -63,45 +68,79 @@ function headingPreviewStyle(t) {
         ]"
       >
         <!-- Mini resume preview card -->
-        <div
-          class="w-full p-3 flex flex-col gap-1.5"
-          :style="{ backgroundColor: '#fff', minHeight: '88px' }"
-        >
-          <!-- Name bar -->
-          <div class="flex items-center justify-between gap-1">
-            <div class="flex flex-col gap-0.5 flex-1 min-w-0">
-              <div
-                class="rounded-sm"
-                :style="{ height: '5px', width: '55%', backgroundColor: t.accentColor }"
-              />
-              <div
-                class="rounded-sm"
-                :style="{ height: '3px', width: '38%', backgroundColor: '#9ca3af' }"
-              />
+        <div class="w-full overflow-hidden" :style="{ backgroundColor: '#fff', minHeight: '88px' }">
+
+          <!-- ── SIDEBAR preview ── -->
+          <div v-if="t.sidebarBgColor" class="flex h-full" style="min-height: 88px;">
+            <div class="flex flex-col items-center gap-1 flex-shrink-0" style="width: 38%; padding: 6px 4px;" :style="{ backgroundColor: t.sidebarBgColor }">
+              <div class="rounded-full" style="width: 16px; height: 16px; background: rgba(255,255,255,0.25); border: 1.5px solid rgba(255,255,255,0.4); flex-shrink: 0;" />
+              <div class="rounded-sm" style="height: 4px; width: 70%; background: rgba(255,255,255,0.85);" />
+              <div class="rounded-sm" style="height: 2.5px; width: 55%; background: rgba(255,255,255,0.5);" />
+              <div style="width: 80%; height: 1px; background: rgba(255,255,255,0.2); margin: 1px 0;" />
+              <div class="rounded-sm" style="height: 2px; width: 80%; background: rgba(255,255,255,0.4);" />
+              <div class="rounded-sm" style="height: 2px; width: 80%; background: rgba(255,255,255,0.4);" />
+              <div class="rounded-sm" style="height: 2px; width: 75%; background: rgba(255,255,255,0.4);" />
             </div>
-            <!-- Column indicator -->
-            <div v-if="t.columns === 'two'" class="flex gap-0.5 flex-shrink-0">
-              <div class="w-4 h-7 rounded-sm" :style="{ backgroundColor: t.borderColor || '#e5e7eb' }" />
-              <div class="w-4 h-7 rounded-sm" :style="{ backgroundColor: t.borderColor || '#e5e7eb' }" />
-            </div>
-            <div v-else-if="t.columns === 'mix'" class="flex gap-0.5 flex-shrink-0">
-              <div class="w-3 h-7 rounded-sm" :style="{ backgroundColor: t.borderColor || '#e5e7eb' }" />
-              <div class="w-5 h-7 rounded-sm" :style="{ backgroundColor: t.borderColor || '#e5e7eb' }" />
+            <div class="flex-1 flex flex-col gap-1" style="padding: 6px;">
+              <div :style="headingPreviewStyle(t)">Experience</div>
+              <div class="rounded-sm" :style="{ height: '2.5px', width: '90%', backgroundColor: '#d1d5db' }" />
+              <div class="rounded-sm" :style="{ height: '2px', width: '70%', backgroundColor: '#e5e7eb' }" />
+              <div class="rounded-sm" :style="{ height: '2px', width: '80%', backgroundColor: '#e5e7eb' }" />
+              <div :style="{ ...headingPreviewStyle(t), marginTop: '4px' }">Education</div>
+              <div class="rounded-sm" :style="{ height: '2px', width: '75%', backgroundColor: '#e5e7eb' }" />
             </div>
           </div>
 
-          <!-- Divider -->
-          <div class="w-full h-px" :style="{ backgroundColor: t.borderColor || '#e5e7eb' }" />
-
-          <!-- Sample heading -->
-          <div :style="headingPreviewStyle(t)">Experience</div>
-
-          <!-- Sample content lines -->
-          <div class="flex flex-col gap-0.5">
-            <div class="rounded-sm" :style="{ height: '3px', width: '70%', backgroundColor: '#d1d5db' }" />
-            <div class="rounded-sm" :style="{ height: '2.5px', width: '55%', backgroundColor: '#e5e7eb' }" />
-            <div class="rounded-sm" :style="{ height: '2.5px', width: '80%', backgroundColor: '#e5e7eb' }" />
+          <!-- ── TWO-TONE header preview ── -->
+          <div v-else-if="t.headerBgColor" class="flex flex-col" style="min-height: 88px;">
+            <div class="flex items-end justify-between flex-shrink-0" style="padding: 6px 8px 5px;" :style="{ backgroundColor: t.headerBgColor }">
+              <div class="flex flex-col gap-1">
+                <div class="rounded-sm" style="height: 5px; width: 65px; background: rgba(255,255,255,0.9);" />
+                <div class="rounded-sm" style="height: 3px; width: 50px; background: rgba(255,255,255,0.55);" />
+              </div>
+              <div class="flex flex-col gap-1 items-end">
+                <div class="rounded-sm" style="height: 2px; width: 36px; background: rgba(255,255,255,0.45);" />
+                <div class="rounded-sm" style="height: 2px; width: 28px; background: rgba(255,255,255,0.45);" />
+              </div>
+            </div>
+            <div class="flex-1 flex flex-col gap-1" style="padding: 5px 8px;">
+              <div :style="headingPreviewStyle(t)">Experience</div>
+              <div class="rounded-sm" :style="{ height: '2.5px', width: '88%', backgroundColor: '#d1d5db' }" />
+              <div class="rounded-sm" :style="{ height: '2px', width: '72%', backgroundColor: '#e5e7eb' }" />
+              <div class="rounded-sm" :style="{ height: '2px', width: '80%', backgroundColor: '#e5e7eb' }" />
+            </div>
           </div>
+
+          <!-- ── DEFAULT preview ── -->
+          <div v-else class="w-full p-3 flex flex-col gap-1.5">
+            <!-- Name bar -->
+            <div class="flex items-center justify-between gap-1">
+              <div class="flex flex-col gap-0.5 flex-1 min-w-0">
+                <div class="rounded-sm" :style="{ height: '5px', width: '55%', backgroundColor: t.accentColor }" />
+                <div class="rounded-sm" :style="{ height: '3px', width: '38%', backgroundColor: '#9ca3af' }" />
+              </div>
+              <!-- Column indicator -->
+              <div v-if="t.columns === 'two'" class="flex gap-0.5 flex-shrink-0">
+                <div class="w-4 h-7 rounded-sm" :style="{ backgroundColor: t.borderColor || '#e5e7eb' }" />
+                <div class="w-4 h-7 rounded-sm" :style="{ backgroundColor: t.borderColor || '#e5e7eb' }" />
+              </div>
+              <div v-else-if="t.columns === 'mix'" class="flex gap-0.5 flex-shrink-0">
+                <div class="w-3 h-7 rounded-sm" :style="{ backgroundColor: t.borderColor || '#e5e7eb' }" />
+                <div class="w-5 h-7 rounded-sm" :style="{ backgroundColor: t.borderColor || '#e5e7eb' }" />
+              </div>
+            </div>
+            <!-- Divider -->
+            <div class="w-full h-px" :style="{ backgroundColor: t.borderColor || '#e5e7eb' }" />
+            <!-- Sample heading -->
+            <div :style="headingPreviewStyle(t)">Experience</div>
+            <!-- Sample content lines -->
+            <div class="flex flex-col gap-0.5">
+              <div class="rounded-sm" :style="{ height: '3px', width: '70%', backgroundColor: '#d1d5db' }" />
+              <div class="rounded-sm" :style="{ height: '2.5px', width: '55%', backgroundColor: '#e5e7eb' }" />
+              <div class="rounded-sm" :style="{ height: '2.5px', width: '80%', backgroundColor: '#e5e7eb' }" />
+            </div>
+          </div>
+
         </div>
 
         <!-- Template info -->
