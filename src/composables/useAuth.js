@@ -49,6 +49,8 @@ export function useAuth() {
   async function signOut() {
     const { error } = await auth.signOut()
     if (error) console.error('[useAuth] signOut error:', error)
+    // Clear offline queue so stale failed writes don't block the next session
+    localStorage.removeItem('rb_offline_queue')
     user.value = null
   }
 
