@@ -34,6 +34,7 @@ import {
 } from './composables/useImportExport'
 
 import { setupDebugGlobal } from './utils/useDebugLogger'
+import { useFontLoader } from './composables/useFontLoader'
 import { undo, redo, canUndo, canRedo } from './composables/useHistory'
 import { hydrateJobs, setupJobStorageWatcher } from './jobs/composables/useJobStorage'
 import { useAuth } from './composables/useAuth.js'
@@ -67,6 +68,7 @@ setupStorageWatchers()
 hydrateJobs()
 setupJobStorageWatcher()
 setupDebugGlobal({ resumes, sections, activeResumeId, activeSettings })
+useFontLoader(activeSettings)
 
 provide('undo', undo)
 provide('redo', redo)
