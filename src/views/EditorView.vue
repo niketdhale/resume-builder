@@ -22,6 +22,7 @@ const activePageSize = inject('activePageSize')
 const savedIndicator = inject('savedIndicator')
 const lastSavedTime = inject('lastSavedTime')
 const formatSavedTime = inject('formatSavedTime')
+const syncStatus = inject('syncStatus')
 const showMetadataModal = ref(false)
 
 // ─── Photo upload ─────────────────────────────────────────────────────────────
@@ -156,10 +157,24 @@ onMounted(() => {
         leave-to-class="opacity-0"
       >
         <span
-          v-if="savedIndicator"
+          v-if="syncStatus === 'saving'"
+          class="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ml-1 text-gray-400 bg-gray-100 dark:text-gray-500 dark:bg-gray-800"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 animate-pulse inline-block"></span>
+          Saving…
+        </span>
+        <span
+          v-else-if="syncStatus === 'synced'"
           class="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ml-1 text-green-500 bg-green-50 dark:text-green-400 dark:bg-green-950/40"
         >
-          ✓ Saved at {{ formatSavedTime(lastSavedTime) }}
+          ✓ Synced at {{ formatSavedTime(lastSavedTime) }}
+        </span>
+        <span
+          v-else-if="syncStatus === 'pending'"
+          class="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ml-1 text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/40"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse inline-block"></span>
+          Pending sync
         </span>
       </Transition>
 

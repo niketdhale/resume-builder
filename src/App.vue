@@ -8,7 +8,7 @@ import {
 
 import {
   hydrateFromStorage, setupStorageWatchers,
-  savedIndicator, lastSavedTime, formatSavedTime,
+  savedIndicator, lastSavedTime, formatSavedTime, syncStatus,
 } from './composables/useStorage'
 
 import {
@@ -83,6 +83,7 @@ provide('activePageSize', activePageSize)
 provide('savedIndicator', savedIndicator)
 provide('lastSavedTime', lastSavedTime)
 provide('formatSavedTime', formatSavedTime)
+provide('syncStatus', syncStatus)
 
 provide('addResume', addResume)
 provide('renameResume', renameResume)

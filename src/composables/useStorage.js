@@ -15,9 +15,11 @@ const KEYS = {
 // ─── Save ─────────────────────────────────────────────────────────────────────
 
 export async function saveToStorage() {
-  await getStorageAdapter().save(KEYS.resumes, resumes.value)
-  await getStorageAdapter().save(KEYS.sections, sections.value)
-  await getStorageAdapter().save(KEYS.active, activeResumeId.value)
+  const adapter = getStorageAdapter()
+  const r1 = await adapter.save(KEYS.resumes, resumes.value)
+  const r2 = await adapter.save(KEYS.sections, sections.value)
+  await adapter.save(KEYS.active, activeResumeId.value)
+  return r1 !== false && r2 !== false
 }
 
 // ─── Load ─────────────────────────────────────────────────────────────────────
@@ -50,18 +52,33 @@ export async function hydrateFromStorage() {
   }
 }
 
-// ─── Auto-save indicator ──────────────────────────────────────────────────────
+// ─── Sync status ─────────────────────────────────────────────────────────────
+// 'idle'    — no recent activity
+// 'saving'  — debounce fired, write in-flight
+// 'synced'  — last write succeeded (resets to idle after 3s)
+// 'pending' — last write failed, data queued for retry
 
-export const savedIndicator = ref(false)
+export const syncStatus = ref('idle')
 export const lastSavedTime = ref(null)
+
+// kept for backward-compat with anything still injecting savedIndicator
+export const savedIndicator = ref(false)
+
 let saveTimer = null
+let syncResetTimer = null
 
 export function triggerSave() {
+  syncStatus.value = 'saving'
   clearTimeout(saveTimer)
   saveTimer = setTimeout(async () => {
-    await saveToStorage()
+    const ok = await saveToStorage()
     lastSavedTime.value = new Date()
-    savedIndicator.value = true
+    savedIndicator.value = ok
+    syncStatus.value = ok ? 'synced' : 'pending'
+    if (ok) {
+      clearTimeout(syncResetTimer)
+      syncResetTimer = setTimeout(() => { syncStatus.value = 'idle' }, 3000)
+    }
   }, 500)
 }
 

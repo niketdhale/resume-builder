@@ -1,10 +1,11 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from '../../composables/useTheme.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { migrationState } from '../../composables/useMigration.js'
 import { cloudAdapter } from '../../services/storage/index.js'
+import { syncStatus } from '../../composables/useStorage.js'
 import { useBreakpoint } from '../../composables/useBreakpoint.js'
 import MobileDrawer from './MobileDrawer.vue'
 
@@ -17,24 +18,20 @@ const showUserMenu = ref(false)
 const showDrawer   = ref(false)
 useBreakpoint()
 
-// ── Offline queue indicator ────────────────────────────────────────────────────
-const hasPendingWrites = ref(false)
-let _queueInterval = null
-
-function checkQueue() {
-  hasPendingWrites.value = cloudAdapter.hasPendingWrites()
-}
+// ── Sync indicator ─────────────────────────────────────────────────────────────
+// On mount, check if there are queued writes from a previous session (before
+// any save fires and syncStatus updates).
+const hasQueuedWrites = ref(false)
 
 onMounted(() => {
-  checkQueue()
-  _queueInterval = setInterval(checkQueue, 3000)
-  window.addEventListener('online', checkQueue)
+  hasQueuedWrites.value = cloudAdapter.hasPendingWrites()
 })
 
-onUnmounted(() => {
-  clearInterval(_queueInterval)
-  window.removeEventListener('online', checkQueue)
-})
+// Show pending if either syncStatus says so, or there were queued writes on load
+// that haven't been cleared yet (they'll clear once a successful save flushes them).
+const showPending  = computed(() => isLoggedIn.value && (syncStatus.value === 'pending' || hasQueuedWrites.value))
+const showSaving   = computed(() => isLoggedIn.value && syncStatus.value === 'saving')
+const showSynced   = computed(() => isLoggedIn.value && syncStatus.value === 'synced')
 
 const navItems = [
   { name: 'overview', label: 'My Resumes', icon: '📄' },
@@ -103,7 +100,7 @@ function closeMenu(e) {
 
     <!-- Right -->
     <div class="flex items-center gap-3">
-      <!-- Offline / pending-writes badge -->
+      <!-- Cloud sync status badge -->
       <Transition
         enter-active-class="transition duration-200 ease-out"
         enter-from-class="opacity-0 scale-90"
@@ -113,7 +110,23 @@ function closeMenu(e) {
         leave-to-class="opacity-0 scale-90"
       >
         <div
-          v-if="isLoggedIn && hasPendingWrites"
+          v-if="showSaving"
+          title="Saving changes to cloud…"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 cursor-default select-none"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse inline-block"></span>
+          Syncing…
+        </div>
+        <div
+          v-else-if="showSynced"
+          title="All changes saved to cloud"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 cursor-default select-none"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>
+          Synced
+        </div>
+        <div
+          v-else-if="showPending"
           title="Some changes couldn't reach the cloud — they'll sync when you're back online"
           class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 cursor-default select-none"
         >
