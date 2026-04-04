@@ -2,7 +2,6 @@
 import { ref, inject, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useKeyboardShortcuts } from '../composables/useKeyboardShortcuts'
-import { useAuth } from '../composables/useAuth'
 
 import NavBar from '../components/ui/NavBar.vue'
 import SectionList from '../components/editor/SectionList.vue'
@@ -21,10 +20,6 @@ const activeResumeId = inject('activeResumeId')
 const activeMetadata = inject('activeMetadata')
 const activePageSize = inject('activePageSize')
 const savedIndicator = inject('savedIndicator')
-const lastSavedTime = inject('lastSavedTime')
-const formatSavedTime = inject('formatSavedTime')
-const syncStatus = inject('syncStatus')
-const { isLoggedIn } = useAuth()
 const showMetadataModal = ref(false)
 
 // ─── Photo upload ─────────────────────────────────────────────────────────────
