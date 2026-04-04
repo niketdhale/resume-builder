@@ -83,10 +83,13 @@ function updateZoomWidth() {
   }
 }
 
+const ZOOM_PADDING = 40 // 20px each side minimum
+
 const zoomScale = computed(() => {
   const pageW = pageSizePx[activePageSize.value] || 794
-  if (zoomWidth.value >= pageW) return 1
-  return zoomWidth.value / pageW
+  const available = zoomWidth.value - ZOOM_PADDING
+  if (available >= pageW) return 1
+  return available / pageW
 })
 
 let resizeObserver = null
@@ -176,22 +179,13 @@ onUnmounted(() => { resizeObserver?.disconnect() })
           v-if="showZoomModal"
           class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
         >
-          <!-- Close button — fixed top-right -->
-          <button
-            @click="closeZoom"
-            class="fixed top-4 right-4 z-[60] flex items-center justify-center w-10 h-10 rounded-full bg-white/90 shadow-lg text-gray-600 hover:text-gray-900 hover:bg-white transition"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-
-          <!-- Scrollable scaled pages — click on background closes -->
-          <div ref="zoomWrapper" class="h-full overflow-y-auto overflow-x-hidden px-5 sm:px-8 py-6" @click.self="closeZoom">
+          <!-- Scrollable area — click on background closes -->
+          <div ref="zoomWrapper" class="h-full overflow-y-auto overflow-x-hidden py-6" @click.self="closeZoom">
             <div class="flex flex-col items-center" :style="{ gap: (16 * zoomScale) + 'px' }" @click.self="closeZoom">
               <div
                 v-for="(page, index) in pages"
                 :key="index"
+                class="relative"
                 :style="{
                   width: (pageSizePx[activePageSize] || 794) + 'px',
                   transform: `scale(${zoomScale})`,
@@ -199,6 +193,16 @@ onUnmounted(() => { resizeObserver?.disconnect() })
                   marginBottom: zoomScale < 1 ? `-${(1 - zoomScale) * (pageSizePx[activePageSize] || 794) * 1.414}px` : '0',
                 }"
               >
+                <!-- Close button — top-right of first page -->
+                <button
+                  v-if="index === 0"
+                  @click="closeZoom"
+                  class="absolute -top-3 -right-3 z-10 flex items-center justify-center w-9 h-9 rounded-full bg-white shadow-lg text-gray-500 hover:text-gray-900 hover:bg-white transition"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
                 <ResumePage
                   :pageSize="activePageSize"
                   :isFirstPage="page.isFirstPage"
