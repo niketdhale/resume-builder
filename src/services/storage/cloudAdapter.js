@@ -41,7 +41,15 @@ async function flushQueue(userId) {
   const remaining = []
   for (const op of q) {
     try { await _save(op.key, op.data, userId) }
-    catch { remaining.push(op) }
+    catch (err) {
+      // Re-queue only transient (network) failures. Supabase/DB errors have a
+      // `code` property — these are data problems that won't resolve on retry.
+      if (err?.code) {
+        console.warn('[cloudAdapter] dropping unrecoverable queued op:', err.code, err.message)
+      } else {
+        remaining.push(op)
+      }
+    }
   }
   writeQueue(remaining)
 }

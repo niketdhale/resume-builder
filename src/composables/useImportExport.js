@@ -86,6 +86,7 @@ export function confirmImport() {
       sections.value.push({
         ...s,
         id: uid(),
+        resumeId: activeResumeId.value,
         viewIds: [activeResumeId.value],
         sharedAcrossViews: false,
         entries: (s.entries || []).map((e) => ({ ...e, id: uid() })),
@@ -103,6 +104,7 @@ export function confirmImport() {
       sections.value.push({
         ...s,
         id: uid(),
+        resumeId: newId,
         viewIds: [newId],
         sharedAcrossViews: false,
         entries: (s.entries || []).map((e) => ({ ...e, id: uid() })),
