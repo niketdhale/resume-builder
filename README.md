@@ -7,17 +7,17 @@
   </a>
 
   <!-- Last Commit -->
-  <a href="https://github.com/commits">
+  <a href="https://github.com/niketdhale/resume-builder/commits">
     <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/niketdhale/resume-builder">
   </a>
 
   <!-- Github Action Workflow Status -->
-  <a href="https://github.com/commits">
+  <a href="https://github.com/niketdhale/resume-builder/actions">
     <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/niketdhale/resume-builder/ci.yml">
   </a>
 
-    <!-- Stars -->
-  <a href="[https://github.com](https://github.com/niketdhale/resume-builder/stargazers)">
+  <!-- Stars -->
+  <a href="https://github.com/niketdhale/resume-builder/stargazers">
     <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/niketdhale/resume-builder">
   </a>
 
