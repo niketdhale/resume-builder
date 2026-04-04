@@ -60,10 +60,10 @@ const photoStyle = computed(() => ({
   <template v-if="headerLayout === 'centered'">
     <div class="flex flex-col items-center text-center gap-1">
       <img v-if="hasPhoto" :src="metadata.photo" alt="Profile photo" :style="photoStyle" class="mb-2" />
-      <h1 class="text-2xl font-bold tracking-tight" :style="nameStyle">
+      <h1 class="font-bold tracking-tight" style="font-size: 1.8em" :style="nameStyle">
         {{ metadata.fullName || 'Your Name' }}
       </h1>
-      <p v-if="metadata.jobTitle" class="text-sm font-medium" :style="jobTitleStyle">
+      <p v-if="metadata.jobTitle" class="font-medium" :style="jobTitleStyle">
         {{ metadata.jobTitle }}
       </p>
       <div class="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-1">
@@ -72,7 +72,8 @@ const photoStyle = computed(() => ({
           :is="item.href(metadata) ? 'a' : 'span'"
           :href="item.href(metadata) || undefined"
           target="_blank" rel="noopener noreferrer"
-          class="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+          class="flex items-center gap-1 text-gray-500 hover:text-gray-700 transition-colors"
+          style="font-size: 0.85em"
         >
           <component v-if="showIcons" :is="item.icon" :size="11" :style="iconStyle" />
           {{ item.label(metadata) }}
@@ -87,11 +88,11 @@ const photoStyle = computed(() => ({
       <img v-if="hasPhoto" :src="metadata.photo" alt="Profile photo" :style="photoStyle" />
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-3 flex-wrap">
-          <h1 class="text-lg font-bold tracking-tight" :style="nameStyle">
+          <h1 class="font-bold tracking-tight" style="font-size: 1.3em" :style="nameStyle">
             {{ metadata.fullName || 'Your Name' }}
           </h1>
           <span v-if="metadata.jobTitle" class="text-gray-300">|</span>
-          <p v-if="metadata.jobTitle" class="text-sm font-medium" :style="jobTitleStyle">
+          <p v-if="metadata.jobTitle" class="font-medium" :style="jobTitleStyle">
             {{ metadata.jobTitle }}
           </p>
         </div>
@@ -101,7 +102,8 @@ const photoStyle = computed(() => ({
             :is="item.href(metadata) ? 'a' : 'span'"
             :href="item.href(metadata) || undefined"
             target="_blank" rel="noopener noreferrer"
-            class="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+            class="flex items-center gap-1 text-gray-500 hover:text-gray-700 transition-colors"
+            style="font-size: 0.85em"
           >
             <component v-if="showIcons" :is="item.icon" :size="11" :style="iconStyle" />
             {{ item.label(metadata) }}
@@ -115,11 +117,11 @@ const photoStyle = computed(() => ({
   <template v-else-if="headerLayout === 'bold'">
     <div class="flex items-start justify-between gap-4">
       <div class="flex-1 min-w-0">
-        <h1 class="text-3xl font-black tracking-tight" :style="nameStyle">
+        <h1 class="font-black tracking-tight" style="font-size: 2.2em" :style="nameStyle">
           {{ metadata.fullName || 'Your Name' }}
         </h1>
         <div class="h-1 w-16 rounded-full mt-1 mb-2" :style="{ backgroundColor: s.accentColor }" />
-        <p v-if="metadata.jobTitle" class="text-sm font-medium mb-2" :style="jobTitleStyle">
+        <p v-if="metadata.jobTitle" class="font-medium mb-2" :style="jobTitleStyle">
           {{ metadata.jobTitle }}
         </p>
         <div class="flex flex-wrap gap-x-4 gap-y-1">
@@ -128,7 +130,8 @@ const photoStyle = computed(() => ({
             :is="item.href(metadata) ? 'a' : 'span'"
             :href="item.href(metadata) || undefined"
             target="_blank" rel="noopener noreferrer"
-            class="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+            class="flex items-center gap-1 text-gray-500 hover:text-gray-700 transition-colors"
+            style="font-size: 0.85em"
           >
             <component v-if="showIcons" :is="item.icon" :size="11" :style="iconStyle" />
             {{ item.label(metadata) }}
@@ -143,10 +146,10 @@ const photoStyle = computed(() => ({
   <template v-else>
     <div class="flex items-start justify-between gap-4">
       <div class="flex-1 min-w-0">
-        <h1 class="text-2xl font-bold tracking-tight" :style="nameStyle">
+        <h1 class="font-bold tracking-tight" style="font-size: 1.8em" :style="nameStyle">
           {{ metadata.fullName || 'Your Name' }}
         </h1>
-        <p v-if="metadata.jobTitle" class="text-sm font-medium mt-0.5" :style="jobTitleStyle">
+        <p v-if="metadata.jobTitle" class="font-medium mt-0.5" :style="jobTitleStyle">
           {{ metadata.jobTitle }}
         </p>
         <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2">
@@ -155,7 +158,8 @@ const photoStyle = computed(() => ({
             :is="item.href(metadata) ? 'a' : 'span'"
             :href="item.href(metadata) || undefined"
             target="_blank" rel="noopener noreferrer"
-            class="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+            class="flex items-center gap-1 text-gray-500 hover:text-gray-700 transition-colors"
+            style="font-size: 0.85em"
           >
             <component v-if="showIcons" :is="item.icon" :size="11" :style="iconStyle" />
             {{ item.label(metadata) }}

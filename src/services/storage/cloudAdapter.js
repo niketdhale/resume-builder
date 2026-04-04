@@ -41,7 +41,15 @@ async function flushQueue(userId) {
   const remaining = []
   for (const op of q) {
     try { await _save(op.key, op.data, userId) }
-    catch { remaining.push(op) }
+    catch (err) {
+      // Re-queue only transient (network) failures. Supabase/DB errors have a
+      // `code` property — these are data problems that won't resolve on retry.
+      if (err?.code) {
+        console.warn('[cloudAdapter] dropping unrecoverable queued op:', err.code, err.message)
+      } else {
+        remaining.push(op)
+      }
+    }
   }
   writeQueue(remaining)
 }
@@ -70,13 +78,19 @@ function keyToTable(key) {
 
 // ── Field mappers ─────────────────────────────────────────────────────────────
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+function toIso(v) {
+  return v ?? new Date().toISOString()
+}
+
 function resumeToRow(r, userId) {
   return {
     id: r.id, user_id: userId,
     title: r.title ?? 'My Resume', page_size: r.pageSize ?? 'A4',
     variant_of: r.variantOf ?? null, language: r.language ?? 'English',
     settings: r.settings ?? {}, metadata: r.metadata ?? {},
-    created_at: r.createdAt, updated_at: r.updatedAt,
+    created_at: toIso(r.createdAt), updated_at: toIso(r.updatedAt),
   }
 }
 function rowToResume(row) {
@@ -96,8 +110,11 @@ function sectionToRow(s, userId) {
     col: s.column ?? 'full',
     is_hidden: s.isHidden ?? false, is_collapsed: s.isCollapsed ?? false,
     shared_across_views: s.sharedAcrossViews ?? false,
-    view_ids: s.viewIds ?? [], order_index: s.orderIndex ?? 0,
-    created_at: s.createdAt, updated_at: s.updatedAt,
+    // Filter to valid UUIDs only — legacy local IDs (e.g. 'resume_001') would
+    // fail the uuid[] column type cast and cause a 400 from PostgREST.
+    view_ids: (s.viewIds ?? []).filter(id => UUID_RE.test(id)),
+    order_index: s.orderIndex ?? 0,
+    created_at: toIso(s.createdAt), updated_at: toIso(s.updatedAt),
   }
 }
 function rowToSection(row) {
@@ -122,7 +139,7 @@ function jobToRow(j, userId) {
     resume_id: j.resumeId ?? null, notes: j.notes ?? '',
     url: j.url ?? '', attachments: j.attachments ?? [],
     custom_fields: j.customFields ?? {},
-    created_at: j.createdAt, updated_at: j.updatedAt,
+    created_at: toIso(j.createdAt), updated_at: toIso(j.updatedAt),
   }
 }
 function rowToJob(row) {

@@ -8,7 +8,7 @@ import {
 
 import {
   hydrateFromStorage, setupStorageWatchers,
-  savedIndicator, lastSavedTime, formatSavedTime,
+  savedIndicator, lastSavedTime, formatSavedTime, syncStatus,
 } from './composables/useStorage'
 
 import {
@@ -34,6 +34,7 @@ import {
 } from './composables/useImportExport'
 
 import { setupDebugGlobal } from './utils/useDebugLogger'
+import { useFontLoader } from './composables/useFontLoader'
 import { undo, redo, canUndo, canRedo } from './composables/useHistory'
 import { hydrateJobs, setupJobStorageWatcher } from './jobs/composables/useJobStorage'
 import { useAuth } from './composables/useAuth.js'
@@ -41,8 +42,20 @@ import { setStorageUserId } from './services/storage/index.js'
 import { setupMigration } from './composables/useMigration.js'
 
 // Keep storage adapter in sync with the logged-in user
+// Re-hydrate when auth resolves (local → real user) so returning users load cloud data
 const { userId } = useAuth()
-watch(userId, (id) => setStorageUserId(id), { immediate: true })
+watch(userId, async (id, oldId) => {
+  setStorageUserId(id)
+  if (oldId === 'local' && id !== 'local') {
+    // Logged in — load from cloud
+    await hydrateFromStorage()
+    await hydrateJobs()
+  } else if (id === 'local' && oldId && oldId !== 'local') {
+    // Logged out — reload from local storage (clears cloud data from memory)
+    await hydrateFromStorage()
+    await hydrateJobs()
+  }
+}, { immediate: true })
 
 // On first login: migrate localStorage → Supabase, then reload from cloud
 setupMigration(async () => {
@@ -55,6 +68,7 @@ setupStorageWatchers()
 hydrateJobs()
 setupJobStorageWatcher()
 setupDebugGlobal({ resumes, sections, activeResumeId, activeSettings })
+useFontLoader(activeSettings)
 
 provide('undo', undo)
 provide('redo', redo)
@@ -71,6 +85,7 @@ provide('activePageSize', activePageSize)
 provide('savedIndicator', savedIndicator)
 provide('lastSavedTime', lastSavedTime)
 provide('formatSavedTime', formatSavedTime)
+provide('syncStatus', syncStatus)
 
 provide('addResume', addResume)
 provide('renameResume', renameResume)

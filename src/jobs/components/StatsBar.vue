@@ -5,7 +5,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="grid grid-cols-6 gap-3">
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
     <!-- Total Applied -->
     <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
       <p class="text-2xl font-bold text-gray-900 dark:text-gray-50">{{ stats.total }}</p>

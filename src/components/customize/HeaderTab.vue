@@ -39,8 +39,79 @@ const orderedFields = computed({
 <template>
   <div class="p-5 flex flex-col gap-6">
 
-    <!-- Header Layout -->
+    <!-- Header Position -->
     <div>
+      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Header Position</h3>
+      <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm">
+        <div class="grid grid-cols-3 gap-2">
+          <button
+            @click="updateSetting('headerPosition', 'top')"
+            :class="[
+              'flex flex-col items-center gap-2 py-3 px-2 rounded-xl border-2 transition-all',
+              activeSettings.headerPosition === 'top'
+                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
+                : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500',
+            ]"
+          >
+            <div class="w-full flex flex-col gap-1 px-1">
+              <div class="h-2 bg-gray-400 dark:bg-gray-500 rounded-sm w-full" />
+              <div class="h-1 bg-gray-200 dark:bg-gray-600 rounded-full w-full" />
+              <div class="h-1 bg-gray-200 dark:bg-gray-600 rounded-full w-3/4" />
+            </div>
+            <span :class="['text-xs font-medium', activeSettings.headerPosition === 'top' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400']">Top</span>
+          </button>
+
+          <button
+            @click="updateSetting('headerPosition', 'left')"
+            :class="[
+              'flex flex-col items-center gap-2 py-3 px-2 rounded-xl border-2 transition-all',
+              activeSettings.headerPosition === 'left'
+                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
+                : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500',
+            ]"
+          >
+            <div class="w-full flex gap-1 px-1">
+              <div class="w-2/5 flex flex-col gap-1">
+                <div class="h-2 bg-gray-400 dark:bg-gray-500 rounded-sm w-full" />
+                <div class="h-1 bg-gray-200 dark:bg-gray-600 rounded-full w-full" />
+              </div>
+              <div class="w-3/5 flex flex-col gap-1">
+                <div class="h-1 bg-gray-200 dark:bg-gray-600 rounded-full" />
+                <div class="h-1 bg-gray-200 dark:bg-gray-600 rounded-full" />
+                <div class="h-1 bg-gray-200 dark:bg-gray-600 rounded-full w-2/3" />
+              </div>
+            </div>
+            <span :class="['text-xs font-medium', activeSettings.headerPosition === 'left' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400']">Left</span>
+          </button>
+
+          <button
+            @click="updateSetting('headerPosition', 'right')"
+            :class="[
+              'flex flex-col items-center gap-2 py-3 px-2 rounded-xl border-2 transition-all',
+              activeSettings.headerPosition === 'right'
+                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30'
+                : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500',
+            ]"
+          >
+            <div class="w-full flex gap-1 px-1">
+              <div class="w-3/5 flex flex-col gap-1">
+                <div class="h-1 bg-gray-200 dark:bg-gray-600 rounded-full" />
+                <div class="h-1 bg-gray-200 dark:bg-gray-600 rounded-full" />
+                <div class="h-1 bg-gray-200 dark:bg-gray-600 rounded-full w-2/3" />
+              </div>
+              <div class="w-2/5 flex flex-col gap-1">
+                <div class="h-2 bg-gray-400 dark:bg-gray-500 rounded-sm w-full" />
+                <div class="h-1 bg-gray-200 dark:bg-gray-600 rounded-full w-full" />
+              </div>
+            </div>
+            <span :class="['text-xs font-medium', activeSettings.headerPosition === 'right' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400']">Right</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Layout -->
+    <div v-if="activeSettings.headerPosition === 'top' || !activeSettings.headerPosition">
       <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Header Layout</h3>
       <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm">
         <div class="grid grid-cols-2 gap-3">

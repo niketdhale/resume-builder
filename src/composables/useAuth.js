@@ -8,7 +8,9 @@
  */
 
 import { ref, computed } from 'vue'
-import { supabaseAuth } from '../services/auth/supabaseAuth.js'
+import { getAuthService } from '../services/auth/index.js'
+
+const auth = getAuthService()
 
 // ── Singleton state (module-level so all callers share the same refs) ─────────
 const user      = ref(null)   // Supabase User object or null
@@ -21,7 +23,7 @@ async function bootstrap() {
   if (_bootstrapped) return
   _bootstrapped = true
 
-  const sessionUser = await supabaseAuth.getUser()
+  const sessionUser = await auth.getUser()
   user.value = sessionUser
   isLoading.value = false
 }
@@ -29,7 +31,7 @@ async function bootstrap() {
 bootstrap()
 
 // ── Auth state listener (module-level, single subscription) ──────────────────
-supabaseAuth.onAuthStateChange((_event, session) => {
+auth.onAuthStateChange((_event, session) => {
   user.value = session?.user ?? null
   isLoading.value = false
 })
@@ -45,8 +47,10 @@ export function useAuth() {
   })
 
   async function signOut() {
-    const { error } = await supabaseAuth.signOut()
+    const { error } = await auth.signOut()
     if (error) console.error('[useAuth] signOut error:', error)
+    // Clear offline queue so stale failed writes don't block the next session
+    localStorage.removeItem('rb_offline_queue')
     user.value = null
   }
 

@@ -1,10 +1,13 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTheme } from '../../composables/useTheme.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { migrationState } from '../../composables/useMigration.js'
 import { cloudAdapter } from '../../services/storage/index.js'
+import { syncStatus } from '../../composables/useStorage.js'
+import { useBreakpoint } from '../../composables/useBreakpoint.js'
+import MobileDrawer from './MobileDrawer.vue'
 
 const router = useRouter()
 const route  = useRoute()
@@ -12,24 +15,22 @@ const { isDark, toggleTheme } = useTheme()
 const { isLoggedIn, userInitial, userEmail, signOut } = useAuth()
 
 const showUserMenu = ref(false)
+const showDrawer   = ref(false)
+useBreakpoint()
 
-// ── Offline queue indicator ────────────────────────────────────────────────────
-const hasPendingWrites = ref(false)
-let _queueInterval = null
-
-function checkQueue() {
-  hasPendingWrites.value = cloudAdapter.hasPendingWrites()
-}
+// ── Sync indicator ─────────────────────────────────────────────────────────────
+// On mount, check if there are queued writes from a previous session (before
+// any save fires and syncStatus updates).
+const hasQueuedWrites = ref(false)
 
 onMounted(() => {
-  checkQueue()
-  _queueInterval = setInterval(checkQueue, 3000)
-  window.addEventListener('online', checkQueue)
+  hasQueuedWrites.value = cloudAdapter.hasPendingWrites()
 })
 
-onUnmounted(() => {
-  clearInterval(_queueInterval)
-  window.removeEventListener('online', checkQueue)
+// Treat queued writes from a previous session as pending until a save clears them
+const effectiveStatus = computed(() => {
+  if (syncStatus.value !== 'idle') return syncStatus.value
+  return hasQueuedWrites.value ? 'pending' : 'idle'
 })
 
 const navItems = [
@@ -50,12 +51,25 @@ function closeMenu(e) {
 </script>
 
 <template>
+  <MobileDrawer :open="showDrawer" @close="showDrawer = false" />
+
   <div
-    class="flex items-center justify-between px-6 py-3 border-b flex-shrink-0 bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-800"
+    class="flex items-center justify-between px-4 md:px-6 py-3 border-b flex-shrink-0 bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-800"
     @click="closeMenu"
   >
-    <!-- Left: Logo + Nav -->
-    <div class="flex items-center gap-6">
+    <!-- Left: Hamburger (mobile) + Logo + Nav (desktop) -->
+    <div class="flex items-center gap-3 md:gap-6">
+      <!-- Hamburger — mobile only -->
+      <button
+        class="md:hidden flex flex-col gap-1.5 p-1 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition"
+        @click.stop="showDrawer = true"
+        aria-label="Open menu"
+      >
+        <span class="block w-5 h-0.5 bg-current rounded"></span>
+        <span class="block w-5 h-0.5 bg-current rounded"></span>
+        <span class="block w-5 h-0.5 bg-current rounded"></span>
+      </button>
+
       <div
         class="flex items-center gap-2 cursor-pointer"
         @click.stop="router.push({ name: 'overview' })"
@@ -66,7 +80,8 @@ function closeMenu(e) {
         <span class="font-semibold text-sm text-gray-800 dark:text-gray-100">Resume Builder</span>
       </div>
 
-      <div class="flex items-center gap-1">
+      <!-- Nav items — tablet and desktop only -->
+      <div class="hidden md:flex items-center gap-1">
         <button
           v-for="item in navItems"
           :key="item.name"
@@ -85,29 +100,43 @@ function closeMenu(e) {
 
     <!-- Right -->
     <div class="flex items-center gap-3">
-      <!-- Offline / pending-writes badge -->
-      <Transition
-        enter-active-class="transition duration-200 ease-out"
-        enter-from-class="opacity-0 scale-90"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition duration-150 ease-in"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-90"
+      <!-- Cloud sync status badge — always visible for logged-in users -->
+      <div
+        v-if="isLoggedIn"
+        :title="{
+          idle:    'Connected to cloud',
+          saving:  'Saving changes to cloud…',
+          synced:  'All changes synced to cloud',
+          pending: 'Some changes couldn\'t reach the cloud — they\'ll sync when you\'re back online',
+        }[effectiveStatus]"
+        class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium cursor-default select-none transition-colors duration-300"
+        :class="{
+          'bg-gray-100   text-gray-500   dark:bg-gray-800      dark:text-gray-400':  effectiveStatus === 'idle',
+          'bg-gray-100   text-gray-500   dark:bg-gray-800      dark:text-gray-400':  effectiveStatus === 'saving',
+          'bg-green-100  text-green-700  dark:bg-green-900/40  dark:text-green-400': effectiveStatus === 'synced',
+          'bg-amber-100  text-amber-700  dark:bg-amber-900/40  dark:text-amber-400': effectiveStatus === 'pending',
+        }"
       >
-        <div
-          v-if="isLoggedIn && hasPendingWrites"
-          title="Some changes couldn't reach the cloud — they'll sync when you're back online"
-          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 cursor-default select-none"
-        >
+        <!-- Cloud icon -->
+        <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+        </svg>
+        <span v-if="effectiveStatus === 'idle'">Cloud sync</span>
+        <span v-else-if="effectiveStatus === 'saving'" class="flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse inline-block"></span>
+          Syncing…
+        </span>
+        <span v-else-if="effectiveStatus === 'synced'">Synced</span>
+        <span v-else-if="effectiveStatus === 'pending'" class="flex items-center gap-1">
           <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse inline-block"></span>
           Pending sync
-        </div>
-      </Transition>
-      <!-- Theme toggle -->
+        </span>
+      </div>
+      <!-- Theme toggle — hidden on mobile (available in drawer) -->
       <button
         @click.stop="toggleTheme"
         :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
-        class="relative w-12 h-6 rounded-full transition-all duration-300 flex items-center flex-shrink-0"
+        class="relative w-12 h-6 rounded-full transition-all duration-300 items-center flex-shrink-0 hidden md:flex"
         :class="isDark ? 'bg-indigo-600' : 'bg-gray-200'"
       >
         <span
@@ -168,34 +197,37 @@ function closeMenu(e) {
         </Transition>
       </div>
     </div>
-  <!-- Migration toast -->
-  <Transition
-    enter-active-class="transition duration-300 ease-out"
-    enter-from-class="opacity-0 translate-y-2"
-    enter-to-class="opacity-100 translate-y-0"
-    leave-active-class="transition duration-200 ease-in"
-    leave-from-class="opacity-100"
-    leave-to-class="opacity-0"
-  >
-    <div
-      v-if="migrationState !== 'idle'"
-      class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2.5 pointer-events-none"
-      :class="{
-        'bg-indigo-600 text-white':          migrationState === 'migrating',
-        'bg-green-600 text-white':           migrationState === 'done',
-        'bg-red-500 text-white':             migrationState === 'error',
-      }"
-    >
-      <span v-if="migrationState === 'migrating'">
-        <svg class="animate-spin w-4 h-4 inline -mt-0.5 mr-1" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-        </svg>
-        Syncing your data to the cloud…
-      </span>
-      <span v-else-if="migrationState === 'done'">✓ Data synced to cloud</span>
-      <span v-else-if="migrationState === 'error'">⚠ Sync failed — your local data is safe</span>
-    </div>
-  </Transition>
   </div>
+
+  <!-- Migration toast (outside nav to avoid transform/overflow issues) -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="opacity-0 translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="migrationState !== 'idle'"
+        class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2.5 pointer-events-none"
+        :class="{
+          'bg-indigo-600 text-white':          migrationState === 'migrating',
+          'bg-green-600 text-white':           migrationState === 'done',
+          'bg-red-500 text-white':             migrationState === 'error',
+        }"
+      >
+        <span v-if="migrationState === 'migrating'">
+          <svg class="animate-spin w-4 h-4 inline -mt-0.5 mr-1" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+          </svg>
+          Syncing your data to the cloud…
+        </span>
+        <span v-else-if="migrationState === 'done'">✓ Data synced to cloud</span>
+        <span v-else-if="migrationState === 'error'">⚠ Sync failed — your local data is safe</span>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
