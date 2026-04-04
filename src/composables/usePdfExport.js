@@ -65,6 +65,17 @@ export function usePdfExport(activePageSize, activeResume) {
     // Small delay to ensure any pending Vue renders have flushed
     await new Promise((resolve) => setTimeout(resolve, 300))
 
+    // Temporarily remove CSS transforms on page wrappers so html2canvas
+    // captures at full resolution (transforms cause scaled-down captures on mobile)
+    const pageWrappers = []
+    pages.forEach((page) => {
+      const wrapper = page.parentElement
+      if (wrapper && wrapper.style.transform) {
+        pageWrappers.push({ el: wrapper, transform: wrapper.style.transform })
+        wrapper.style.transform = 'none'
+      }
+    })
+
     try {
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -87,6 +98,9 @@ export function usePdfExport(activePageSize, activeResume) {
       pdf.save(filename)
     } catch (err) {
       console.error('[usePdfExport] PDF export failed:', err)
+    } finally {
+      // Restore transforms
+      pageWrappers.forEach(({ el, transform }) => { el.style.transform = transform })
     }
   }
 
