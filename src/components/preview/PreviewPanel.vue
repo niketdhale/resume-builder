@@ -1,5 +1,5 @@
 <script setup>
-import { inject, computed, ref, onMounted, onUnmounted } from 'vue'
+import { inject, computed, ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import ResumePage from './ResumePage.vue'
 import ResumeHeader from './ResumeHeader.vue'
 import SectionContent from './SectionContent.vue'
@@ -73,14 +73,47 @@ const previewScale = computed(() => {
   return containerWidth.value / pageW
 })
 
+// ─── Zoom modal scale ────────────────────────────────────────────────────────
+const zoomWrapper = ref(null)
+const zoomWidth = ref(800)
+
+function updateZoomWidth() {
+  if (zoomWrapper.value) {
+    zoomWidth.value = zoomWrapper.value.clientWidth
+  }
+}
+
+const zoomScale = computed(() => {
+  const pageW = pageSizePx[activePageSize.value] || 794
+  if (zoomWidth.value >= pageW) return 1
+  return zoomWidth.value / pageW
+})
+
 let resizeObserver = null
 onMounted(() => {
   updateWidth()
   if (previewWrapper.value) {
-    resizeObserver = new ResizeObserver(updateWidth)
+    resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === previewWrapper.value) updateWidth()
+        if (entry.target === zoomWrapper.value) updateZoomWidth()
+      }
+    })
     resizeObserver.observe(previewWrapper.value)
   }
 })
+
+// Watch for zoom modal opening to observe its wrapper
+watch(showZoomModal, async (val) => {
+  if (val) {
+    await nextTick()
+    if (zoomWrapper.value) {
+      updateZoomWidth()
+      resizeObserver?.observe(zoomWrapper.value)
+    }
+  }
+})
+
 onUnmounted(() => { resizeObserver?.disconnect() })
 </script>
 
@@ -141,40 +174,54 @@ onUnmounted(() => { resizeObserver?.disconnect() })
       >
         <div
           v-if="showZoomModal"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          class="fixed inset-0 z-50 flex flex-col bg-black/60 backdrop-blur-sm"
           @click.self="closeZoom"
         >
-          <div class="relative w-full max-w-4xl max-h-[95vh] overflow-y-auto scrollbar-hide p-8">
+          <!-- Close button -->
+          <div class="flex justify-end p-3 flex-shrink-0">
             <button
               @click="closeZoom"
-              class="absolute top-4 right-4 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-white/90 shadow-lg text-gray-600 hover:text-gray-900 hover:bg-white transition"
+              class="flex items-center justify-center w-10 h-10 rounded-full bg-white/90 shadow-lg text-gray-600 hover:text-gray-900 hover:bg-white transition"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <div class="flex flex-col gap-6 items-center">
-              <ResumePage
+          </div>
+
+          <!-- Scrollable scaled pages -->
+          <div ref="zoomWrapper" class="flex-1 overflow-y-auto overflow-x-hidden px-3 pb-6">
+            <div class="flex flex-col items-center" :style="{ gap: (16 * zoomScale) + 'px' }">
+              <div
                 v-for="(page, index) in pages"
                 :key="index"
-                :pageSize="activePageSize"
-                :isFirstPage="page.isFirstPage"
-                :sections="page.sections"
-                :metadata="activeMetadata"
-                :s="s"
-                :headingStyle="headingStyle"
-                :nameStyle="nameStyle"
-                :jobTitleStyle="jobTitleStyle"
-                :iconStyle="iconStyle"
-                :headerPos="headerPos"
-                :headerLayout="headerLayout"
-                :isTwoCol="isTwoCol"
-                :isMixCol="isMixCol"
-                :columnLayout="columnLayout"
-                :show="show"
-                :sectionContentProps="sectionContentProps"
-                class="shadow-2xl"
-              />
+                :style="{
+                  width: (pageSizePx[activePageSize] || 794) + 'px',
+                  transform: `scale(${zoomScale})`,
+                  transformOrigin: 'top center',
+                  marginBottom: zoomScale < 1 ? `-${(1 - zoomScale) * (pageSizePx[activePageSize] || 794) * 1.414}px` : '0',
+                }"
+              >
+                <ResumePage
+                  :pageSize="activePageSize"
+                  :isFirstPage="page.isFirstPage"
+                  :sections="page.sections"
+                  :metadata="activeMetadata"
+                  :s="s"
+                  :headingStyle="headingStyle"
+                  :nameStyle="nameStyle"
+                  :jobTitleStyle="jobTitleStyle"
+                  :iconStyle="iconStyle"
+                  :headerPos="headerPos"
+                  :headerLayout="headerLayout"
+                  :isTwoCol="isTwoCol"
+                  :isMixCol="isMixCol"
+                  :columnLayout="columnLayout"
+                  :show="show"
+                  :sectionContentProps="sectionContentProps"
+                  class="shadow-2xl"
+                />
+              </div>
             </div>
           </div>
         </div>
