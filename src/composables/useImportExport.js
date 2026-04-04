@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { uid } from '../utils/uid'
 import { defaultMetadata, defaultSettings } from '../constants/sectionDefaults'
 import { resumes, sections, activeResumeId } from './useResumeState'
+import { getAuthService } from '../services/auth/index.js'
 
 // ─── State ────────────────────────────────────────────────────────────────────
 
@@ -71,43 +72,57 @@ export function confirmImport() {
   const data = importData.value
   const newId = uid()
 
+  const now = new Date().toISOString()
+  const currentUserId = getAuthService().getUserId()
+
   if (importMode.value === 'replace') {
-    const r = resumes.value.find((r) => r.id === activeResumeId.value)
+    const targetId = activeResumeId.value
+    const r = resumes.value.find((r) => r.id === targetId)
     if (r) {
       r.title = data.resume.title
       r.pageSize = data.resume.pageSize || 'A4'
       r.settings = { ...defaultSettings(), ...data.resume.settings }
       r.metadata = { ...defaultMetadata(), ...data.resume.metadata }
+      r.updatedAt = now
     }
     sections.value = sections.value.filter(
-      (s) => s.sharedAcrossViews || !s.viewIds.includes(activeResumeId.value),
+      (s) => s.sharedAcrossViews || !s.viewIds.includes(targetId),
     )
     data.sections.forEach((s) => {
       sections.value.push({
         ...s,
         id: uid(),
-        resumeId: activeResumeId.value,
-        viewIds: [activeResumeId.value],
+        userId: currentUserId,
+        resumeId: targetId,
+        viewIds: [targetId],
         sharedAcrossViews: false,
-        entries: (s.entries || []).map((e) => ({ ...e, id: uid() })),
+        createdAt: s.createdAt ?? now,
+        updatedAt: now,
+        entries: (s.entries || []).map((e) => ({ ...e, id: uid(), userId: currentUserId })),
       })
     })
   } else {
     resumes.value.push({
       id: newId,
+      userId: currentUserId,
       title: data.resume.title + ' (Imported)',
       pageSize: data.resume.pageSize || 'A4',
       settings: { ...defaultSettings(), ...data.resume.settings },
       metadata: { ...defaultMetadata(), ...data.resume.metadata },
+      createdAt: now,
+      updatedAt: now,
     })
     data.sections.forEach((s) => {
       sections.value.push({
         ...s,
         id: uid(),
+        userId: currentUserId,
         resumeId: newId,
         viewIds: [newId],
         sharedAcrossViews: false,
-        entries: (s.entries || []).map((e) => ({ ...e, id: uid() })),
+        createdAt: s.createdAt ?? now,
+        updatedAt: now,
+        entries: (s.entries || []).map((e) => ({ ...e, id: uid(), userId: currentUserId })),
       })
     })
     activeResumeId.value = newId

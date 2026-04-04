@@ -1,5 +1,6 @@
 import { watch } from 'vue'
 import { getStorageAdapter } from '../../services/storage/index.js'
+import { suppressSaves } from '../../composables/useStorage.js'
 import { jobs, customColumns } from './useJobState'
 
 const JOBS_KEY = 'jobs'
@@ -56,6 +57,6 @@ export async function hydrateJobs() {
 
 // ─── Watchers ─────────────────────────────────────────────────────────────────
 export function setupJobStorageWatcher() {
-  watch(jobs,          () => saveJobs(), { deep: true })
-  watch(customColumns, () => saveJobs(), { deep: true })
+  watch(jobs,          () => { if (!suppressSaves.value) saveJobs() }, { deep: true })
+  watch(customColumns, () => { if (!suppressSaves.value) saveJobs() }, { deep: true })
 }

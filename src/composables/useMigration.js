@@ -53,7 +53,7 @@ function remapIds(resumes, sections, jobs, cols, userId) {
       id:       sectionIdMap[s.id],
       userId,
       resumeId: resumeIdMap[s.resumeId],
-      viewIds:  (s.viewIds ?? []).map(vid => resumeIdMap[vid] ?? vid),
+      viewIds:  (s.viewIds ?? []).map(vid => resumeIdMap[vid]).filter(Boolean),
       createdAt: s.createdAt ?? now,
       updatedAt: s.updatedAt ?? now,
       entries:  (s.entries ?? []).map(e => ({
@@ -157,6 +157,8 @@ export function setupMigration(onComplete) {
   supabaseAuth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session?.user?.id) {
       await runMigration(session.user.id, onComplete)
+    } else if (event === 'SIGNED_OUT') {
+      _migrated = false
     }
   })
 }

@@ -46,6 +46,11 @@ const { userId } = useAuth()
 watch(userId, async (id, oldId) => {
   setStorageUserId(id)
   if (oldId === 'local' && id !== 'local') {
+    // Logged in — load from cloud
+    await hydrateFromStorage()
+    await hydrateJobs()
+  } else if (id === 'local' && oldId && oldId !== 'local') {
+    // Logged out — reload from local storage (clears cloud data from memory)
     await hydrateFromStorage()
     await hydrateJobs()
   }
