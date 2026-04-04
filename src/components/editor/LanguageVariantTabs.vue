@@ -11,6 +11,7 @@ const addLanguageVariant = inject('addLanguageVariant')
 
 
 const showPicker = ref(false)
+const autoTranslate = ref(false)
 
 // Find the base resume for the currently active resume
 const baseResume = computed(() => {
@@ -92,9 +93,20 @@ function addVariant(language) {
       <!-- Language picker dropdown -->
       <div
         v-if="showPicker"
-        class="absolute top-full left-0 mt-1 w-44 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1 max-h-60 overflow-y-auto"
+        class="absolute top-full left-0 mt-1 w-52 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1 max-h-72 overflow-y-auto"
         @click.stop
       >
+        <!-- Auto-translate checkbox -->
+        <label class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+          <input
+            type="checkbox"
+            v-model="autoTranslate"
+            class="accent-indigo-600 w-3.5 h-3.5"
+          />
+          <span class="text-xs text-gray-600 dark:text-gray-300">Auto-translate with AI</span>
+          <span class="ml-auto text-[10px] text-indigo-500 font-medium">AI</span>
+        </label>
+
         <button
           v-for="lang in availableLanguages"
           :key="lang"
