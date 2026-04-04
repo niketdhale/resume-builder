@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useKeyboardShortcuts } from '../composables/useKeyboardShortcuts'
 
 import NavBar from '../components/ui/NavBar.vue'
+import LanguageVariantTabs from '../components/editor/LanguageVariantTabs.vue'
 import SectionList from '../components/editor/SectionList.vue'
 import PreviewPanel from '../components/preview/PreviewPanel.vue'
 import CustomizePanel from '../components/customize/CustomizePanel.vue'
@@ -190,6 +191,9 @@ onMounted(() => {
         title="Keyboard shortcuts (?)"
       >?</button>
     </div>
+
+    <!-- Language variant tabs -->
+    <LanguageVariantTabs />
 
     <!-- ═══════════════════════════════════════════════════════════════
          RESPONSIVE SPLIT PANEL

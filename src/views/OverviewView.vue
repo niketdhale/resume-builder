@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { inject } from 'vue'
 import NavBar from '../components/ui/NavBar.vue'
+import { flagCode } from '../constants/languages'
 
 const router = useRouter()
 const resumes = inject('resumes')
@@ -14,27 +15,6 @@ const addResume = inject('addResume')
 
 function sectionCount(resumeId) {
   return sections.value.filter(s => s.viewIds?.includes(resumeId)).length
-}
-
-// ─── Language flag map ────────────────────────────────────────────────────────
-const LANG_FLAG = {
-  'English':    'GB',
-  'French':     'FR',
-  'German':     'DE',
-  'Spanish':    'ES',
-  'Italian':    'IT',
-  'Portuguese': 'PT',
-  'Dutch':      'NL',
-  'Japanese':   'JP',
-  'Chinese':    'CN',
-  'Korean':     'KR',
-  'Arabic':     'AR',
-  'Russian':    'RU',
-  'Hindi':      'HI',
-}
-
-function flagCode(language) {
-  return LANG_FLAG[language] || language?.slice(0, 2).toUpperCase() || 'GB'
 }
 
 // ─── Only show base resumes in the grid ──────────────────────────────────────
