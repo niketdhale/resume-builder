@@ -65,7 +65,6 @@ export const lastSavedTime = ref(null)
 export const savedIndicator = ref(false)
 
 let saveTimer = null
-let syncResetTimer = null
 
 export function triggerSave() {
   syncStatus.value = 'saving'
@@ -75,10 +74,6 @@ export function triggerSave() {
     lastSavedTime.value = new Date()
     savedIndicator.value = ok
     syncStatus.value = ok ? 'synced' : 'pending'
-    if (ok) {
-      clearTimeout(syncResetTimer)
-      syncResetTimer = setTimeout(() => { syncStatus.value = 'idle' }, 3000)
-    }
   }, 500)
 }
 

@@ -27,11 +27,11 @@ onMounted(() => {
   hasQueuedWrites.value = cloudAdapter.hasPendingWrites()
 })
 
-// Show pending if either syncStatus says so, or there were queued writes on load
-// that haven't been cleared yet (they'll clear once a successful save flushes them).
-const showPending  = computed(() => isLoggedIn.value && (syncStatus.value === 'pending' || hasQueuedWrites.value))
-const showSaving   = computed(() => isLoggedIn.value && syncStatus.value === 'saving')
-const showSynced   = computed(() => isLoggedIn.value && syncStatus.value === 'synced')
+// Treat queued writes from a previous session as pending until a save clears them
+const effectiveStatus = computed(() => {
+  if (syncStatus.value !== 'idle') return syncStatus.value
+  return hasQueuedWrites.value ? 'pending' : 'idle'
+})
 
 const navItems = [
   { name: 'overview', label: 'My Resumes', icon: '📄' },
@@ -100,40 +100,38 @@ function closeMenu(e) {
 
     <!-- Right -->
     <div class="flex items-center gap-3">
-      <!-- Cloud sync status badge -->
-      <Transition
-        enter-active-class="transition duration-200 ease-out"
-        enter-from-class="opacity-0 scale-90"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition duration-150 ease-in"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-90"
+      <!-- Cloud sync status badge — always visible for logged-in users -->
+      <div
+        v-if="isLoggedIn"
+        :title="{
+          idle:    'Connected to cloud',
+          saving:  'Saving changes to cloud…',
+          synced:  'All changes synced to cloud',
+          pending: 'Some changes couldn\'t reach the cloud — they\'ll sync when you\'re back online',
+        }[effectiveStatus]"
+        class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium cursor-default select-none transition-colors duration-300"
+        :class="{
+          'bg-gray-100   text-gray-500   dark:bg-gray-800      dark:text-gray-400':  effectiveStatus === 'idle',
+          'bg-gray-100   text-gray-500   dark:bg-gray-800      dark:text-gray-400':  effectiveStatus === 'saving',
+          'bg-green-100  text-green-700  dark:bg-green-900/40  dark:text-green-400': effectiveStatus === 'synced',
+          'bg-amber-100  text-amber-700  dark:bg-amber-900/40  dark:text-amber-400': effectiveStatus === 'pending',
+        }"
       >
-        <div
-          v-if="showSaving"
-          title="Saving changes to cloud…"
-          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 cursor-default select-none"
-        >
+        <!-- Cloud icon -->
+        <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+        </svg>
+        <span v-if="effectiveStatus === 'idle'">Cloud sync</span>
+        <span v-else-if="effectiveStatus === 'saving'" class="flex items-center gap-1">
           <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse inline-block"></span>
           Syncing…
-        </div>
-        <div
-          v-else-if="showSynced"
-          title="All changes saved to cloud"
-          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 cursor-default select-none"
-        >
-          <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>
-          Synced
-        </div>
-        <div
-          v-else-if="showPending"
-          title="Some changes couldn't reach the cloud — they'll sync when you're back online"
-          class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 cursor-default select-none"
-        >
+        </span>
+        <span v-else-if="effectiveStatus === 'synced'">Synced</span>
+        <span v-else-if="effectiveStatus === 'pending'" class="flex items-center gap-1">
           <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse inline-block"></span>
           Pending sync
-        </div>
-      </Transition>
+        </span>
+      </div>
       <!-- Theme toggle — hidden on mobile (available in drawer) -->
       <button
         @click.stop="toggleTheme"

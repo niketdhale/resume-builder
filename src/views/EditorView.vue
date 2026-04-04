@@ -148,35 +148,35 @@ onMounted(() => {
       <span class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate flex-1 min-w-0">
         {{ activeResume?.title || 'Resume' }}
       </span>
-      <Transition
-        enter-active-class="transition duration-200 ease-out"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition duration-300 ease-in"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
+      <!-- Cloud sync status — always visible in editor toolbar -->
+      <span
+        class="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ml-1 transition-colors duration-300"
+        :class="{
+          'text-gray-400  bg-gray-100  dark:text-gray-500 dark:bg-gray-800':    syncStatus === 'idle' || syncStatus === 'saving',
+          'text-green-600 bg-green-50  dark:text-green-400 dark:bg-green-950/40': syncStatus === 'synced',
+          'text-amber-600 bg-amber-50  dark:text-amber-400 dark:bg-amber-950/40': syncStatus === 'pending',
+        }"
+        :title="{
+          idle:    'Connected to cloud',
+          saving:  'Saving changes to cloud…',
+          synced:  'All changes synced to cloud',
+          pending: 'Some changes couldn\'t reach the cloud',
+        }[syncStatus]"
       >
-        <span
-          v-if="syncStatus === 'saving'"
-          class="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ml-1 text-gray-400 bg-gray-100 dark:text-gray-500 dark:bg-gray-800"
-        >
-          <span class="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 animate-pulse inline-block"></span>
-          Saving…
+        <svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+        </svg>
+        <span v-if="syncStatus === 'saving'" class="flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse inline-block"></span>
+          Syncing…
         </span>
-        <span
-          v-else-if="syncStatus === 'synced'"
-          class="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ml-1 text-green-500 bg-green-50 dark:text-green-400 dark:bg-green-950/40"
-        >
-          ✓ Synced at {{ formatSavedTime(lastSavedTime) }}
-        </span>
-        <span
-          v-else-if="syncStatus === 'pending'"
-          class="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ml-1 text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/40"
-        >
+        <span v-else-if="syncStatus === 'synced'">✓ Synced {{ formatSavedTime(lastSavedTime) ? 'at ' + formatSavedTime(lastSavedTime) : '' }}</span>
+        <span v-else-if="syncStatus === 'pending'" class="flex items-center gap-1">
           <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse inline-block"></span>
           Pending sync
         </span>
-      </Transition>
+        <span v-else>Cloud sync</span>
+      </span>
 
       <div class="flex-1" />
 
