@@ -1,5 +1,15 @@
 # Resume Builder
 
+<p align="center">
+  <a href="https://github.com"><img src="https://shields.io" alt="License: MIT" /></a>
+  <a href="https://github.com/niketdhale/resume-builder"><img src="https://shields.io" alt="GitHub Stars" /></a>
+  <a href="https://github.com/commits"><img src="https://shields.io" alt="Last Commit" /></a>
+  <a href="https://github.com"><img src="https://github.com/workflows/YOUR_WORKFLOW_FILENAME.yml/badge.svg" alt="Build Status" /></a>
+  <a href="https://github.com">
+  <img src="https://github.com/workflows/main.yml/badge.svg" alt="Build Status" />
+  </a>
+</p>
+
 A modern, fully-featured resume builder built with **Vue 3** and **Tailwind CSS**. Create, customize, and export professional resumes with real-time preview, multiple templates, cloud sync, and a built-in job application tracker.
 
 **Fully responsive** — works on mobile, tablet, and desktop.
@@ -9,6 +19,7 @@ A modern, fully-featured resume builder built with **Vue 3** and **Tailwind CSS*
 ## Features
 
 ### Resume Editor
+
 - **Real-time preview** — see changes as you type, paginated across A4 / Letter / A3 / Legal pages
 - **Drag & drop** — reorder sections and entries with touch support
 - **Undo / Redo** — full history with `Ctrl+Z` / `Ctrl+Shift+Z`
@@ -17,6 +28,7 @@ A modern, fully-featured resume builder built with **Vue 3** and **Tailwind CSS*
 - **Language variants** — create translated copies of any resume (EN, FR, DE, ES, and more)
 
 ### Customization
+
 - **Templates** — Classic, Executive, Modern, Creative, and more
 - **Fonts & Typography** — font family, size, line height, margins
 - **Layouts** — one-column, two-column, or mixed column per section
@@ -25,11 +37,13 @@ A modern, fully-featured resume builder built with **Vue 3** and **Tailwind CSS*
 - **Per-section control** — toggle visibility, assign columns, reorder
 
 ### Export & Import
+
 - **PDF export** via `html2pdf.js` with accurate page rendering
 - **JSON export / import** for backup and sharing
 - **Print** directly from browser
 
 ### Job Tracker
+
 - Track applications with company, role, status, salary, applied date, and linked resume
 - **Table view** and **Kanban board** with drag-to-change-status
 - Filter by status (Applied, Interview, Offered, Rejected)
@@ -37,11 +51,13 @@ A modern, fully-featured resume builder built with **Vue 3** and **Tailwind CSS*
 - Chart visualisation of application history
 
 ### Auth & Cloud Sync
+
 - **Guest mode** — works fully offline with `localStorage`, no account needed
 - **Sign in with magic link** (Supabase) — data syncs to the cloud automatically on login
 - **Offline queue** — changes made offline sync when back online
 
 ### Responsive UI
+
 - **Mobile (< 768px)** — hamburger drawer nav, single-column card list, bottom tab bar in editor, card list for jobs, FAB buttons, bottom-sheet modals
 - **Tablet (768px – 1023px)** — 2-column resume grid, stacked editor with bottom tabs, compact job table
 - **Desktop (1024px+)** — 40/60 split editor, 4-column resume grid, full job table / board
@@ -51,25 +67,26 @@ A modern, fully-featured resume builder built with **Vue 3** and **Tailwind CSS*
 
 ## Tech Stack
 
-| Category | Library |
-|---|---|
-| Framework | [Vue 3](https://vuejs.org/) (Composition API) |
-| Build | [Vite 7](https://vite.dev/) |
-| Styling | [Tailwind CSS v4](https://tailwindcss.com/) |
-| Routing | [Vue Router 5](https://router.vuejs.org/) |
-| Icons | [Lucide Vue Next](https://lucide.dev/) |
-| Drag & Drop | [vue-draggable-next](https://github.com/SortableJS/vue.draggable.next) |
-| PDF Export | [html2pdf.js](https://github.com/eKoopmans/html2pdf.js) + jsPDF + html2canvas-pro |
-| Charts | [Chart.js](https://www.chartjs.org/) |
-| Backend | [Supabase](https://supabase.com/) (auth + database) |
-| Utilities | [@vueuse/core](https://vueuse.org/) |
-| Testing | [Vitest](https://vitest.dev/) + [Playwright](https://playwright.dev/) |
+| Category    | Library                                                                           |
+| ----------- | --------------------------------------------------------------------------------- |
+| Framework   | [Vue 3](https://vuejs.org/) (Composition API)                                     |
+| Build       | [Vite 7](https://vite.dev/)                                                       |
+| Styling     | [Tailwind CSS v4](https://tailwindcss.com/)                                       |
+| Routing     | [Vue Router 5](https://router.vuejs.org/)                                         |
+| Icons       | [Lucide Vue Next](https://lucide.dev/)                                            |
+| Drag & Drop | [vue-draggable-next](https://github.com/SortableJS/vue.draggable.next)            |
+| PDF Export  | [html2pdf.js](https://github.com/eKoopmans/html2pdf.js) + jsPDF + html2canvas-pro |
+| Charts      | [Chart.js](https://www.chartjs.org/)                                              |
+| Backend     | [Supabase](https://supabase.com/) (auth + database)                               |
+| Utilities   | [@vueuse/core](https://vueuse.org/)                                               |
+| Testing     | [Vitest](https://vitest.dev/) + [Playwright](https://playwright.dev/)             |
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js `^20.19.0` or `>=22.12.0`
 - [Bun](https://bun.sh/) (recommended) or npm
 
@@ -154,15 +171,15 @@ src/
 
 ## Scripts
 
-| Command | Description |
-|---|---|
-| `bun dev` | Start dev server |
-| `bun run build` | Production build |
-| `bun run preview` | Preview production build |
-| `bun test` | Run unit tests (Vitest) |
-| `bun test:ui` | Run e2e tests (Playwright) |
-| `bun lint` | Lint with ESLint |
-| `bun format` | Format with Prettier |
+| Command           | Description                |
+| ----------------- | -------------------------- |
+| `bun dev`         | Start dev server           |
+| `bun run build`   | Production build           |
+| `bun run preview` | Preview production build   |
+| `bun test`        | Run unit tests (Vitest)    |
+| `bun test:ui`     | Run e2e tests (Playwright) |
+| `bun lint`        | Lint with ESLint           |
+| `bun format`      | Format with Prettier       |
 
 ---
 
@@ -171,5 +188,6 @@ src/
 [VS Code](https://code.visualstudio.com/) with the [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) extension (disable Vetur if installed).
 
 **Recommended browser extensions for development:**
+
 - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) (Chrome/Edge)
 - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/) (Firefox)
