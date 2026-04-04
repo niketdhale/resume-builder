@@ -1,22 +1,17 @@
 # Resume Builder
 
 <p align="center">
-  <!-- CI/CD Status (Points to the default branch) -->
+  <!-- Build Status - Assumes your file is .github/workflows/main.yml -->
   <a href="https://github.com">
     <img src="https://github.com/workflows/ci.yml/badge.svg" alt="Build Status" />
   </a>
 
-  <!-- Discord Badge -->
-  <a href="https://discord.gg">
-    <img src="https://shields.io" alt="Discord" />
-  </a>
-
-  <!-- License Badge -->
+  <!-- License -->
   <a href="https://github.com">
     <img src="https://shields.io" alt="License: MIT" />
   </a>
 
-  <!-- GitHub Stars -->
+  <!-- Stars -->
   <a href="https://github.com">
     <img src="https://shields.io" alt="GitHub Stars" />
   </a>
@@ -26,6 +21,7 @@
     <img src="https://shields.io" alt="Last Commit" />
   </a>
 </p>
+
 
 A modern, fully-featured resume builder built with **Vue 3** and **Tailwind CSS**. Create, customize, and export professional resumes with real-time preview, multiple templates, cloud sync, and a built-in job application tracker.
 
