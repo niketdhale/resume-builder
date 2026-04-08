@@ -18,24 +18,17 @@ const showUserMenu = ref(false)
 const showDrawer   = ref(false)
 useBreakpoint()
 
-// ── Sync indicator ─────────────────────────────────────────────────────────────
-// On mount, check if there are queued writes from a previous session (before
-// any save fires and syncStatus updates).
 const hasQueuedWrites = ref(false)
+onMounted(() => { hasQueuedWrites.value = cloudAdapter.hasPendingWrites() })
 
-onMounted(() => {
-  hasQueuedWrites.value = cloudAdapter.hasPendingWrites()
-})
-
-// Treat queued writes from a previous session as pending until a save clears them
 const effectiveStatus = computed(() => {
   if (syncStatus.value !== 'idle') return syncStatus.value
   return hasQueuedWrites.value ? 'pending' : 'idle'
 })
 
 const navItems = [
-  { name: 'overview', label: 'My Resumes', icon: '📄' },
-  { name: 'jobs',     label: 'Job Tracker', icon: '💼' },
+  { name: 'overview', label: 'My Resumes' },
+  { name: 'jobs',     label: 'Job Tracker' },
 ]
 
 async function handleSignOut() {
@@ -45,7 +38,6 @@ async function handleSignOut() {
 }
 
 function closeMenu(e) {
-  // Close on outside click
   if (!e.target.closest('[data-user-menu]')) showUserMenu.value = false
 }
 </script>
@@ -53,153 +45,161 @@ function closeMenu(e) {
 <template>
   <MobileDrawer :open="showDrawer" @close="showDrawer = false" />
 
-  <div
-    class="flex items-center justify-between px-4 md:px-6 py-3 border-b flex-shrink-0 bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-800"
+  <header
+    class="flex items-center justify-between px-5 md:px-8 flex-shrink-0"
+    style="height: var(--nav-h); border-bottom: 1px solid var(--border); background: var(--bg-surface);"
     @click="closeMenu"
   >
-    <!-- Left: Hamburger (mobile) + Logo + Nav (desktop) -->
-    <div class="flex items-center gap-3 md:gap-6">
-      <!-- Hamburger — mobile only -->
+    <!-- Left: Hamburger + Wordmark + Nav -->
+    <div class="flex items-center gap-6">
+      <!-- Hamburger mobile -->
       <button
-        class="md:hidden flex flex-col gap-1.5 p-1 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition"
+        class="md:hidden flex flex-col gap-1.5 p-1"
+        style="color: var(--ink-2);"
         @click.stop="showDrawer = true"
         aria-label="Open menu"
       >
-        <span class="block w-5 h-0.5 bg-current rounded"></span>
-        <span class="block w-5 h-0.5 bg-current rounded"></span>
-        <span class="block w-5 h-0.5 bg-current rounded"></span>
+        <span class="block w-5 h-px bg-current rounded-full"></span>
+        <span class="block w-5 h-px bg-current rounded-full"></span>
+        <span class="block w-3.5 h-px bg-current rounded-full"></span>
       </button>
 
-      <div
-        class="flex items-center gap-2 cursor-pointer"
+      <!-- Wordmark -->
+      <button
+        class="flex items-center gap-2.5 group"
         @click.stop="router.push({ name: 'overview' })"
+        style="text-decoration: none;"
       >
-        <div class="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xs font-bold">
-          R
-        </div>
-        <span class="font-semibold text-sm text-gray-800 dark:text-gray-100">Resume Builder</span>
-      </div>
+        <div
+          class="flex items-center justify-center w-7 h-7 rounded-lg text-white text-xs font-semibold flex-shrink-0"
+          style="background: var(--gold); font-family: var(--font-display); font-style: italic; font-size: 1rem; font-weight: 500; letter-spacing: -0.01em;"
+        >R</div>
+        <span
+          class="hidden sm:block text-sm font-medium tracking-tight"
+          style="font-family: var(--font-display); font-size: 1.0625rem; font-weight: 500; color: var(--ink); letter-spacing: -0.01em;"
+        >Résumé Builder</span>
+      </button>
 
-      <!-- Nav items — tablet and desktop only -->
-      <div class="hidden md:flex items-center gap-1">
+      <!-- Desktop nav links -->
+      <nav class="hidden md:flex items-center gap-5">
         <button
           v-for="item in navItems"
           :key="item.name"
           @click.stop="router.push({ name: item.name })"
-          :class="[
-            'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition',
-            route.name === item.name
-              ? 'bg-indigo-600/10 text-indigo-600 dark:text-indigo-400'
-              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800',
-          ]"
+          class="rb-nav-link"
+          :class="{ active: route.name === item.name }"
         >
-          {{ item.icon }} {{ item.label }}
+          {{ item.label }}
         </button>
-      </div>
+      </nav>
     </div>
 
     <!-- Right -->
     <div class="flex items-center gap-3">
-      <!-- Cloud sync status badge — always visible for logged-in users -->
-      <div
-        v-if="isLoggedIn"
-        :title="{
-          idle:    'Connected to cloud',
-          saving:  'Saving changes to cloud…',
-          synced:  'All changes synced to cloud',
-          pending: 'Some changes couldn\'t reach the cloud — they\'ll sync when you\'re back online',
-        }[effectiveStatus]"
-        class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium cursor-default select-none transition-colors duration-300"
-        :class="{
-          'bg-gray-100   text-gray-500   dark:bg-gray-800      dark:text-gray-400':  effectiveStatus === 'idle',
-          'bg-gray-100   text-gray-500   dark:bg-gray-800      dark:text-gray-400':  effectiveStatus === 'saving',
-          'bg-green-100  text-green-700  dark:bg-green-900/40  dark:text-green-400': effectiveStatus === 'synced',
-          'bg-amber-100  text-amber-700  dark:bg-amber-900/40  dark:text-amber-400': effectiveStatus === 'pending',
-        }"
-      >
-        <!-- Cloud icon -->
-        <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
-        </svg>
-        <span v-if="effectiveStatus === 'idle'">Cloud sync</span>
-        <span v-else-if="effectiveStatus === 'saving'" class="flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse inline-block"></span>
-          Syncing…
-        </span>
-        <span v-else-if="effectiveStatus === 'synced'">Synced</span>
-        <span v-else-if="effectiveStatus === 'pending'" class="flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse inline-block"></span>
-          Pending sync
-        </span>
-      </div>
-      <!-- Theme toggle — hidden on mobile (available in drawer) -->
+
+      <!-- Sync badge — logged in only -->
+      <Transition name="rb-fade">
+        <div
+          v-if="isLoggedIn"
+          class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium select-none"
+          :title="{
+            idle:    'Connected — all changes saved',
+            saving:  'Saving to cloud…',
+            synced:  'All changes synced',
+            pending: 'Changes pending sync',
+          }[effectiveStatus]"
+          :style="{
+            background: effectiveStatus === 'synced'  ? 'rgba(34,197,94,0.08)'  :
+                        effectiveStatus === 'pending' ? 'rgba(245,158,11,0.08)' :
+                        'var(--bg-subtle)',
+            color:      effectiveStatus === 'synced'  ? '#16a34a' :
+                        effectiveStatus === 'pending' ? '#b45309' :
+                        'var(--ink-3)',
+            border:     effectiveStatus === 'synced'  ? '1px solid rgba(34,197,94,0.18)'  :
+                        effectiveStatus === 'pending' ? '1px solid rgba(245,158,11,0.18)' :
+                        '1px solid var(--border)',
+          }"
+        >
+          <!-- Cloud icon -->
+          <svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+          </svg>
+          <span v-if="effectiveStatus === 'idle'">Cloud</span>
+          <span v-else-if="effectiveStatus === 'saving'" class="flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse inline-block"></span>Syncing
+          </span>
+          <span v-else-if="effectiveStatus === 'synced'">Synced</span>
+          <span v-else-if="effectiveStatus === 'pending'" class="flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse inline-block"></span>Pending
+          </span>
+        </div>
+      </Transition>
+
+      <!-- Theme toggle — desktop -->
       <button
         @click.stop="toggleTheme"
-        :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
-        class="relative w-12 h-6 rounded-full transition-all duration-300 items-center flex-shrink-0 hidden md:flex"
-        :class="isDark ? 'bg-indigo-600' : 'bg-gray-200'"
+        :title="isDark ? 'Light mode' : 'Dark mode'"
+        class="hidden md:flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-200"
+        style="color: var(--ink-3); border: 1px solid var(--border);"
+        :style="{ background: 'var(--bg-subtle)' }"
       >
-        <span
-          class="absolute w-5 h-5 rounded-full shadow-sm transition-all duration-300 flex items-center justify-center text-xs"
-          :class="isDark ? 'translate-x-6 bg-gray-900' : 'translate-x-0.5 bg-white'"
-        >
-          {{ isDark ? '🌙' : '☀️' }}
-        </span>
+        <svg v-if="isDark" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg v-else class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
       </button>
 
       <!-- User avatar / menu -->
       <div class="relative" data-user-menu>
-        <!-- Avatar button -->
         <button
           @click.stop="isLoggedIn ? (showUserMenu = !showUserMenu) : router.push('/auth')"
           :title="isLoggedIn ? userEmail : 'Sign in'"
-          class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold transition"
-          :class="isLoggedIn
-            ? 'bg-indigo-600 hover:bg-indigo-700'
-            : 'bg-gray-400 hover:bg-gray-500'"
-        >
-          {{ userInitial }}
-        </button>
+          class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium transition-opacity"
+          :style="{ background: isLoggedIn ? 'var(--gold)' : 'var(--ink-3)' }"
+        >{{ userInitial }}</button>
 
         <!-- Dropdown -->
         <Transition
-          enter-active-class="transition duration-100 ease-out"
-          enter-from-class="opacity-0 scale-95 translate-y-1"
-          enter-to-class="opacity-100 scale-100 translate-y-0"
-          leave-active-class="transition duration-75 ease-in"
-          leave-from-class="opacity-100 scale-100"
+          enter-active-class="transition duration-150 ease-out"
+          enter-from-class="opacity-0 translate-y-1 scale-95"
+          enter-to-class="opacity-100 translate-y-0 scale-100"
+          leave-active-class="transition duration-100 ease-in"
+          leave-from-class="opacity-100"
           leave-to-class="opacity-0 scale-95"
         >
           <div
             v-if="showUserMenu && isLoggedIn"
-            class="absolute right-0 top-10 w-52 rounded-xl shadow-lg border overflow-hidden z-50"
-            :class="isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'"
+            class="absolute right-0 top-11 w-52 rounded-xl shadow-xl overflow-hidden z-50"
+            style="background: var(--bg-surface); border: 1px solid var(--border);"
           >
-            <!-- Email -->
-            <div class="px-4 py-3 border-b" :class="isDark ? 'border-gray-700' : 'border-gray-100'">
-              <p class="text-xs font-medium truncate" :class="isDark ? 'text-gray-300' : 'text-gray-700'">
-                {{ userEmail }}
-              </p>
-              <p class="text-xs mt-0.5" :class="isDark ? 'text-gray-500' : 'text-gray-400'">Signed in</p>
+            <div class="px-4 py-3" style="border-bottom: 1px solid var(--border);">
+              <p class="text-xs font-medium truncate" style="color: var(--ink);">{{ userEmail }}</p>
+              <p class="text-xs mt-0.5" style="color: var(--ink-3);">Signed in · Cloud sync active</p>
             </div>
-
-            <!-- Sign out -->
             <button
               @click.stop="handleSignOut"
-              class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition text-left"
-              :class="isDark
-                ? 'text-gray-300 hover:bg-gray-800 hover:text-red-400'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-red-500'"
+              class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left transition-colors"
+              style="color: var(--ink-2);"
+              onmouseover="this.style.background='var(--bg-subtle)';this.style.color='var(--ink)'"
+              onmouseout="this.style.background='';this.style.color='var(--ink-2)'"
             >
-              <span>→</span> Sign out
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Sign out
             </button>
           </div>
         </Transition>
       </div>
     </div>
-  </div>
+  </header>
 
-  <!-- Migration toast (outside nav to avoid transform/overflow issues) -->
+  <!-- Migration toast -->
   <Teleport to="body">
     <Transition
       enter-active-class="transition duration-300 ease-out"
@@ -211,23 +211,26 @@ function closeMenu(e) {
     >
       <div
         v-if="migrationState !== 'idle'"
-        class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2.5 pointer-events-none"
-        :class="{
-          'bg-indigo-600 text-white':          migrationState === 'migrating',
-          'bg-green-600 text-white':           migrationState === 'done',
-          'bg-red-500 text-white':             migrationState === 'error',
+        class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-2xl text-sm font-medium flex items-center gap-2.5 pointer-events-none"
+        :style="{
+          background: migrationState === 'migrating' ? 'var(--gold)' :
+                      migrationState === 'done'      ? '#16a34a'     : '#dc2626',
+          color: '#fff',
         }"
       >
-        <span v-if="migrationState === 'migrating'">
-          <svg class="animate-spin w-4 h-4 inline -mt-0.5 mr-1" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-          </svg>
-          Syncing your data to the cloud…
-        </span>
-        <span v-else-if="migrationState === 'done'">✓ Data synced to cloud</span>
-        <span v-else-if="migrationState === 'error'">⚠ Sync failed — your local data is safe</span>
+        <svg v-if="migrationState === 'migrating'" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+        </svg>
+        <span v-if="migrationState === 'migrating'">Syncing your data to the cloud…</span>
+        <span v-else-if="migrationState === 'done'">✓ All data synced to cloud</span>
+        <span v-else-if="migrationState === 'error'">⚠ Sync failed — local data is safe</span>
       </div>
     </Transition>
   </Teleport>
 </template>
+
+<style scoped>
+.rb-fade-enter-active, .rb-fade-leave-active { transition: opacity 0.2s ease; }
+.rb-fade-enter-from, .rb-fade-leave-to { opacity: 0; }
+</style>

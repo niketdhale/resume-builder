@@ -4,6 +4,12 @@ import { getAuthService } from '../services/auth/index.js'
 const routes = [
   {
     path: '/',
+    name: 'landing',
+    component: () => import('../views/LandingView.vue'),
+    meta: { title: 'Resume Builder — Craft. Refine. Land.', public: true },
+  },
+  {
+    path: '/dashboard',
     name: 'overview',
     component: () => import('../views/OverviewView.vue'),
     meta: { title: 'My Resumes' },
