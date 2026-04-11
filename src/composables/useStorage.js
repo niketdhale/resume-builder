@@ -2,6 +2,9 @@ import { ref, watch } from 'vue'
 import { getStorageAdapter } from '../services/storage/index.js'
 import { resumes, sections, activeResumeId, resetResumeState } from './useResumeState'
 import { isRestoring } from './useHistory'
+import { initVersionControl, teardownVersionControl } from './useVersionControl.js'
+import { hydrateGroups } from './useGroups.js'
+import * as repo from '../services/git/repo.js'
 
 // Set to true during migration to prevent stale in-memory data from writing to new user's cloud
 export const suppressSaves = ref(false)
@@ -24,7 +27,39 @@ export async function saveToStorage() {
 
 // ─── Load ─────────────────────────────────────────────────────────────────────
 
+/**
+ * Restore git history from cloud storage for logged-in users.
+ * Non-blocking; logs errors but doesn't throw.
+ */
+async function restoreGitFromCloud() {
+  try {
+    const adapter = getStorageAdapter()
+    if (!adapter.loadBlob) return  // Not a cloud adapter
+    const gitJson = await adapter.loadBlob('git-repo')
+    if (!gitJson) return  // No backup exists
+    const gitMap = JSON.parse(gitJson)
+    await repo.importGitDir(gitMap)
+  } catch (e) {
+    console.warn('[storage] git restore failed:', e.message)
+  }
+}
+
 export async function hydrateFromStorage() {
+  // Restore git history from cloud (if available) before initializing VC
+  try {
+    await restoreGitFromCloud()
+  } catch (e) {
+    console.warn('[storage] git restore failed:', e)
+  }
+
+  // Bootstrap the git repo
+  try {
+    await initVersionControl()
+    await hydrateGroups()
+  } catch (e) {
+    console.warn('[storage] git init failed:', e)
+  }
+
   const savedResumes = await getStorageAdapter().load(KEYS.resumes)
   const savedSections = await getStorageAdapter().load(KEYS.sections)
   const savedActive = await getStorageAdapter().load(KEYS.active)
@@ -32,6 +67,7 @@ export async function hydrateFromStorage() {
   if (!savedResumes?.length) {
     // Nothing in storage (e.g. after sign-out with empty local storage) — reset to defaults
     // so cloud data isn't left visible in guest mode.
+    teardownVersionControl()
     resetResumeState()
     return
   }
@@ -74,6 +110,12 @@ export function triggerSave() {
     lastSavedTime.value = new Date()
     savedIndicator.value = ok
     syncStatus.value = ok ? 'synced' : 'pending'
+    // Reset to idle after 3s
+    if (ok) {
+      setTimeout(() => {
+        syncStatus.value = 'idle'
+      }, 3000)
+    }
   }, 500)
 }
 
