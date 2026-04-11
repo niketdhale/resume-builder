@@ -321,6 +321,41 @@ export const cloudAdapter = {
 
   async list() { return [] },
 
+  /**
+   * Save a blob (string or Uint8Array) to Supabase Storage bucket 'resume-git'.
+   * Path inside the bucket: <userId>/<key>
+   */
+  async saveBlob(key, data) {
+    const userId = this._userId
+    if (!userId || !hasSupabaseConfig) return false
+    try {
+      const path = `${userId}/${key}`
+      const blob = typeof data === 'string'
+        ? new Blob([data], { type: 'application/json' })
+        : new Blob([data], { type: 'application/octet-stream' })
+      const { error } = await supabase.storage.from('resume-git').upload(path, blob, { upsert: true })
+      if (error) throw error
+      return true
+    } catch (err) {
+      console.warn('[cloudAdapter] saveBlob failed:', err.message)
+      return false
+    }
+  },
+
+  /**
+   * Load a blob from Supabase Storage. Returns the raw text or null.
+   */
+  async loadBlob(key) {
+    const userId = this._userId
+    if (!userId || !hasSupabaseConfig) return null
+    try {
+      const path = `${userId}/${key}`
+      const { data, error } = await supabase.storage.from('resume-git').download(path)
+      if (error) return null
+      return await data.text()
+    } catch { return null }
+  },
+
   hasPendingWrites() { return readQueue().length > 0 },
 
   async flush() {

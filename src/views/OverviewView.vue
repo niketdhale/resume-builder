@@ -1,9 +1,11 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { inject } from 'vue'
 import NavBar from '../components/ui/NavBar.vue'
+import GroupManagerModal from '../components/groups/GroupManagerModal.vue'
 import { flagCode } from '../constants/languages'
+import { groups, resumeToGroup, assignResumeToGroup } from '../composables/useGroups.js'
 
 const router = useRouter()
 const resumes = inject('resumes')
@@ -18,6 +20,28 @@ function sectionCount(resumeId) {
 }
 
 const baseResumes = computed(() => resumes.value.filter((r) => !r.variantOf))
+
+// ── Groups ────────────────────────────────────────────────────────────────────
+const showGroupModal    = ref(false)
+const activeGroupFilter = ref(null)   // null = All, '__ungrouped__' = ungrouped, else groupId
+
+const filteredResumes = computed(() => {
+  if (activeGroupFilter.value === null) return baseResumes.value
+  if (activeGroupFilter.value === '__ungrouped__') {
+    return baseResumes.value.filter(r => !resumeToGroup.value[r.id])
+  }
+  return baseResumes.value.filter(r => resumeToGroup.value[r.id] === activeGroupFilter.value)
+})
+
+function groupForResume(resumeId) {
+  const gid = resumeToGroup.value[resumeId]
+  return gid ? groups.value.find(g => g.id === gid) : null
+}
+
+// Assign resume to a group from a select dropdown in the card menu
+async function handleAssignGroup(resumeId, groupId) {
+  await assignResumeToGroup(resumeId, groupId || null)
+}
 
 function variantsOf(baseId) {
   return resumes.value.filter((r) => r.variantOf === baseId)
@@ -60,6 +84,40 @@ function timeAgo(isoString) {
   <div class="overview-root">
     <NavBar />
 
+    <div class="overview-layout">
+
+    <!-- Groups sidebar -->
+    <aside class="groups-sidebar">
+      <div class="sidebar-head">
+        <span class="sidebar-title">Groups</span>
+        <button class="sidebar-manage" @click="showGroupModal = true" title="Manage groups">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+      <nav class="sidebar-nav">
+        <button
+          class="sidebar-item"
+          :class="{ active: activeGroupFilter === null }"
+          @click="activeGroupFilter = null"
+        >All resumes</button>
+        <button
+          v-for="g in groups"
+          :key="g.id"
+          class="sidebar-item"
+          :class="{ active: activeGroupFilter === g.id }"
+          @click="activeGroupFilter = g.id"
+        >
+          <span class="sidebar-dot" :style="{ background: g.color }" />
+          {{ g.name }}
+        </button>
+        <button
+          class="sidebar-item"
+          :class="{ active: activeGroupFilter === '__ungrouped__' }"
+          @click="activeGroupFilter = '__ungrouped__'"
+        >Ungrouped</button>
+      </nav>
+    </aside>
+
     <main class="overview-main">
 
       <!-- Page header -->
@@ -101,7 +159,7 @@ function timeAgo(isoString) {
 
         <!-- Resume cards -->
         <div
-          v-for="(resume, idx) in baseResumes"
+          v-for="(resume, idx) in filteredResumes"
           :key="resume.id"
           class="resume-card anim-fade-up"
           :class="`anim-fade-up-d${Math.min(idx + 3, 5)}`"
@@ -140,6 +198,13 @@ function timeAgo(isoString) {
               <p class="card-subtitle">{{ resume.metadata?.jobTitle || 'No job title' }}</p>
             </div>
 
+            <!-- Group chip -->
+            <div v-if="groupForResume(resume.id)" class="card-group">
+              <span class="group-chip" :style="{ background: groupForResume(resume.id).color + '22', color: groupForResume(resume.id).color, borderColor: groupForResume(resume.id).color + '44' }">
+                {{ groupForResume(resume.id).name }}
+              </span>
+            </div>
+
             <!-- Lang flags -->
             <div class="card-langs">
               <span
@@ -175,15 +240,29 @@ function timeAgo(isoString) {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
             </button>
           </div>
+          <!-- Move to group -->
+          <div v-if="groups.length" class="card-group-select" @click.stop>
+            <select
+              class="group-select"
+              :value="resumeToGroup[resume.id] || ''"
+              @change="handleAssignGroup(resume.id, $event.target.value)"
+            >
+              <option value="">No group</option>
+              <option v-for="g in groups" :key="g.id" :value="g.id">{{ g.name }}</option>
+            </select>
+          </div>
         </div>
       </div>
-
-    </main>
 
     <!-- Mobile FAB -->
     <button class="fab" @click="createResume" aria-label="New Resume">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
+
+    </main><!-- end overview-main -->
+    </div><!-- end overview-layout -->
+
+    <GroupManagerModal v-model="showGroupModal" />
   </div>
 </template>
 
@@ -196,9 +275,51 @@ function timeAgo(isoString) {
   background: var(--bg-base);
 }
 
+/* ─── Outer layout (sidebar + main) ───────────────────────────── */
+.overview-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ─── Groups sidebar ───────────────────────────────────────────── */
+.groups-sidebar {
+  width: 200px;
+  min-width: 200px;
+  border-right: 1px solid var(--border);
+  background: var(--bg-surface);
+  padding: 1.25rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+@media (max-width: 767px) { .groups-sidebar { display: none; } }
+.sidebar-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 0.25rem; margin-bottom: 0.25rem;
+}
+.sidebar-title { font-size: 0.75rem; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; }
+.sidebar-manage {
+  width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+  border-radius: 5px; border: none; background: transparent; color: var(--ink-3); cursor: pointer;
+}
+.sidebar-manage:hover { background: var(--bg-subtle); color: var(--ink); }
+.sidebar-nav { display: flex; flex-direction: column; gap: 1px; }
+.sidebar-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.8125rem; color: var(--ink-2);
+  padding: 0.4rem 0.625rem; border-radius: 6px;
+  border: none; background: transparent; cursor: pointer; text-align: left; width: 100%;
+  transition: all 0.12s;
+}
+.sidebar-item:hover { background: var(--bg-subtle); color: var(--ink); }
+.sidebar-item.active { background: var(--gold-bg); color: var(--gold); font-weight: 500; }
+.sidebar-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
 /* ─── Main layout ──────────────────────────────────────────────── */
 .overview-main {
-  max-width: 1200px;
+  flex: 1;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 2.5rem 2rem 5rem;
   width: 100%;
@@ -401,6 +522,23 @@ function timeAgo(isoString) {
 .card-title { font-size: 0.875rem; font-weight: 500; color: var(--ink); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card-subtitle { font-size: 0.75rem; color: var(--ink-3); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+.card-group { margin-bottom: 0.1rem; }
+.group-chip {
+  font-size: 0.6875rem; font-weight: 500;
+  padding: 0.125rem 0.5rem; border-radius: 4px;
+  border: 1px solid transparent;
+}
+.card-group-select {
+  padding: 0 0.875rem 0.625rem;
+  border-top: 1px solid var(--border);
+}
+.group-select {
+  width: 100%; font-size: 0.75rem; padding: 0.3rem 0.5rem;
+  border: 1px solid var(--border); border-radius: 5px;
+  background: var(--bg-subtle); color: var(--ink-2);
+  cursor: pointer; outline: none;
+}
+.group-select:focus { border-color: var(--gold); }
 .card-langs { display: flex; flex-wrap: wrap; gap: 0.25rem; }
 .lang-chip {
   font-size: 0.6875rem;

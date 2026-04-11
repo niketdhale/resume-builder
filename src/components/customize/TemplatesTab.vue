@@ -1,9 +1,11 @@
 <script setup>
 import { inject, computed } from 'vue'
 import { TEMPLATES } from '../../constants/templates'
+import { scheduleAutoCommit } from '../../composables/useVersionControl.js'
 
-const activeSettings = inject('activeSettings')
-const updateSetting  = inject('updateSetting')
+const activeSettings  = inject('activeSettings')
+const updateSetting   = inject('updateSetting')
+const activeResumeId  = inject('activeResumeId')
 
 function applyTemplate(template) {
   const keys = [
@@ -18,6 +20,7 @@ function applyTemplate(template) {
   keys.forEach((key) => {
     if (template[key] !== undefined) updateSetting(key, template[key])
   })
+  scheduleAutoCommit(activeResumeId.value, 'template')
 }
 
 // Detect active template — all controlled keys must match

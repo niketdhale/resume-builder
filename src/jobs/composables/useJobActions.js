@@ -1,6 +1,7 @@
 import { jobs, customColumns } from './useJobState'
 import { uid } from '../../utils/uid'
 import { getAuthService } from '../../services/auth/index.js'
+import { scheduleAutoCommit } from '../../composables/useVersionControl.js'
 
 function now() { return new Date().toISOString() }
 function userId() { return getAuthService().getUserId() }
@@ -33,7 +34,13 @@ export function addJob(fields) {
 
 export function updateJob(jobId, updates) {
   const j = jobs.value.find(j => j.id === jobId)
-  if (j) Object.assign(j, updates, { updatedAt: now() })
+  if (!j) return
+  const prevResumeId = j.resumeId
+  Object.assign(j, updates, { updatedAt: now() })
+  // Auto-commit on the linked resume when the job-resume link changes
+  if (updates.resumeId !== undefined && updates.resumeId !== prevResumeId && updates.resumeId) {
+    scheduleAutoCommit(updates.resumeId, 'job-link')
+  }
 }
 
 export function deleteJob(jobId) {

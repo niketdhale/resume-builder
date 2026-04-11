@@ -9,6 +9,7 @@ import SectionList from '../components/editor/SectionList.vue'
 import PreviewPanel from '../components/preview/PreviewPanel.vue'
 import CustomizePanel from '../components/customize/CustomizePanel.vue'
 import MobileEditorTabs from '../components/ui/MobileEditorTabs.vue'
+import VersionHistoryPanel from '../components/versions/VersionHistoryPanel.vue'
 import { usePdfExport } from '../composables/usePdfExport'
 import { useBreakpoint } from '../composables/useBreakpoint'
 
@@ -71,8 +72,9 @@ const cancelImport    = inject('cancelImport')
 const activeResume = computed(() => resumes.value.find((r) => r.id === activeResumeId.value) ?? null)
 const { exportPdf } = usePdfExport(activePageSize, activeResume)
 
-const activeTab   = ref('content')
-const mobilePanel = ref('content')
+const activeTab        = ref('content')
+const mobilePanel      = ref('content')
+const showHistoryPanel = ref(false)
 const { isDesktop } = useBreakpoint()
 
 const sections = inject('sections')
@@ -115,6 +117,14 @@ onMounted(() => {
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></svg>
         </button>
       </div>
+      <button
+        @click="showHistoryPanel = !showHistoryPanel"
+        class="shortcuts-btn history-toggle-btn"
+        :class="{ active: showHistoryPanel }"
+        title="Version history"
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg>
+      </button>
       <button @click="showShortcutsModal = true" class="shortcuts-btn" title="Keyboard shortcuts (?)">?</button>
     </div>
 
@@ -187,6 +197,9 @@ onMounted(() => {
         </div>
         <div class="preview-canvas"><PreviewPanel /></div>
       </div>
+
+      <!-- VERSION HISTORY PANEL -->
+      <VersionHistoryPanel v-if="showHistoryPanel && isDesktop" />
     </div>
 
     <!-- Mobile tabs -->
@@ -332,6 +345,7 @@ onMounted(() => {
 .ud-sep { width:1px; height:16px; background:var(--border); flex-shrink:0; }
 .shortcuts-btn { width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:600; border-radius:6px; border:1px solid var(--border); background:var(--bg-surface); color:var(--ink-3); cursor:pointer; flex-shrink:0; transition:all .15s; font-family:var(--font-sans); }
 .shortcuts-btn:hover { color:var(--ink); background:var(--bg-subtle); }
+.history-toggle-btn.active { background: var(--gold-bg); color: var(--gold); border-color: var(--gold-border); }
 
 /* Body */
 .editor-body { display:flex; flex:1; overflow:hidden; }
