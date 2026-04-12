@@ -1,3 +1,4 @@
+// Polyfill for isomorphic-git in browser
 import { Buffer } from 'buffer'
 window.Buffer = Buffer
 
@@ -12,6 +13,7 @@ initTheme()
 
 const app = createApp(App)
 
+// Register v-click-outside directive
 app.directive('click-outside', {
   mounted(el, binding) {
     el.clickOutsideEvent = (event) => {

@@ -79,7 +79,7 @@ async function handleCreate() {
 }
 .branch-btn:hover { background: var(--bg-surface); color: var(--ink); }
 .branch-dropdown {
-  position: absolute; top: calc(100% + 6px); left: 0;
+  position: absolute; top: calc(100% + 6px); right: 0;
   background: var(--bg-surface); border: 1px solid var(--border);
   border-radius: 10px; padding: 0.375rem;
   min-width: 180px; z-index: 50;
