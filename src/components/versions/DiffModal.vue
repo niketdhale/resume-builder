@@ -1,6 +1,7 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { diffCommits } from '../../composables/useVersionControl.js'
+import { sections } from '../../composables/useResumeState.js'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -23,18 +24,74 @@ watch(() => props.modelValue, async (open) => {
 
 function close() { emit('update:modelValue', false) }
 
-function friendlyPath(path) {
-  return path
-    .replace('/resumes/', '')
-    .replace('/sections/', ' › ')
-    .replace('.json', '')
-    .replace('photo.txt', 'photo')
+// Build a lookup: sectionId → section title
+const sectionTitleById = computed(() => {
+  const map = {}
+  for (const s of sections.value) {
+    map[s.id] = s.title
+  }
+  return map
+})
+
+// Fields to hide (noise)
+const NOISE_KEYS = new Set(['updatedAt', 'createdAt', 'syncedAt', 'id', 'resumeId'])
+
+// Convert a raw dot-path like "entries.2.content" to "Entry 3 › Content"
+function formatKey(key) {
+  const parts = key.split('.')
+  const result = []
+  let i = 0
+  while (i < parts.length) {
+    const p = parts[i]
+    // numeric index: combine with previous label
+    if (/^\d+$/.test(p)) {
+      const num = parseInt(p, 10) + 1
+      if (result.length) {
+        result[result.length - 1] += ` ${num}`
+      } else {
+        result.push(`Item ${num}`)
+      }
+    } else {
+      result.push(humanize(p))
+    }
+    i++
+  }
+  return result.join(' › ')
 }
 
+function humanize(str) {
+  return str
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/^./, s => s.toUpperCase())
+    .trim()
+}
+
+// Parse the file path into a readable label
+function friendlyPath(path) {
+  // /resumes/<id>/sections/<sid>.json  → section name
+  const secMatch = path.match(/\/resumes\/[^/]+\/sections\/([^/]+)\.json$/)
+  if (secMatch) {
+    const sid = secMatch[1]
+    const title = sectionTitleById.value[sid] || sectionTitleById.value[parseFloat(sid)]
+    return title ? `Section: ${title}` : `Section (${sid.slice(0, 8)}…)`
+  }
+  // /resumes/<id>.json
+  if (path.match(/\/resumes\/[^/]+\.json$/)) return 'Resume settings'
+  // /resumes/<id>/photo.txt
+  if (path.match(/\/photo\.txt$/)) return 'Profile photo'
+  // /index.json
+  if (path === '/index.json') return 'Index'
+  // /groups/<id>.json
+  if (path.match(/\/groups\//)) return 'Group'
+  return path
+}
+
+// Flatten parsed diff, filtering noise fields
 function flattenDiff(parsed, prefix = '') {
   if (!parsed) return []
   const rows = []
   for (const [k, v] of Object.entries(parsed)) {
+    if (NOISE_KEYS.has(k)) continue
     const key = prefix ? `${prefix}.${k}` : k
     if (v && typeof v === 'object' && ('before' in v || 'after' in v)) {
       rows.push({ key, before: v.before, after: v.after })
@@ -43,6 +100,11 @@ function flattenDiff(parsed, prefix = '') {
     }
   }
   return rows
+}
+
+function truncate(val, len = 120) {
+  const s = val == null ? '—' : String(val)
+  return s.length > len ? s.slice(0, len) + '…' : s
 }
 </script>
 
@@ -69,27 +131,37 @@ function flattenDiff(parsed, prefix = '') {
             <div v-for="(change, i) in changes" :key="i" class="change-item">
               <div class="change-path">
                 <span class="badge" :class="change.type">{{ change.type }}</span>
-                {{ friendlyPath(change.path) }}
+                <span class="path-label">{{ friendlyPath(change.path) }}</span>
               </div>
+
               <template v-if="change.parsed">
                 <div class="diff-table">
-                  <div
-                    v-for="row in flattenDiff(change.parsed)"
-                    :key="row.key"
-                    class="diff-row"
-                  >
-                    <span class="diff-key">{{ row.key }}</span>
-                    <span class="diff-before">{{ row.before ?? '—' }}</span>
-                    <span class="diff-arrow">→</span>
-                    <span class="diff-after">{{ row.after ?? '—' }}</span>
+                  <template v-for="row in flattenDiff(change.parsed)" :key="row.key">
+                    <div class="diff-row">
+                      <span class="diff-key">{{ formatKey(row.key) }}</span>
+                      <div class="diff-values">
+                        <span class="diff-before">{{ truncate(row.before) }}</span>
+                        <svg class="diff-arrow-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        <span class="diff-after">{{ truncate(row.after) }}</span>
+                      </div>
+                    </div>
+                  </template>
+                  <div v-if="flattenDiff(change.parsed).length === 0" class="no-visible-changes">
+                    Only metadata fields changed (timestamps, IDs).
                   </div>
                 </div>
               </template>
               <template v-else-if="change.type === 'added'">
-                <pre class="diff-raw added">{{ change.after }}</pre>
+                <div class="diff-summary added-summary">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  New item added
+                </div>
               </template>
               <template v-else-if="change.type === 'removed'">
-                <pre class="diff-raw removed">{{ change.before }}</pre>
+                <div class="diff-summary removed-summary">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Item removed
+                </div>
               </template>
             </div>
           </div>
@@ -117,7 +189,7 @@ function flattenDiff(parsed, prefix = '') {
 }
 .modal-title { font-family: var(--font-display); font-size: 1rem; font-weight: 400; color: var(--ink); margin: 0; flex: 1; }
 .modal-labels { display: flex; align-items: center; gap: 0.375rem; }
-.label { font-size: 0.75rem; font-weight: 500; padding: 0.2rem 0.5rem; border-radius: 4px; }
+.label { font-size: 0.75rem; font-weight: 500; padding: 0.2rem 0.5rem; border-radius: 4px; font-family: monospace; }
 .label-a { background: rgba(220,38,38,0.1); color: #dc2626; }
 .label-b { background: rgba(34,197,94,0.1); color: #16a34a; }
 .label-arrow { font-size: 0.75rem; color: var(--ink-3); }
@@ -130,29 +202,52 @@ function flattenDiff(parsed, prefix = '') {
 .loading, .empty { font-size: 0.875rem; color: var(--ink-3); text-align: center; padding: 2rem 0; }
 .change-list { display: flex; flex-direction: column; gap: 1rem; }
 .change-item { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+
 .change-path {
   display: flex; align-items: center; gap: 0.5rem;
   padding: 0.5rem 0.75rem; background: var(--bg-subtle);
-  font-size: 0.8125rem; color: var(--ink-2); font-family: monospace;
   border-bottom: 1px solid var(--border);
 }
+.path-label { font-size: 0.8125rem; color: var(--ink-2); font-weight: 500; }
+
 .badge {
   font-size: 0.6875rem; font-weight: 600; text-transform: uppercase;
-  padding: 0.125rem 0.4rem; border-radius: 3px;
+  padding: 0.125rem 0.4rem; border-radius: 3px; flex-shrink: 0;
 }
 .badge.added    { background: rgba(34,197,94,0.12);  color: #16a34a; }
 .badge.removed  { background: rgba(220,38,38,0.1);   color: #dc2626; }
 .badge.modified { background: rgba(184,146,58,0.12); color: var(--gold); }
-.diff-table { padding: 0.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.3rem; }
+
+.diff-table { padding: 0.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; }
+
 .diff-row {
-  display: grid; grid-template-columns: 1fr 1fr auto 1fr;
-  align-items: start; gap: 0.5rem; font-size: 0.8rem;
+  display: flex; flex-direction: column; gap: 0.2rem;
 }
-.diff-key { color: var(--ink-3); font-family: monospace; grid-column: 1; }
-.diff-before { color: #dc2626; background: rgba(220,38,38,0.06); padding: 0.1rem 0.3rem; border-radius: 3px; word-break: break-all; }
-.diff-arrow  { color: var(--ink-3); }
-.diff-after  { color: #16a34a; background: rgba(34,197,94,0.07); padding: 0.1rem 0.3rem; border-radius: 3px; word-break: break-all; }
-.diff-raw { font-size: 0.75rem; padding: 0.5rem 0.75rem; margin: 0; overflow: auto; max-height: 200px; }
-.diff-raw.added   { background: rgba(34,197,94,0.06);  color: #166534; }
-.diff-raw.removed { background: rgba(220,38,38,0.05); color: #991b1b; }
+.diff-key {
+  font-size: 0.6875rem; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.03em;
+}
+.diff-values {
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+.diff-before {
+  flex: 1; color: #dc2626; background: rgba(220,38,38,0.06);
+  padding: 0.2rem 0.4rem; border-radius: 4px; word-break: break-word; min-width: 0;
+}
+.diff-after {
+  flex: 1; color: #16a34a; background: rgba(34,197,94,0.07);
+  padding: 0.2rem 0.4rem; border-radius: 4px; word-break: break-word; min-width: 0;
+}
+.diff-arrow-icon { flex-shrink: 0; color: var(--ink-3); margin-top: 0.3rem; }
+
+.no-visible-changes {
+  font-size: 0.8125rem; color: var(--ink-3); font-style: italic; padding: 0.25rem 0;
+}
+
+.diff-summary {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.8125rem; padding: 0.625rem 0.75rem;
+}
+.added-summary   { color: #16a34a; }
+.removed-summary { color: #dc2626; }
 </style>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import {
   commitLog, isDirty,
   commitChanges, revertToCommit, checkoutCommit,
@@ -56,10 +56,6 @@ function openDiff() {
   showDiff.value = true
 }
 
-// ─── Tags for a commit ───────────────────────────────────────────────────────
-// isomorphic-git tags are refs; we don't have OID-to-tag reverse lookup built-in.
-// For display, we just show allTags (names). Advanced tag→oid lookup is deferred.
-
 // ─── Formatted date ──────────────────────────────────────────────────────────
 function formatDate(ts) {
   const d = new Date(ts * 1000)
@@ -68,17 +64,52 @@ function formatDate(ts) {
 }
 
 function shortOid(oid) { return oid?.slice(0, 7) ?? '' }
+
+// ─── Resize ───────────────────────────────────────────────────────────────────
+const panelWidth = ref(260)
+const isResizing = ref(false)
+let startX = 0
+let startWidth = 0
+
+function onResizeStart(e) {
+  isResizing.value = true
+  startX = e.clientX
+  startWidth = panelWidth.value
+  document.addEventListener('mousemove', onResizeMove)
+  document.addEventListener('mouseup', onResizeEnd)
+  document.body.style.cursor = 'ew-resize'
+  document.body.style.userSelect = 'none'
+}
+
+function onResizeMove(e) {
+  if (!isResizing.value) return
+  const delta = startX - e.clientX  // dragging left = wider
+  panelWidth.value = Math.min(480, Math.max(200, startWidth + delta))
+}
+
+function onResizeEnd() {
+  isResizing.value = false
+  document.removeEventListener('mousemove', onResizeMove)
+  document.removeEventListener('mouseup', onResizeEnd)
+  document.body.style.cursor = ''
+  document.body.style.userSelect = ''
+}
+
+onUnmounted(() => {
+  document.removeEventListener('mousemove', onResizeMove)
+  document.removeEventListener('mouseup', onResizeEnd)
+})
 </script>
 
 <template>
-  <aside class="history-panel">
+  <aside class="history-panel" :style="{ width: panelWidth + 'px', minWidth: panelWidth + 'px' }">
+    <!-- Resize handle -->
+    <div class="resize-handle" @mousedown.prevent="onResizeStart" title="Drag to resize"></div>
+
     <div class="panel-header">
-      <span class="panel-title">History</span>
+      <span class="panel-title">Version Control</span>
       <BranchSwitcher />
-      <button
-        class="commit-btn"
-        @click="showCommitDialog = true"
-      >
+      <button class="commit-btn" @click="showCommitDialog = true">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg>
         Commit
       </button>
@@ -89,9 +120,9 @@ function shortOid(oid) { return oid?.slice(0, 7) ?? '' }
       Uncommitted changes
     </div>
 
-    <!-- Compare button -->
+    <!-- Compare bar -->
     <div v-if="selectedOids.length === 2" class="compare-bar">
-      <span>{{ selectedOids.length }}/2 selected</span>
+      <span>2/2 selected</span>
       <button class="compare-btn" @click="openDiff">Compare</button>
       <button class="clear-btn" @click="selectedOids = []">Clear</button>
     </div>
@@ -100,37 +131,71 @@ function shortOid(oid) { return oid?.slice(0, 7) ?? '' }
       <button class="clear-btn" @click="selectedOids = []">Clear</button>
     </div>
 
-    <!-- Commit list -->
+    <!-- Commit list with git graph -->
     <div class="commit-list">
       <div v-if="!commitLog.length" class="empty">
         No commits yet. Make some changes and click Commit.
       </div>
-      <div
-        v-for="entry in commitLog"
-        :key="entry.oid"
-        class="commit-item"
-        :class="{ selected: selectedOids.includes(entry.oid) }"
-        @click="toggleSelect(entry.oid)"
-      >
-        <div class="commit-top">
-          <span class="commit-sha">{{ shortOid(entry.oid) }}</span>
-          <span class="commit-date">{{ formatDate(entry.commit.author.timestamp) }}</span>
-        </div>
-        <p class="commit-msg">{{ entry.commit.message }}</p>
+      <div v-else class="graph-container">
+        <!-- SVG git graph column -->
+        <svg
+          class="git-graph-svg"
+          :height="commitLog.length * 56"
+          width="24"
+          aria-hidden="true"
+        >
+          <!-- Trunk line -->
+          <line
+            v-if="commitLog.length > 1"
+            x1="12" y1="12"
+            x2="12" :y2="commitLog.length * 56 - 44"
+            stroke="var(--gold)"
+            stroke-width="1.5"
+            stroke-dasharray="2 2"
+            opacity="0.4"
+          />
+          <!-- Commit dots -->
+          <circle
+            v-for="(entry, i) in commitLog"
+            :key="entry.oid"
+            cx="12"
+            :cy="i * 56 + 12"
+            r="4"
+            :fill="selectedOids.includes(entry.oid) ? 'var(--gold)' : 'var(--bg-surface)'"
+            stroke="var(--gold)"
+            stroke-width="1.5"
+          />
+        </svg>
 
-        <!-- Tag input for this commit -->
-        <template v-if="taggingOid === entry.oid">
-          <div class="tag-row">
-            <input v-model="tagName" class="tag-input" placeholder="v1.0-google" autofocus
-              @keydown.enter="handleTag(entry.oid)" @keydown.escape="taggingOid = null" />
-            <button class="tag-save-btn" @click="handleTag(entry.oid)">Save</button>
+        <!-- Commit items -->
+        <div class="commit-items">
+          <div
+            v-for="entry in commitLog"
+            :key="entry.oid"
+            class="commit-item"
+            :class="{ selected: selectedOids.includes(entry.oid) }"
+            @click="toggleSelect(entry.oid)"
+          >
+            <div class="commit-top">
+              <span class="commit-sha">{{ shortOid(entry.oid) }}</span>
+              <span class="commit-date">{{ formatDate(entry.commit.author.timestamp) }}</span>
+            </div>
+            <p class="commit-msg">{{ entry.commit.message }}</p>
+
+            <template v-if="taggingOid === entry.oid">
+              <div class="tag-row">
+                <input v-model="tagName" class="tag-input" placeholder="v1.0-google" autofocus
+                  @keydown.enter="handleTag(entry.oid)" @keydown.escape="taggingOid = null" />
+                <button class="tag-save-btn" @click="handleTag(entry.oid)">Save</button>
+              </div>
+            </template>
+
+            <div class="commit-actions" @click.stop>
+              <button title="Revert to this version" @click="handleRevert(entry.oid)">Revert</button>
+              <button title="View this version"      @click="handleCheckout(entry.oid)">View</button>
+              <button title="Tag this version"       @click="taggingOid = taggingOid === entry.oid ? null : entry.oid">Tag</button>
+            </div>
           </div>
-        </template>
-
-        <div class="commit-actions" @click.stop>
-          <button title="Revert to this version" @click="handleRevert(entry.oid)">Revert</button>
-          <button title="View this version"      @click="handleCheckout(entry.oid)">View</button>
-          <button title="Tag this version"       @click="taggingOid = taggingOid === entry.oid ? null : entry.oid">Tag</button>
         </div>
       </div>
     </div>
@@ -148,12 +213,29 @@ function shortOid(oid) { return oid?.slice(0, 7) ?? '' }
 
 <style scoped>
 .history-panel {
-  width: 260px; min-width: 260px;
   border-left: 1px solid var(--border);
   background: var(--bg-surface);
   display: flex; flex-direction: column;
   height: 100%; overflow: hidden;
+  position: relative;
+  transition: width 0s;
 }
+
+.resize-handle {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  cursor: ew-resize;
+  z-index: 10;
+  background: transparent;
+  transition: background 0.15s;
+}
+.resize-handle:hover,
+.resize-handle:active {
+  background: var(--gold);
+  opacity: 0.5;
+}
+
 .panel-header {
   display: flex; align-items: center; gap: 0.5rem;
   padding: 0.75rem 0.875rem;
@@ -190,33 +272,55 @@ function shortOid(oid) { return oid?.slice(0, 7) ?? '' }
   border: 1px solid var(--border); background: transparent; color: var(--ink-3); cursor: pointer;
 }
 
-.commit-list { flex: 1; overflow-y: auto; padding: 0.5rem 0; }
+.commit-list { flex: 1; overflow-y: auto; }
 .empty { font-size: 0.8125rem; color: var(--ink-3); text-align: center; padding: 2rem 1rem; line-height: 1.55; }
 
+.graph-container {
+  display: flex;
+  align-items: flex-start;
+}
+
+.git-graph-svg {
+  flex-shrink: 0;
+  padding-top: 0;
+  overflow: visible;
+}
+
+.commit-items {
+  flex: 1;
+  min-width: 0;
+}
+
 .commit-item {
-  padding: 0.625rem 0.875rem;
+  height: 56px;
+  padding: 0.4rem 0.75rem 0.4rem 0.25rem;
   border-bottom: 1px solid var(--border);
   cursor: pointer; transition: background 0.12s;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 0.15rem;
 }
 .commit-item:hover { background: var(--bg-subtle); }
 .commit-item.selected { background: var(--gold-bg); border-left: 2px solid var(--gold); }
 
-.commit-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; }
+.commit-top { display: flex; justify-content: space-between; align-items: center; }
 .commit-sha  { font-family: monospace; font-size: 0.6875rem; color: var(--gold); }
 .commit-date { font-size: 0.6875rem; color: var(--ink-3); }
-.commit-msg  { font-size: 0.8125rem; color: var(--ink); margin: 0 0 0.375rem; line-height: 1.45; word-break: break-word; }
+.commit-msg  {
+  font-size: 0.8125rem; color: var(--ink); margin: 0; line-height: 1.3;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 
 .commit-actions {
-  display: flex; gap: 0.3rem; margin-top: 0.25rem;
+  display: flex; gap: 0.25rem;
 }
 .commit-actions button {
-  font-size: 0.6875rem; padding: 0.2rem 0.45rem; border-radius: 4px;
+  font-size: 0.6rem; padding: 0.1rem 0.35rem; border-radius: 4px;
   border: 1px solid var(--border); background: transparent; color: var(--ink-3);
-  cursor: pointer; transition: all 0.12s;
+  cursor: pointer; transition: all 0.12s; white-space: nowrap;
 }
-.commit-actions button:hover { background: var(--bg-subtle); color: var(--ink); border-color: var(--border-2); }
+.commit-actions button:hover { background: var(--bg-subtle); color: var(--ink); }
 
-.tag-row { display: flex; gap: 0.3rem; margin: 0.3rem 0; }
+.tag-row { display: flex; gap: 0.3rem; margin: 0.2rem 0; }
 .tag-input {
   flex: 1; font-size: 0.75rem; padding: 0.2rem 0.4rem;
   border: 1px solid var(--gold); border-radius: 4px;

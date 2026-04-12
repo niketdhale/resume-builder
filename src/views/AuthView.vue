@@ -9,7 +9,7 @@ const router = useRouter()
 const { isLoggedIn } = useAuth()
 const { isDark } = useTheme()
 
-if (isLoggedIn.value) router.replace('/')
+if (isLoggedIn.value) router.replace({ name: 'overview' })
 
 const mode         = ref('signin')
 const email        = ref('')
@@ -82,7 +82,7 @@ const submitLabel = computed(() => {
   return 'Create account'
 })
 
-watch(isLoggedIn, (val) => { if (val) router.replace('/') })
+watch(isLoggedIn, (val) => { if (val) router.replace({ name: 'overview' }) })
 </script>
 
 <template>
@@ -91,7 +91,7 @@ watch(isLoggedIn, (val) => { if (val) router.replace('/') })
     <!-- Left: Branding panel -->
     <div class="auth-brand">
       <!-- Wordmark -->
-      <div class="brand-wordmark" @click="router.push({ name: 'overview' })">
+      <div class="brand-wordmark" @click="router.push({ name: 'landing' })">
         <div class="brand-icon">R</div>
         <span class="brand-name">Résumé Builder</span>
       </div>
@@ -133,9 +133,9 @@ watch(isLoggedIn, (val) => { if (val) router.replace('/') })
 
       <!-- Top bar: back + theme -->
       <div class="form-topbar">
-        <button class="back-btn" @click="router.push({ name: 'overview' })">
+        <button class="back-btn" @click="router.push({ name: 'landing' })">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-          Back
+          Back to home
         </button>
       </div>
 

@@ -1,14 +1,6 @@
 <script setup>
 import { ref, inject, computed, nextTick } from 'vue'
-import {
-  GripVertical,
-  ChevronDown,
-  ChevronRight,
-  Link2,
-  Pencil,
-  Trash2,
-  Plus,
-} from 'lucide-vue-next'
+import { GripVertical, ChevronDown, ChevronRight, Link2, Pencil, Trash2, Plus } from 'lucide-vue-next'
 import EntryList from './EntryList.vue'
 
 const props = defineProps({
@@ -21,7 +13,6 @@ const toggleSectionCollapse = inject('toggleSectionCollapse')
 const toggleSectionSharing = inject('toggleSectionSharing')
 const addEntry = inject('addEntry')
 
-// ─── Inline rename ────────────────────────────────────────────────────────────
 const isRenaming = ref(false)
 const renameInput = ref(null)
 const draftTitle = ref('')
@@ -44,102 +35,66 @@ function onRenameKeydown(e) {
   if (e.key === 'Escape') isRenaming.value = false
 }
 
-// ─── Computed ─────────────────────────────────────────────────────────────────
 const visibleCount = computed(() => props.section.entries.filter((e) => e.isVisible).length)
 const totalCount = computed(() => props.section.entries.length)
 </script>
 
 <template>
-  <div
-    class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-shadow hover:shadow-md"
-  >
+  <div class="section-card">
     <!-- Section Header -->
-    <div
-      class="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-gray-50 to-white dark:from-gray-700/60 dark:to-gray-800 border-b border-gray-100 dark:border-gray-700"
-    >
-      <!-- Drag handle -->
-      <span
-        class="section-drag-handle cursor-grab text-gray-300 dark:text-gray-600 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors flex-shrink-0"
-      >
+    <div class="section-header">
+      <span class="drag-handle section-drag-handle">
         <GripVertical :size="15" />
       </span>
 
-      <!-- Collapse toggle -->
-      <button
-        @click="toggleSectionCollapse(section.id)"
-        class="text-gray-400 dark:text-gray-500 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors flex-shrink-0"
-      >
+      <button class="icon-btn" @click="toggleSectionCollapse(section.id)">
         <ChevronDown v-if="!section.isCollapsed" :size="15" />
         <ChevronRight v-else :size="15" />
       </button>
 
-      <!-- Title / Rename -->
       <input
         v-if="isRenaming"
         ref="renameInput"
         v-model="draftTitle"
         @blur="commitRename"
         @keydown="onRenameKeydown"
-        class="flex-1 text-sm font-semibold border border-indigo-300 dark:border-indigo-500 rounded-md px-2 py-0.5 outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+        class="rename-input"
       />
       <span
         v-else
         @dblclick="startRename"
-        class="flex-1 text-sm font-semibold text-gray-800 dark:text-gray-100 truncate cursor-pointer select-none"
+        class="section-title"
         title="Double click to rename"
       >
         {{ section.title }}
       </span>
 
-      <!-- Shared badge -->
-      <span
-        v-if="section.sharedAcrossViews"
-        class="flex items-center gap-1 text-xs text-indigo-500 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/40 px-2 py-0.5 rounded-full flex-shrink-0"
-        title="Shared across all resumes"
-      >
+      <span v-if="section.sharedAcrossViews" class="shared-badge">
         <Link2 :size="10" /> Shared
       </span>
 
-      <!-- Visible count badge -->
-      <span
-        class="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap flex-shrink-0 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full"
-      >
-        {{ visibleCount }}/{{ totalCount }}
-      </span>
+      <span class="count-badge">{{ visibleCount }}/{{ totalCount }}</span>
 
-      <!-- Rename -->
-      <button
-        @click="startRename"
-        class="p-1 text-gray-300 dark:text-gray-600 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors flex-shrink-0"
-        title="Rename"
-      >
+      <button class="icon-btn" @click="startRename" title="Rename">
         <Pencil :size="13" />
       </button>
 
-      <!-- Delete -->
-      <button
-        @click="deleteSection(section.id)"
-        class="p-1 text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition-colors flex-shrink-0"
-        title="Delete section"
-      >
+      <button class="icon-btn icon-btn--danger" @click="deleteSection(section.id)" title="Delete section">
         <Trash2 :size="13" />
       </button>
 
-      <!-- Share checkbox -->
-      <label
-        class="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 cursor-pointer whitespace-nowrap flex-shrink-0"
-      >
+      <label class="share-label">
         <input
           type="checkbox"
           :checked="section.sharedAcrossViews"
           @change="toggleSectionSharing(section.id)"
-          class="accent-indigo-600"
+          class="share-checkbox"
         />
         Share
       </label>
     </div>
 
-    <!-- Section description + body — animated collapse -->
+    <!-- Section body -->
     <Transition
       enter-active-class="transition-all duration-200 ease-out overflow-hidden"
       enter-from-class="opacity-0 max-h-0"
@@ -149,17 +104,12 @@ const totalCount = computed(() => props.section.entries.length)
       leave-to-class="opacity-0 max-h-0"
     >
       <div v-if="!section.isCollapsed">
-        <div v-if="section.description" class="px-4 pt-3 pb-0">
-          <p class="text-xs text-gray-400 dark:text-gray-500 italic leading-relaxed">
-            {{ section.description }}
-          </p>
+        <div v-if="section.description" class="section-desc">
+          <p>{{ section.description }}</p>
         </div>
-        <div class="p-4 flex flex-col gap-3">
+        <div class="section-body">
           <EntryList :section="section" :sectionType="section.type" />
-          <button
-            @click="addEntry(section.id)"
-            class="flex items-center gap-1.5 text-xs font-medium text-indigo-500 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 px-3 py-2 rounded-lg border border-dashed border-indigo-200 dark:border-indigo-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition-all w-full justify-center"
-          >
+          <button class="add-entry-btn" @click="addEntry(section.id)">
             <Plus :size="13" /> Add Entry
           </button>
         </div>
@@ -167,3 +117,158 @@ const totalCount = computed(() => props.section.entries.length)
     </Transition>
   </div>
 </template>
+
+<style scoped>
+.section-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: box-shadow 0.15s;
+}
+.section-card:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.625rem 0.875rem;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
+}
+
+.drag-handle {
+  color: var(--ink-3);
+  cursor: grab;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.12s;
+}
+.drag-handle:hover { color: var(--gold); }
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem;
+  background: transparent;
+  border: none;
+  color: var(--ink-3);
+  cursor: pointer;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: color 0.12s, background 0.12s;
+}
+.icon-btn:hover { color: var(--gold); background: var(--gold-bg); }
+.icon-btn--danger:hover { color: #ef4444; background: rgba(239,68,68,0.08); }
+
+.section-title {
+  flex: 1;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink);
+  truncate: true;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  min-width: 0;
+}
+
+.rename-input {
+  flex: 1;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: 1px solid var(--gold);
+  border-radius: 5px;
+  padding: 0.2rem 0.4rem;
+  outline: none;
+  background: var(--bg-base);
+  color: var(--ink);
+  min-width: 0;
+}
+
+.shared-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  color: var(--gold);
+  background: var(--gold-bg);
+  padding: 0.125rem 0.5rem;
+  border-radius: 99px;
+  flex-shrink: 0;
+  border: 1px solid rgba(184,146,58,0.2);
+}
+
+.count-badge {
+  font-size: 0.6875rem;
+  color: var(--ink-3);
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  padding: 0.1rem 0.45rem;
+  border-radius: 99px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.share-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.6875rem;
+  color: var(--ink-3);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.share-checkbox {
+  accent-color: var(--gold);
+  width: 12px;
+  height: 12px;
+}
+
+.section-desc {
+  padding: 0.625rem 0.875rem 0;
+}
+.section-desc p {
+  font-size: 0.75rem;
+  color: var(--ink-3);
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.section-body {
+  padding: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.add-entry-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--gold);
+  background: transparent;
+  border: 1px dashed rgba(184,146,58,0.35);
+  border-radius: 7px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.15s;
+}
+.add-entry-btn:hover {
+  background: var(--gold-bg);
+  border-color: var(--gold);
+}
+</style>

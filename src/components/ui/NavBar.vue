@@ -64,10 +64,10 @@ function closeMenu(e) {
         <span class="block w-3.5 h-px bg-current rounded-full"></span>
       </button>
 
-      <!-- Wordmark -->
+      <!-- Wordmark — goes to landing when guest, dashboard when logged in -->
       <button
         class="flex items-center gap-2.5 group"
-        @click.stop="router.push({ name: 'overview' })"
+        @click.stop="router.push({ name: isLoggedIn ? 'overview' : 'landing' })"
         style="text-decoration: none;"
       >
         <div
@@ -154,14 +154,30 @@ function closeMenu(e) {
         </svg>
       </button>
 
-      <!-- User avatar / menu -->
+      <!-- Sign In button — guest only, desktop -->
+      <button
+        v-if="!isLoggedIn"
+        @click.stop="router.push('/auth')"
+        class="hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
+        style="border: 1px solid var(--border); background: var(--bg-subtle); color: var(--ink-2);"
+        onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'"
+        onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink-2)'"
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign In
+      </button>
+
+      <!-- User avatar / menu — logged in only -->
       <div class="relative" data-user-menu>
         <button
           @click.stop="isLoggedIn ? (showUserMenu = !showUserMenu) : router.push('/auth')"
           :title="isLoggedIn ? userEmail : 'Sign in'"
           class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium transition-opacity"
-          :style="{ background: isLoggedIn ? 'var(--gold)' : 'var(--ink-3)' }"
-        >{{ userInitial }}</button>
+          :style="{ background: isLoggedIn ? 'var(--gold)' : 'var(--bg-subtle)', border: isLoggedIn ? 'none' : '1px solid var(--border)' }"
+        >
+          <span v-if="isLoggedIn">{{ userInitial }}</span>
+          <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
 
         <!-- Dropdown -->
         <Transition
