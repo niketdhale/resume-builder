@@ -5,47 +5,91 @@ defineProps({
 </script>
 
 <template>
-  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-    <!-- Total Applied -->
-    <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
-      <p class="text-2xl font-bold text-gray-900 dark:text-gray-50">{{ stats.total }}</p>
-      <p class="text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5">Total Applied</p>
-      <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">All time</p>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <p class="stat-value">{{ stats.total }}</p>
+      <p class="stat-label">Total Applied</p>
+      <p class="stat-sub">All time</p>
     </div>
 
-    <!-- Response Rate -->
-    <div class="bg-indigo-50 dark:bg-indigo-950/40 rounded-xl border border-indigo-100 dark:border-indigo-900 p-4">
-      <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{{ stats.responseRate }}%</p>
-      <p class="text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5">Response Rate</p>
-      <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ stats.responded }} responded</p>
+    <div class="stat-card stat-card--accent">
+      <p class="stat-value stat-value--gold">{{ stats.responseRate }}%</p>
+      <p class="stat-label">Response Rate</p>
+      <p class="stat-sub">{{ stats.responded }} responded</p>
     </div>
 
-    <!-- Interview Rate -->
-    <div class="bg-violet-50 dark:bg-violet-950/40 rounded-xl border border-violet-100 dark:border-violet-900 p-4">
-      <p class="text-2xl font-bold text-violet-600 dark:text-violet-400">{{ stats.interviewRate }}%</p>
-      <p class="text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5">Interview Rate</p>
-      <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ stats.interviews }} interviews</p>
+    <div class="stat-card stat-card--accent">
+      <p class="stat-value stat-value--gold">{{ stats.interviewRate }}%</p>
+      <p class="stat-label">Interview Rate</p>
+      <p class="stat-sub">{{ stats.interviews }} interviews</p>
     </div>
 
-    <!-- Offers -->
-    <div class="bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-100 dark:border-emerald-900 p-4">
-      <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ stats.offers }}</p>
-      <p class="text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5">Offers</p>
-      <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">In negotiation</p>
+    <div class="stat-card stat-card--accent">
+      <p class="stat-value stat-value--gold">{{ stats.offers }}</p>
+      <p class="stat-label">Offers</p>
+      <p class="stat-sub">In negotiation</p>
     </div>
 
-    <!-- This Month -->
-    <div class="bg-blue-50 dark:bg-blue-950/40 rounded-xl border border-blue-100 dark:border-blue-900 p-4">
-      <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ stats.thisMonth }}</p>
-      <p class="text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5">This Month</p>
-      <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ new Date().toLocaleString('default', { month: 'short', year: 'numeric' }) }}</p>
+    <div class="stat-card stat-card--accent">
+      <p class="stat-value stat-value--gold">{{ stats.thisMonth }}</p>
+      <p class="stat-label">This Month</p>
+      <p class="stat-sub">{{ new Date().toLocaleString('default', { month: 'short', year: 'numeric' }) }}</p>
     </div>
 
-    <!-- Avg Response Time -->
-    <div class="bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-100 dark:border-amber-900 p-4">
-      <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">{{ stats.avgResponse }}d</p>
-      <p class="text-xs font-medium text-gray-700 dark:text-gray-300 mt-0.5">Avg Response Time</p>
-      <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Days to hear back</p>
+    <div class="stat-card stat-card--accent">
+      <p class="stat-value stat-value--gold">{{ stats.avgResponse }}d</p>
+      <p class="stat-label">Avg Response Time</p>
+      <p class="stat-sub">Days to hear back</p>
     </div>
   </div>
 </template>
+
+<style scoped>
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+@media (min-width: 640px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1024px) {
+  .stats-grid { grid-template-columns: repeat(6, 1fr); }
+}
+
+.stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.stat-card--accent {
+  background: var(--gold-bg);
+  border-color: rgba(184, 146, 58, 0.2);
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.stat-value--gold {
+  color: var(--gold);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ink-2);
+  margin-top: 0.125rem;
+}
+
+.stat-sub {
+  font-size: 0.6875rem;
+  color: var(--ink-3);
+  margin-top: 0.125rem;
+}
+</style>

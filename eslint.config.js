@@ -5,7 +5,7 @@ import globals from 'globals'
 export default [
   // ─── Ignored paths ─────────────────────────────────────────────────────────
   {
-    ignores: ['dist/**', 'node_modules/**', 'coverage/**', 'playwright-report/**'],
+    ignores: ['dist/**', 'node_modules/**', 'coverage/**', 'playwright-report/**', '.claude/**'],
   },
   // ─── Node config files ─────────────────────────────────────────────────────
   {

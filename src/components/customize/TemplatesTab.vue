@@ -1,9 +1,11 @@
 <script setup>
 import { inject, computed } from 'vue'
 import { TEMPLATES } from '../../constants/templates'
+import { scheduleAutoCommit } from '../../composables/useVersionControl.js'
 
-const activeSettings = inject('activeSettings')
-const updateSetting  = inject('updateSetting')
+const activeSettings  = inject('activeSettings')
+const updateSetting   = inject('updateSetting')
+const activeResumeId  = inject('activeResumeId')
 
 function applyTemplate(template) {
   const keys = [
@@ -18,6 +20,7 @@ function applyTemplate(template) {
   keys.forEach((key) => {
     if (template[key] !== undefined) updateSetting(key, template[key])
   })
+  scheduleAutoCommit(activeResumeId.value, 'template')
 }
 
 // Detect active template — all controlled keys must match
@@ -51,7 +54,7 @@ function headingPreviewStyle(t) {
 
 <template>
   <div class="p-5 flex flex-col gap-4">
-    <p class="text-xs text-gray-400 dark:text-gray-500">
+    <p class="text-xs text-[var(--ink-3)]">
       Applying a template overwrites fonts, colors, spacing, and heading style. Your content stays untouched.
     </p>
 
@@ -63,8 +66,8 @@ function headingPreviewStyle(t) {
         :class="[
           'flex flex-col text-left rounded-xl border-2 overflow-hidden transition-all',
           activeTemplateId === t.id
-            ? 'border-indigo-500 shadow-md shadow-indigo-100 dark:shadow-indigo-950/40'
-            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm',
+            ? 'border-[var(--gold)] shadow-md'
+            : 'border-[var(--border)] hover:border-[var(--gold)] hover:shadow-sm',
         ]"
       >
         <!-- Mini resume preview card -->
@@ -145,16 +148,17 @@ function headingPreviewStyle(t) {
 
         <!-- Template info -->
         <div
-          class="px-3 py-2 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60"
+          class="px-3 py-2 border-t bg-[var(--bg-subtle)]"
+          style="border-color: var(--border);"
         >
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-gray-800 dark:text-gray-100">{{ t.name }}</span>
+            <span class="text-xs font-semibold text-[var(--ink)]">{{ t.name }}</span>
             <span
               v-if="activeTemplateId === t.id"
-              class="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400"
+              class="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-[var(--gold-bg)] text-[var(--gold)]"
             >Active</span>
           </div>
-          <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 leading-tight">{{ t.description }}</p>
+          <p class="text-[10px] text-[var(--ink-3)] mt-0.5 leading-tight">{{ t.description }}</p>
         </div>
       </button>
     </div>

@@ -47,4 +47,9 @@ export const localAdapter = {
       return []
     }
   },
+
+  // Blob methods — LightningFS already owns IndexedDB for the guest FS,
+  // so these are no-ops for the local adapter. The FS persists automatically.
+  async saveBlob() { return true },
+  async loadBlob() { return null },
 }

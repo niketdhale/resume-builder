@@ -174,11 +174,12 @@ onUnmounted(() => { resizeObserver?.disconnect() })
 
     <div
       v-if="!hasMetadata && previewSections.length === 0"
-      class="bg-white dark:bg-gray-800 shadow-md rounded-xl flex flex-col items-center justify-center py-24 text-gray-300 dark:text-gray-600"
+      class="rounded-xl flex flex-col items-center justify-center py-24 shadow-sm"
+      style="background: var(--bg-surface); border: 1px solid var(--border); color: var(--ink-3);"
     >
       <span class="text-5xl mb-4">📄</span>
-      <p class="text-sm font-medium text-gray-400 dark:text-gray-500">Your resume preview will appear here</p>
-      <p class="text-xs text-gray-300 dark:text-gray-600 mt-1">Fill in Resume Info and add entries to get started</p>
+      <p class="text-sm font-medium mt-1" style="color: var(--ink-2);">Your resume preview will appear here</p>
+      <p class="text-xs mt-1" style="color: var(--ink-3);">Fill in Resume Info and add entries to get started</p>
     </div>
 
     <div ref="previewWrapper" class="preview-pages-wrapper flex flex-col items-center" :style="{ gap: (16 * previewScale) + 'px' }">
