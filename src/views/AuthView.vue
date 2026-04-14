@@ -3,12 +3,9 @@ import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabaseAuth } from '../services/auth/supabaseAuth.js'
 import { useAuth } from '../composables/useAuth.js'
-import { useTheme } from '../composables/useTheme.js'
 
 const router = useRouter()
 const { isLoggedIn } = useAuth()
-const { isDark } = useTheme()
-
 if (isLoggedIn.value) router.replace({ name: 'overview' })
 
 const mode         = ref('signin')

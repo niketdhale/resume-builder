@@ -1,9 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import { useTheme } from '../composables/useTheme.js'
-
 const router = useRouter()
-const { isDark, toggleTheme } = useTheme()
 
 const features = [
   {

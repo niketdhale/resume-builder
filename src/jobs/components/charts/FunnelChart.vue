@@ -1,6 +1,5 @@
 <script setup>
 import { computed } from 'vue'
-import { JOB_STATUSES } from '../../composables/useJobState'
 
 const props = defineProps({
   jobs: { type: Array, required: true },
@@ -19,25 +18,11 @@ const stages = computed(() => {
   if (!total) return []
 
   return FUNNEL_STAGES.map((stage, i) => {
-    // Count jobs that reached this stage or beyond
-    const reached = props.jobs.filter(j => {
-      const order = FUNNEL_STAGES.findIndex(s => s.key === j.status)
-      const stageOrder = i
-      // Offer/interview/screening count as having passed through lower stages
-      if (j.status === 'rejected' || j.status === 'withdrawn') {
-        // Need to figure out at which stage they were rejected
-        // We use updatedAt ordering — for simplicity count status at face value
-        return false
-      }
-      return order >= stageOrder
-    }).length
-
-    // More accurate: count by cumulative reach
+    // Count by cumulative reach:
     // applied = all, screening = screening+interview+offer, interview = interview+offer, offer = offer
     const stageKeys = FUNNEL_STAGES.slice(i).map(s => s.key)
     const count = props.jobs.filter(j => stageKeys.includes(j.status)).length
 
-    const prevCount = i === 0 ? total : null
     return { ...stage, count, total }
   }).map((stage, i, arr) => {
     const prev = arr[i - 1]
@@ -59,10 +44,6 @@ const lost = computed(() => {
 // Ghost/rejected summary
 const rejected = computed(() => props.jobs.filter(j => j.status === 'rejected').length)
 const withdrawn = computed(() => props.jobs.filter(j => j.status === 'withdrawn').length)
-const noResponse = computed(() => {
-  const responded = props.jobs.filter(j => j.status !== 'applied').length
-  return props.jobs.filter(j => j.status === 'applied').length
-})
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import {
   commitLog, isDirty,
   commitChanges, revertToCommit, checkoutCommit,

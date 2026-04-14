@@ -22,7 +22,7 @@ const filteredJobs = computed(() =>
 const showModal  = ref(false)
 const editingJob = ref(null)
 
-function openAdd(status = 'applied') {
+function openAdd() {
   editingJob.value = null
   showModal.value = true
 }
