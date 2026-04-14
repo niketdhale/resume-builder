@@ -89,26 +89,26 @@ watch(isLoggedIn, (val) => { if (val) router.replace({ name: 'overview' }) })
     <div class="auth-brand">
       <!-- Wordmark -->
       <div class="brand-wordmark" @click="router.push({ name: 'landing' })">
-        <div class="brand-icon">R</div>
-        <span class="brand-name">Résumé Builder</span>
+        <div class="brand-icon">C</div>
+        <span class="brand-name">CuratorWorkspace</span>
       </div>
 
       <!-- Brand copy -->
       <div class="brand-copy">
         <h2 class="brand-headline">
-          Your career,<br>
-          <em>beautifully</em><br>
-          presented.
+          The invisible<br>
+          architecture of a<br>
+          <em>perfect career.</em>
         </h2>
         <p class="brand-sub">
-          Sign in to sync your resumes across every device. Your data stays yours — always.
+          Sign in to sync your curated resumes across every device. Your data stays yours — always.
         </p>
       </div>
 
       <!-- Features list -->
       <ul class="brand-features">
         <li class="brand-feature" v-for="f in [
-          'Seven premium resume templates',
+          'Seven precision-crafted templates',
           'Real-time live preview editor',
           'Pixel-perfect PDF export',
           '30+ font choices',
@@ -283,7 +283,8 @@ watch(isLoggedIn, (val) => { if (val) router.replace({ name: 'overview' }) })
 
 /* ─── Brand panel (left) ───────────────────────────────────────── */
 .auth-brand {
-  background: #0C0B09;
+  background: var(--bg-subtle);
+  border-right: 1px solid var(--border);
   padding: 2.5rem;
   display: flex;
   flex-direction: column;
@@ -294,11 +295,11 @@ watch(isLoggedIn, (val) => { if (val) router.replace({ name: 'overview' }) })
 .auth-brand::before {
   content: '';
   position: absolute;
-  top: -30%;
-  left: -20%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(ellipse at center, rgba(0,94,180,0.09) 0%, transparent 65%);
+  top: -20%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(ellipse at center, rgba(0,94,180,0.06) 0%, transparent 65%);
   pointer-events: none;
 }
 
@@ -314,42 +315,41 @@ watch(isLoggedIn, (val) => { if (val) router.replace({ name: 'overview' }) })
 .brand-icon {
   width: 32px;
   height: 32px;
-  background: #005eb4;
+  background: var(--gold);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
+  font-family: var(--font-display);
   font-size: 1.125rem;
-  font-weight: 500;
+  font-weight: 700;
   color: #fff;
   flex-shrink: 0;
 }
 .brand-name {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: var(--font-display);
   font-size: 1.0625rem;
-  font-weight: 500;
-  color: #F0EDE6;
+  font-weight: 600;
+  color: var(--ink);
   letter-spacing: -0.01em;
 }
 
 .brand-copy { position: relative; z-index: 1; }
 .brand-headline {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(2.25rem, 3.5vw, 3.25rem);
-  font-weight: 300;
-  line-height: 1.08;
-  letter-spacing: -0.025em;
-  color: #F0EDE6;
+  font-family: var(--font-display);
+  font-size: clamp(1.875rem, 3vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+  color: var(--ink);
   margin: 0 0 1rem;
 }
-.brand-headline em { font-style: italic; color: #C8A050; }
+.brand-headline em { font-style: normal; color: var(--gold); }
 .brand-sub {
   font-size: 0.875rem;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.65;
-  color: rgba(240,237,230,0.5);
+  color: var(--ink-2);
   margin: 0;
   max-width: 360px;
 }
@@ -361,26 +361,26 @@ watch(isLoggedIn, (val) => { if (val) router.replace({ name: 'overview' }) })
   gap: 0.625rem;
   font-size: 0.8125rem;
   font-weight: 400;
-  color: rgba(240,237,230,0.6);
+  color: var(--ink-2);
 }
 .feature-check {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: rgba(0,94,180,0.15);
-  border: 1px solid rgba(0,94,180,0.3);
+  background: var(--gold-bg);
+  border: 1px solid var(--gold-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #005eb4;
+  color: var(--gold);
   flex-shrink: 0;
 }
 .brand-footer {
   font-size: 0.6875rem;
-  font-weight: 300;
-  color: rgba(240,237,230,0.25);
+  font-weight: 400;
+  color: var(--ink-3);
   letter-spacing: 0.02em;
-  margin: 0 0 0 0;
+  margin: 0;
   margin-top: auto;
   position: relative;
   z-index: 1;
@@ -436,9 +436,9 @@ watch(isLoggedIn, (val) => { if (val) router.replace({ name: 'overview' }) })
 .form-header { display: flex; flex-direction: column; gap: 0.375rem; }
 .form-title {
   font-family: var(--font-display);
-  font-size: 1.875rem;
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
   color: var(--ink);
   margin: 0;
 }
