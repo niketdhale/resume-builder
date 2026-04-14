@@ -59,7 +59,7 @@ async function triggerGroupCommit() {
 
 // ─── CRUD ─────────────────────────────────────────────────────────────────────
 
-export async function createGroup(name, color = '#B8923A') {
+export async function createGroup(name, color = '#005eb4') {
   const group = { id: uid(), name, color, createdAt: new Date().toISOString() }
   groups.value.push(group)
   await saveGroup(group)

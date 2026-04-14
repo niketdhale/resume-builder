@@ -44,7 +44,7 @@ async function render() {
           {
             label: 'Applications',
             data: topCompanies.value.map(c => c.total),
-            backgroundColor: 'rgba(184,146,58,0.55)',
+            backgroundColor: 'rgba(0,94,180,0.55)',
             borderRadius: { topRight: 4, bottomRight: 4, topLeft: 0, bottomLeft: 0 },
             borderSkipped: false,
             stack: 'stack',

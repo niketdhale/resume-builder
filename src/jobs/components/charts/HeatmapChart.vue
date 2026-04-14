@@ -70,7 +70,7 @@ function cellColor(count) {
   if (count === 0) return 'var(--bg-subtle)'
   const intensity = Math.min(count / Math.max(maxCount.value, 1), 1)
   const opacity = 0.2 + intensity * 0.8
-  return `rgba(184,146,58,${opacity})`
+  return `rgba(0,94,180,${opacity})`
 }
 
 function cellTitle(cell) {
@@ -90,7 +90,7 @@ function cellTitle(cell) {
       <div class="legend">
         <span class="legend-text">Less</span>
         <div class="legend-cells">
-          <div v-for="n in 5" :key="n" class="legend-cell" :style="{ backgroundColor: `rgba(184,146,58,${0.1 + n * 0.18})` }" />
+          <div v-for="n in 5" :key="n" class="legend-cell" :style="{ backgroundColor: `rgba(0,94,180,${0.1 + n * 0.18})` }" />
         </div>
         <span class="legend-text">More</span>
       </div>

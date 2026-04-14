@@ -140,7 +140,7 @@ function onDrop(e, status) {
   cursor: grab;
   transition: box-shadow 0.15s, border-color 0.15s;
 }
-.job-card:hover { border-color: rgba(184,146,58,0.3); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.job-card:hover { border-color: rgba(0,94,180,0.3); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 .job-card:active { cursor: grabbing; }
 
 .job-card__top {
@@ -190,7 +190,7 @@ function onDrop(e, status) {
 }
 .add-card-btn:hover {
   color: var(--gold);
-  border-color: rgba(184,146,58,0.35);
+  border-color: rgba(0,94,180,0.35);
   background: var(--gold-bg);
 }
 </style>

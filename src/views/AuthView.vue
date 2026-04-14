@@ -301,7 +301,7 @@ watch(isLoggedIn, (val) => { if (val) router.replace({ name: 'overview' }) })
   left: -20%;
   width: 600px;
   height: 600px;
-  background: radial-gradient(ellipse at center, rgba(184,146,58,0.09) 0%, transparent 65%);
+  background: radial-gradient(ellipse at center, rgba(0,94,180,0.09) 0%, transparent 65%);
   pointer-events: none;
 }
 
@@ -317,7 +317,7 @@ watch(isLoggedIn, (val) => { if (val) router.replace({ name: 'overview' }) })
 .brand-icon {
   width: 32px;
   height: 32px;
-  background: #B8923A;
+  background: #005eb4;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -370,12 +370,12 @@ watch(isLoggedIn, (val) => { if (val) router.replace({ name: 'overview' }) })
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: rgba(184,146,58,0.15);
-  border: 1px solid rgba(184,146,58,0.3);
+  background: rgba(0,94,180,0.15);
+  border: 1px solid rgba(0,94,180,0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #B8923A;
+  color: #005eb4;
   flex-shrink: 0;
 }
 .brand-footer {

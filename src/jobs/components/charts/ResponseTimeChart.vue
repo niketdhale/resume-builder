@@ -69,7 +69,7 @@ async function render() {
           data: bucketCounts.value,
           backgroundColor: bucketCounts.value.map((_, i) => {
             const opacity = 0.4 + (i / BUCKETS.length) * 0.5
-            return `rgba(184,146,58,${opacity})`
+            return `rgba(0,94,180,${opacity})`
           }),
           borderRadius: 5,
           borderSkipped: false,

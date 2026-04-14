@@ -216,7 +216,7 @@ function truncate(val, len = 120) {
 }
 .badge.added    { background: rgba(34,197,94,0.12);  color: #16a34a; }
 .badge.removed  { background: rgba(220,38,38,0.1);   color: #dc2626; }
-.badge.modified { background: rgba(184,146,58,0.12); color: var(--gold); }
+.badge.modified { background: rgba(0,94,180,0.12); color: var(--gold); }
 
 .diff-table { padding: 0.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; }
 

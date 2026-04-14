@@ -66,8 +66,8 @@ async function render() {
         labels: buckets.value.map(b => b.label),
         datasets: [{
           data: buckets.value.map(b => b.count),
-          backgroundColor: 'rgba(184,146,58,0.65)',
-          hoverBackgroundColor: 'rgba(184,146,58,0.9)',
+          backgroundColor: 'rgba(0,94,180,0.65)',
+          hoverBackgroundColor: 'rgba(0,94,180,0.9)',
           borderRadius: 5,
           borderSkipped: false,
           barPercentage: 0.9,
@@ -133,7 +133,7 @@ onUnmounted(() => observer?.disconnect())
 .avg-badge {
   font-size: 0.6875rem; font-weight: 600; padding: 0.2rem 0.5rem;
   background: var(--gold-bg); color: var(--gold);
-  border: 1px solid rgba(184,146,58,0.2); border-radius: 99px; white-space: nowrap;
+  border: 1px solid rgba(0,94,180,0.2); border-radius: 99px; white-space: nowrap;
 }
 .canvas-wrap { flex: 1; position: relative; min-height: 160px; }
 .empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; color: var(--ink-3); }

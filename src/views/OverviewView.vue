@@ -173,10 +173,10 @@ function timeAgo(isoString) {
                 <div class="thumb-avatar"></div>
                 <div class="thumb-info">
                   <div class="thumb-name"></div>
-                  <div class="thumb-role" :style="{ background: resume.design?.accentColor || '#B8923A' }"></div>
+                  <div class="thumb-role" :style="{ background: resume.design?.accentColor || '#005eb4' }"></div>
                 </div>
               </div>
-              <div class="thumb-divider" :style="{ background: resume.design?.accentColor || '#B8923A' }"></div>
+              <div class="thumb-divider" :style="{ background: resume.design?.accentColor || '#005eb4' }"></div>
               <div class="thumb-lines">
                 <div class="thumb-label"></div>
                 <div class="tl tl-full"></div>
@@ -504,11 +504,11 @@ function timeAgo(isoString) {
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);
 }
 .thumb-header { display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.5rem; }
-.thumb-avatar { width: 22px; height: 22px; border-radius: 5px; background: linear-gradient(135deg, #D4A94A, #B8923A); flex-shrink: 0; }
+.thumb-avatar { width: 22px; height: 22px; border-radius: 5px; background: linear-gradient(135deg, #005eb4, #00529e); flex-shrink: 0; }
 .thumb-info { flex: 1; display: flex; flex-direction: column; gap: 0.25rem; padding-top: 0.1rem; }
 .thumb-name { height: 6px; background: #1A1914; border-radius: 3px; width: 60%; }
 .thumb-role { height: 4px; border-radius: 2px; width: 40%; opacity: 0.6; }
-.thumb-divider { height: 1px; background: #B8923A; opacity: 0.35; margin-bottom: 0.5rem; }
+.thumb-divider { height: 1px; background: #005eb4; opacity: 0.35; margin-bottom: 0.5rem; }
 .thumb-lines { display: flex; flex-direction: column; gap: 0.25rem; }
 .thumb-label { height: 5px; background: #1A1914; border-radius: 2px; width: 35%; margin-bottom: 0.2rem; }
 .tl { height: 4px; border-radius: 2px; background: #E5E3DC; }
@@ -615,7 +615,7 @@ function timeAgo(isoString) {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(184,146,58,0.35);
+  box-shadow: 0 8px 24px rgba(0,94,180,0.35);
   transition: background 0.15s, transform 0.12s;
 }
 .fab:active { transform: scale(0.95); }

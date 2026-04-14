@@ -8,33 +8,23 @@ const { isDark, toggleTheme } = useTheme()
 const features = [
   {
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
-    title: 'Seven premium templates',
-    desc: 'Ranging from executive serif to modern two-column — each template is precision-crafted for ATS compatibility and human first-impressions alike.',
+    title: 'Adaptive Hierarchy',
+    desc: 'Your resume intelligently reflows across seven precision-crafted templates. Shift between executive serif and modern two-column in a single click.',
   },
   {
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>`,
-    title: 'Real-time live preview',
-    desc: 'Every keystroke updates your resume instantly. The split-panel editor keeps your content and your design in perfect view at all times.',
-  },
-  {
-    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
-    title: 'Pixel-perfect PDF export',
-    desc: 'Download a print-ready PDF in A4, Letter, or Legal format. What you see is precisely what the hiring manager receives.',
-  },
-  {
-    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
-    title: 'Typographic control',
-    desc: 'Choose from 30+ Google Fonts across three categories. Control size, spacing, and heading styles to make every resume uniquely yours.',
+    title: 'Version Control',
+    desc: 'Every edit is tracked. Commit named snapshots, branch for different roles, and revert to any point in your career narrative without losing work.',
   },
   {
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
-    title: 'Cloud sync & offline',
-    desc: 'Works completely in your browser with no account required. Sign in with email when you want your resumes synced across every device.',
+    title: 'Pipeline View',
+    desc: 'Track every application from prospect to offer. Your job pipeline lives alongside your resumes — context always within reach.',
   },
   {
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
-    title: '13 supported languages',
-    desc: 'Create language variants of the same resume — ideal for international job applications without duplicating work.',
+    title: 'Language Variants',
+    desc: 'Create localized versions of a single resume for international markets. Manage all variants from one canonical source without duplication.',
   },
 ]
 
@@ -56,22 +46,23 @@ const steps = [
       <div class="landing-nav-inner">
         <!-- Wordmark -->
         <div class="wordmark" @click="router.push({ name: 'overview' })">
-          <div class="wordmark-icon">R</div>
-          <span class="wordmark-text">Résumé Builder</span>
+          <div class="wordmark-icon">C</div>
+          <span class="wordmark-text">CuratorWorkspace</span>
         </div>
 
         <!-- Links (desktop) -->
         <div class="nav-links">
-          <a href="#features" class="nav-a">Features</a>
-          <a href="#how-it-works" class="nav-a">How it works</a>
+          <a href="#features" class="nav-a">Product</a>
           <a href="#" class="nav-a">Templates</a>
+          <a href="#how-it-works" class="nav-a">Pricing</a>
+          <a href="#" class="nav-a">Resources</a>
         </div>
 
         <!-- Actions -->
         <div class="nav-actions">
           <button class="nav-btn-ghost" @click="router.push('/auth')">Sign in</button>
           <button class="nav-btn-primary" @click="router.push({ name: 'overview' })">
-            Start free
+            Build Resume
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
         </div>
@@ -92,24 +83,23 @@ const steps = [
         <div class="hero-copy">
           <div class="hero-eyebrow anim-fade-up anim-fade-up-d1">
             <span class="eyebrow-dot"></span>
-            Built for the serious professional
+            The digital curator
           </div>
 
           <h1 class="hero-headline anim-fade-up anim-fade-up-d2">
-            Your career,<br>
-            <em>beautifully</em><br>
-            presented.
+            The invisible<br>
+            architecture of a<br>
+            perfect <em>career.</em>
           </h1>
 
           <p class="hero-sub anim-fade-up anim-fade-up-d3">
-            The resume builder that respects your craft.
-            Seven premium templates, real-time preview, and
-            pixel-perfect PDF export — no subscriptions required.
+            Build your professional identity across different roles
+            and industries with curated resume versions.
           </p>
 
           <div class="hero-actions anim-fade-up anim-fade-up-d4">
             <button class="hero-cta-primary" @click="router.push({ name: 'overview' })">
-              Start building — it's free
+              Start curating — it's free
             </button>
             <a href="#features" class="hero-cta-ghost">
               See all features
@@ -216,9 +206,9 @@ const steps = [
     <section id="features" class="features-section">
       <div class="section-inner">
         <div class="section-header">
-          <p class="section-eyebrow">Everything you need</p>
-          <h2 class="section-headline">Crafted for the<br><em>serious professional</em></h2>
-          <p class="section-sub">Not a template mill. Not a subscription trap. A precision tool built for people who take their career seriously.</p>
+          <p class="section-eyebrow">Curated tools</p>
+          <h2 class="section-headline">Every piece of work<br>in its right place</h2>
+          <p class="section-sub">Purpose-built for professionals who treat their career as a portfolio.</p>
         </div>
 
         <div class="features-grid">
@@ -261,6 +251,7 @@ const steps = [
     ══════════════════════════════════════════════════════════ -->
     <section class="quote-section">
       <div class="quote-inner">
+        <p class="section-eyebrow">Voices of the Curated</p>
         <div class="quote-mark">"</div>
         <blockquote class="quote-text">
           The most refined resume builder I've encountered.
@@ -281,11 +272,11 @@ const steps = [
     ══════════════════════════════════════════════════════════ -->
     <section class="cta-section">
       <div class="cta-inner">
-        <h2 class="cta-headline">Ready to make<br><em>your mark?</em></h2>
-        <p class="cta-sub">Join thousands of professionals who've landed their next role with a resume that stands apart.</p>
+        <h2 class="cta-headline">Ready to start<br><em>curating?</em></h2>
+        <p class="cta-sub">Your professional identity, curated across every role and industry.</p>
         <div class="cta-actions">
           <button class="cta-btn-primary" @click="router.push({ name: 'overview' })">
-            Create your resume — free
+            Start curating — it's free
           </button>
           <button class="cta-btn-ghost" @click="router.push('/auth')">
             Sign in to sync →
@@ -302,18 +293,18 @@ const steps = [
       <div class="footer-inner">
         <div class="footer-brand">
           <div class="wordmark" @click="router.push({ name: 'overview' })">
-            <div class="wordmark-icon">R</div>
-            <span class="wordmark-text">Résumé Builder</span>
+            <div class="wordmark-icon">C</div>
+            <span class="wordmark-text">CuratorWorkspace</span>
           </div>
-          <p class="footer-tagline">Craft the career you deserve.</p>
+          <p class="footer-tagline">Your professional identity, curated.</p>
         </div>
         <div class="footer-links">
-          <a href="#features" class="footer-a">Features</a>
-          <a href="#how-it-works" class="footer-a">How it works</a>
+          <a href="#features" class="footer-a">Product</a>
+          <a href="#" class="footer-a">Templates</a>
           <button class="footer-a" @click="router.push({ name: 'overview' })">My Resumes</button>
           <button class="footer-a" @click="router.push('/auth')">Sign in</button>
         </div>
-        <p class="footer-copy">© 2025 Résumé Builder. All rights reserved.</p>
+        <p class="footer-copy">© 2025 CuratorWorkspace. All rights reserved.</p>
       </div>
     </footer>
 
@@ -321,14 +312,14 @@ const steps = [
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* ─── Root ─────────────────────────────────────────────────────── */
 .landing-root {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  background: #0C0B09;
-  color: #F0EDE6;
+  background: #faf9f8;
+  color: #2f3333;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -338,8 +329,8 @@ const steps = [
   position: sticky;
   top: 0;
   z-index: 100;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  background: rgba(12,11,9,0.85);
+  border-bottom: 1px solid rgba(47,51,51,0.08);
+  background: rgba(250,249,248,0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
@@ -365,23 +356,22 @@ const steps = [
 .wordmark-icon {
   width: 30px;
   height: 30px;
-  background: #B8923A;
+  background: #005eb4;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 1.125rem;
-  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
   color: #fff;
   flex-shrink: 0;
 }
 .wordmark-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: #F0EDE6;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2f3333;
   letter-spacing: -0.01em;
 }
 
@@ -394,12 +384,12 @@ const steps = [
 .nav-a {
   font-size: 0.8125rem;
   font-weight: 400;
-  color: rgba(240,237,230,0.55);
+  color: rgba(47,51,51,0.5);
   text-decoration: none;
   transition: color 0.15s;
   letter-spacing: 0.01em;
 }
-.nav-a:hover { color: #F0EDE6; }
+.nav-a:hover { color: #2f3333; }
 
 /* Nav actions */
 .nav-actions {
@@ -408,24 +398,24 @@ const steps = [
   align-items: center;
 }
 .nav-btn-ghost {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.8125rem;
   font-weight: 400;
-  color: rgba(240,237,230,0.65);
+  color: rgba(47,51,51,0.65);
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(47,51,51,0.18);
   border-radius: 8px;
   padding: 0.375rem 0.875rem;
   cursor: pointer;
   transition: all 0.15s;
 }
-.nav-btn-ghost:hover { color: #F0EDE6; border-color: rgba(255,255,255,0.22); background: rgba(255,255,255,0.04); }
+.nav-btn-ghost:hover { color: #2f3333; border-color: rgba(47,51,51,0.3); background: rgba(47,51,51,0.04); }
 .nav-btn-primary {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.8125rem;
   font-weight: 500;
   color: #fff;
-  background: #B8923A;
+  background: linear-gradient(135deg, #005eb4, #00529e);
   border: none;
   border-radius: 8px;
   padding: 0.375rem 1rem;
@@ -435,7 +425,7 @@ const steps = [
   gap: 0.375rem;
   transition: background 0.15s;
 }
-.nav-btn-primary:hover { background: #A07E2E; }
+.nav-btn-primary:hover { background: #00529e; }
 
 /* ─── Hero ─────────────────────────────────────────────────────── */
 .hero {
@@ -459,7 +449,7 @@ const steps = [
   transform: translateX(-50%);
   width: 900px;
   height: 600px;
-  background: radial-gradient(ellipse at center, rgba(184,146,58,0.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse at center, rgba(0,94,180,0.06) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -485,34 +475,34 @@ const steps = [
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #B8923A;
+  color: #005eb4;
 }
 .eyebrow-dot {
   display: inline-block;
   width: 5px;
   height: 5px;
-  background: #B8923A;
+  background: #005eb4;
   border-radius: 50%;
 }
 .hero-headline {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(3.25rem, 5.5vw, 5rem);
-  font-weight: 300;
+  font-weight: 600;
   line-height: 1.04;
-  letter-spacing: -0.025em;
-  color: #F0EDE6;
+  letter-spacing: -2.125px;
+  color: #2f3333;
   margin: 0;
 }
 .hero-headline em {
-  font-style: italic;
-  font-weight: 300;
-  color: #C8A050;
+  font-style: normal;
+  font-weight: 600;
+  color: #005eb4;
 }
 .hero-sub {
   font-size: 1rem;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.65;
-  color: rgba(240,237,230,0.55);
+  color: #5b605f;
   max-width: 420px;
   margin: 0;
 }
@@ -523,37 +513,37 @@ const steps = [
   align-items: flex-start;
 }
 .hero-cta-primary {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.9375rem;
   font-weight: 500;
   color: #fff;
-  background: #B8923A;
+  background: linear-gradient(135deg, #005eb4, #00529e);
   border: none;
-  border-radius: 10px;
+  border-radius: 4px;
   padding: 0.75rem 1.75rem;
   cursor: pointer;
   transition: background 0.18s, transform 0.12s;
   letter-spacing: 0.005em;
 }
-.hero-cta-primary:hover { background: #A07E2E; }
+.hero-cta-primary:hover { background: #00529e; }
 .hero-cta-primary:active { transform: scale(0.98); }
 .hero-cta-ghost {
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
   font-weight: 400;
-  color: rgba(240,237,230,0.5);
+  color: #5b605f;
   text-decoration: none;
   cursor: pointer;
   transition: color 0.15s;
 }
-.hero-cta-ghost:hover { color: rgba(240,237,230,0.85); }
+.hero-cta-ghost:hover { color: #2f3333; }
 .hero-fine {
   font-size: 0.75rem;
-  font-weight: 300;
-  color: rgba(240,237,230,0.3);
+  font-weight: 400;
+  color: rgba(47,51,51,0.35);
   letter-spacing: 0.01em;
 }
 
@@ -575,26 +565,26 @@ const steps = [
 .resume-card:hover { transform: rotate(0.5deg) scale(1.01); }
 
 .rc-header { display: flex; gap: 0.75rem; align-items: flex-start; margin-bottom: 0.875rem; }
-.rc-avatar { width: 40px; height: 40px; border-radius: 8px; background: linear-gradient(135deg, #D4A94A, #B8923A); flex-shrink: 0; }
+.rc-avatar { width: 40px; height: 40px; border-radius: 8px; background: linear-gradient(135deg, #005eb4, #00529e); flex-shrink: 0; }
 .rc-info { flex: 1; display: flex; flex-direction: column; gap: 0.375rem; padding-top: 0.25rem; }
-.rc-name { height: 10px; background: #1A1914; border-radius: 4px; width: 70%; }
-.rc-title { height: 7px; background: #B8923A; border-radius: 4px; width: 50%; opacity: 0.7; }
-.rc-divider { height: 1px; background: linear-gradient(to right, #B8923A, transparent); margin-bottom: 0.875rem; }
+.rc-name { height: 10px; background: #2f3333; border-radius: 4px; width: 70%; }
+.rc-title { height: 7px; background: #005eb4; border-radius: 4px; width: 50%; opacity: 0.7; }
+.rc-divider { height: 1px; background: linear-gradient(to right, #005eb4, transparent); margin-bottom: 0.875rem; }
 
 .rc-body { display: flex; flex-direction: column; gap: 0.875rem; }
 .rc-section { display: flex; flex-direction: column; gap: 0.35rem; }
-.rc-section-label { height: 7px; background: #1A1914; border-radius: 3px; width: 40%; margin-bottom: 0.2rem; }
-.rc-line { height: 5px; background: #E5E3DC; border-radius: 3px; }
+.rc-section-label { height: 7px; background: #2f3333; border-radius: 3px; width: 40%; margin-bottom: 0.2rem; }
+.rc-line { height: 5px; background: rgba(47,51,51,0.1); border-radius: 3px; }
 .rc-line-full { width: 100%; }
 .rc-line-3q   { width: 75%; }
 .rc-line-half { width: 50%; }
 
 .rc-entry { display: flex; gap: 0.5rem; margin-top: 0.2rem; }
-.rc-entry-dot { width: 4px; height: 4px; border-radius: 50%; background: #B8923A; margin-top: 0.35rem; flex-shrink: 0; }
+.rc-entry-dot { width: 4px; height: 4px; border-radius: 50%; background: #005eb4; margin-top: 0.35rem; flex-shrink: 0; }
 .rc-entry-lines { flex: 1; display: flex; flex-direction: column; gap: 0.3rem; }
 
 .rc-chips { display: flex; flex-wrap: wrap; gap: 0.25rem; }
-.rc-chip { height: 14px; background: #F5F3EF; border: 1px solid #E5E3DC; border-radius: 4px; width: 50px; }
+.rc-chip { height: 14px; background: #f3f4f2; border: 1px solid rgba(47,51,51,0.1); border-radius: 4px; width: 50px; }
 .rc-chip-sm { width: 36px; }
 
 /* Floating badges */
@@ -607,13 +597,13 @@ const steps = [
   font-weight: 500;
   padding: 0.375rem 0.625rem;
   border-radius: 8px;
-  background: rgba(12,11,9,0.9);
-  border: 1px solid rgba(184,146,58,0.3);
-  color: #F0EDE6;
+  background: rgba(250,249,248,0.95);
+  border: 1px solid rgba(0,94,180,0.2);
+  color: #2f3333;
   backdrop-filter: blur(8px);
   white-space: nowrap;
 }
-.badge-icon { color: #B8923A; font-size: 0.875rem; }
+.badge-icon { color: #005eb4; font-size: 0.875rem; }
 .badge-1 { top: -14px; left: -28px; animation: badge-float 3s ease-in-out infinite; }
 .badge-2 { bottom: 16px; right: -28px; animation: badge-float 3s ease-in-out infinite 1.5s; }
 @keyframes badge-float {
@@ -628,21 +618,21 @@ const steps = [
   justify-content: center;
   gap: 0;
   padding: 1.75rem 2rem;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(47,51,51,0.08);
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
 }
 .stat { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; flex: 1; }
 .stat-num {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Inter', sans-serif;
   font-size: 1.875rem;
-  font-weight: 300;
-  color: #B8923A;
+  font-weight: 600;
+  color: #005eb4;
   line-height: 1;
 }
-.stat-label { font-size: 0.6875rem; font-weight: 400; color: rgba(240,237,230,0.4); letter-spacing: 0.03em; }
-.stat-divider { width: 1px; height: 36px; background: rgba(255,255,255,0.08); flex-shrink: 0; }
+.stat-label { font-size: 0.6875rem; font-weight: 400; color: rgba(47,51,51,0.45); letter-spacing: 0.03em; }
+.stat-divider { width: 1px; height: 36px; background: rgba(47,51,51,0.1); flex-shrink: 0; }
 
 /* ─── Section commons ──────────────────────────────────────────── */
 .section-inner {
@@ -663,51 +653,52 @@ const steps = [
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #B8923A;
+  color: #005eb4;
   margin: 0;
 }
 .section-headline {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(2rem, 3.5vw, 3rem);
-  font-weight: 300;
+  font-weight: 600;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
+  color: #2f3333;
   margin: 0;
 }
-.section-headline em { font-style: italic; color: #C8A050; }
+.section-headline em { font-style: italic; color: #005eb4; }
 .section-sub {
   font-size: 0.9375rem;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.65;
-  color: rgba(240,237,230,0.5);
+  color: #5b605f;
   max-width: 500px;
   margin: 0;
 }
 
 /* ─── Features section ─────────────────────────────────────────── */
 .features-section {
-  background: #111009;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  background: #f3f4f2;
 }
-.features-section .section-headline,
-.features-section .section-sub { color: #F0EDE6; }
-.features-section .section-sub { color: rgba(240,237,230,0.5); }
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
 }
 .feature-card {
   padding: 2rem;
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid rgba(47,51,51,0.07);
+  border-radius: 8px;
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
-  transition: background 0.2s;
+  transition: background 0.2s, box-shadow 0.2s;
 }
-.feature-card:hover { background: rgba(184,146,58,0.04); }
+.feature-card:hover {
+  background: rgba(0,94,180,0.03);
+  box-shadow: inset 0 0 0 1px rgba(0,94,180,0.08);
+}
 .feature-icon {
   width: 40px;
   height: 40px;
@@ -715,29 +706,28 @@ const steps = [
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: rgba(184,146,58,0.08);
-  color: #B8923A;
+  background: rgba(0,94,180,0.07);
+  color: #005eb4;
   flex-shrink: 0;
 }
 .feature-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: #F0EDE6;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: #2f3333;
   margin: 0;
   line-height: 1.3;
 }
 .feature-desc {
   font-size: 0.8125rem;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.65;
-  color: rgba(240,237,230,0.45);
+  color: #5b605f;
   margin: 0;
 }
 
 /* ─── How it works ─────────────────────────────────────────────── */
-.how-section { background: #0C0B09; }
-.how-section .section-headline { color: #F0EDE6; }
+.how-section { background: #faf9f8; }
 
 .steps-grid {
   display: grid;
@@ -752,25 +742,25 @@ const steps = [
   position: relative;
 }
 .step-num {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Inter', sans-serif;
   font-size: 2.5rem;
-  font-weight: 300;
-  color: rgba(184,146,58,0.35);
+  font-weight: 700;
+  color: rgba(0,94,180,0.25);
   line-height: 1;
 }
 .step-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.1875rem;
-  font-weight: 500;
-  color: #F0EDE6;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: #2f3333;
   margin: 0;
   line-height: 1.3;
 }
 .step-desc {
   font-size: 0.8125rem;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.65;
-  color: rgba(240,237,230,0.45);
+  color: #5b605f;
   margin: 0;
 }
 
@@ -782,14 +772,12 @@ const steps = [
   right: -1.25rem;
   width: 2.5rem;
   height: 1px;
-  background: linear-gradient(to right, rgba(184,146,58,0.3), transparent);
+  background: linear-gradient(to right, rgba(0,94,180,0.2), transparent);
 }
 
 /* ─── Quote section ────────────────────────────────────────────── */
 .quote-section {
-  background: #111009;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  background: #f3f4f2;
 }
 .quote-inner {
   max-width: 700px;
@@ -802,20 +790,20 @@ const steps = [
   text-align: center;
 }
 .quote-mark {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Inter', sans-serif;
   font-size: 5rem;
   line-height: 0.6;
-  color: #B8923A;
+  color: #005eb4;
   opacity: 0.4;
   user-select: none;
 }
 .quote-text {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(1.375rem, 2.5vw, 2rem);
-  font-weight: 300;
+  font-weight: 400;
   font-style: italic;
   line-height: 1.45;
-  color: #F0EDE6;
+  color: #2f3333;
   margin: 0;
 }
 .quote-attribution {
@@ -828,15 +816,15 @@ const steps = [
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #B8923A, #7A6025);
+  background: linear-gradient(135deg, #005eb4, #00529e);
   flex-shrink: 0;
 }
-.quote-name { font-size: 0.875rem; font-weight: 500; color: #F0EDE6; }
-.quote-role { font-size: 0.75rem; font-weight: 300; color: rgba(240,237,230,0.45); }
+.quote-name { font-size: 0.875rem; font-weight: 500; color: #2f3333; }
+.quote-role { font-size: 0.75rem; font-weight: 400; color: #5b605f; }
 
 /* ─── CTA ──────────────────────────────────────────────────────── */
 .cta-section {
-  background: radial-gradient(ellipse at center top, rgba(184,146,58,0.1) 0%, transparent 60%), #0C0B09;
+  background: radial-gradient(ellipse at center top, rgba(0,94,180,0.07) 0%, transparent 60%), #faf9f8;
 }
 .cta-inner {
   max-width: 640px;
@@ -849,20 +837,20 @@ const steps = [
   gap: 1.25rem;
 }
 .cta-headline {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Inter', sans-serif;
   font-size: clamp(2.25rem, 4vw, 3.5rem);
-  font-weight: 300;
+  font-weight: 600;
   line-height: 1.08;
-  letter-spacing: -0.02em;
-  color: #F0EDE6;
+  letter-spacing: -0.04em;
+  color: #2f3333;
   margin: 0;
 }
-.cta-headline em { font-style: italic; color: #C8A050; }
+.cta-headline em { font-style: italic; color: #005eb4; }
 .cta-sub {
   font-size: 0.9375rem;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.65;
-  color: rgba(240,237,230,0.45);
+  color: #5b605f;
   max-width: 440px;
   margin: 0;
 }
@@ -875,44 +863,44 @@ const steps = [
   margin-top: 0.5rem;
 }
 .cta-btn-primary {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.9375rem;
   font-weight: 500;
   color: #fff;
-  background: #B8923A;
+  background: linear-gradient(135deg, #005eb4, #00529e);
   border: none;
-  border-radius: 10px;
+  border-radius: 4px;
   padding: 0.8125rem 2rem;
   cursor: pointer;
   transition: background 0.18s, transform 0.12s;
 }
-.cta-btn-primary:hover { background: #A07E2E; }
+.cta-btn-primary:hover { background: #00529e; }
 .cta-btn-primary:active { transform: scale(0.98); }
 .cta-btn-ghost {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
   font-weight: 400;
-  color: rgba(240,237,230,0.55);
+  color: #5b605f;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 10px;
+  border: 1px solid rgba(47,51,51,0.18);
+  border-radius: 4px;
   padding: 0.8125rem 1.25rem;
   cursor: pointer;
   transition: all 0.15s;
 }
-.cta-btn-ghost:hover { color: #F0EDE6; border-color: rgba(255,255,255,0.22); }
+.cta-btn-ghost:hover { color: #2f3333; border-color: rgba(47,51,51,0.3); }
 .cta-fine {
   font-size: 0.6875rem;
-  font-weight: 300;
-  color: rgba(240,237,230,0.28);
+  font-weight: 400;
+  color: rgba(47,51,51,0.28);
   letter-spacing: 0.02em;
   margin: 0;
 }
 
 /* ─── Footer ───────────────────────────────────────────────────── */
 .landing-footer {
-  border-top: 1px solid rgba(255,255,255,0.06);
-  background: #0C0B09;
+  border-top: 1px solid rgba(47,51,51,0.08);
+  background: #f3f4f2;
 }
 .footer-inner {
   max-width: 1200px;
@@ -925,12 +913,12 @@ const steps = [
   text-align: center;
 }
 .footer-brand { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
-.footer-tagline { font-size: 0.8125rem; font-weight: 300; color: rgba(240,237,230,0.35); margin: 0; font-style: italic; font-family: 'Cormorant Garamond', serif; }
+.footer-tagline { font-size: 0.8125rem; font-weight: 400; color: rgba(47,51,51,0.45); margin: 0; font-style: italic; font-family: 'Inter', sans-serif; }
 .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
 .footer-a {
   font-size: 0.8125rem;
   font-weight: 400;
-  color: rgba(240,237,230,0.4);
+  color: rgba(47,51,51,0.45);
   text-decoration: none;
   cursor: pointer;
   background: none;
@@ -938,8 +926,8 @@ const steps = [
   padding: 0;
   transition: color 0.15s;
 }
-.footer-a:hover { color: rgba(240,237,230,0.8); }
-.footer-copy { font-size: 0.6875rem; color: rgba(240,237,230,0.2); font-weight: 300; margin: 0; }
+.footer-a:hover { color: rgba(47,51,51,0.8); }
+.footer-copy { font-size: 0.6875rem; color: rgba(47,51,51,0.25); font-weight: 400; margin: 0; }
 
 /* ─── Animations ───────────────────────────────────────────────── */
 .anim-fade-up {
