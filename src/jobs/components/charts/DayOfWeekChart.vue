@@ -62,7 +62,7 @@ async function render() {
           {
             label: 'Applied',
             data: dayStats.value.applied,
-            backgroundColor: 'rgba(184,146,58,0.45)',
+            backgroundColor: 'rgba(0,94,180,0.45)',
             borderRadius: { topLeft: 0, topRight: 0, bottomLeft: 4, bottomRight: 4 },
             borderSkipped: false,
             stack: 'stack',
@@ -71,7 +71,7 @@ async function render() {
           {
             label: 'Responses',
             data: dayStats.value.responded,
-            backgroundColor: 'rgba(184,146,58,0.9)',
+            backgroundColor: 'rgba(0,94,180,0.9)',
             borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 },
             borderSkipped: false,
             stack: 'stack',
@@ -142,7 +142,7 @@ onUnmounted(() => observer?.disconnect())
 .best-day-badge {
   font-size: 0.6875rem; font-weight: 500; padding: 0.2rem 0.6rem;
   background: var(--gold-bg); color: var(--gold);
-  border: 1px solid rgba(184,146,58,0.2); border-radius: 99px; white-space: nowrap;
+  border: 1px solid rgba(0,94,180,0.2); border-radius: 99px; white-space: nowrap;
 }
 .canvas-wrap { flex: 1; position: relative; min-height: 180px; }
 .empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; color: var(--ink-3); }

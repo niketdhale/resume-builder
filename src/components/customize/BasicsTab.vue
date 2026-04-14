@@ -37,23 +37,24 @@ const pageSizes = [
   <div class="p-5 flex flex-col gap-6">
     <!-- Language & Region -->
     <div>
-      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+      <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--ink-3)] mb-3">
         Language & Region
       </h3>
-      <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm flex flex-col gap-4">
+      <div class="rounded-xl p-4 shadow-sm flex flex-col gap-4" style="background: var(--bg-surface); border: 1px solid var(--border);">
         <div>
-          <label class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5 block">Language</label>
+          <label class="text-xs font-medium text-[var(--ink-2)] mb-1.5 block">Language</label>
           <select
             :value="activeSettings.language"
             @change="updateSetting('language', $event.target.value)"
-            class="w-full text-sm border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+            class="w-full text-sm rounded-lg px-3 py-2 outline-none focus:border-[var(--gold)]"
+            style="border: 1px solid var(--border); background: var(--bg-surface); color: var(--ink);"
           >
             <option v-for="lang in languages" :key="lang" :value="lang">{{ lang }}</option>
           </select>
         </div>
 
         <div>
-          <label class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5 block">Date Format</label>
+          <label class="text-xs font-medium text-[var(--ink-2)] mb-1.5 block">Date Format</label>
           <div class="grid grid-cols-2 gap-2">
             <button
               v-for="fmt in dateFormats"
@@ -62,8 +63,8 @@ const pageSizes = [
               :class="[
                 'text-xs px-3 py-2 rounded-lg border-2 transition-all font-medium',
                 activeSettings.dateFormat === fmt.value
-                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
-                  : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700',
+                  ? 'border-[var(--gold)] bg-[var(--gold-bg)] text-[var(--gold)]'
+                  : 'border-[var(--border)] text-[var(--ink-2)] hover:bg-[var(--bg-subtle)]',
               ]"
             >
               {{ fmt.label }}
@@ -75,8 +76,8 @@ const pageSizes = [
 
     <!-- Page Format -->
     <div>
-      <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">Page Format</h3>
-      <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm">
+      <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--ink-3)] mb-3">Page Format</h3>
+      <div class="rounded-xl p-4 shadow-sm" style="background: var(--bg-surface); border: 1px solid var(--border);">
         <div class="grid grid-cols-2 gap-3">
           <button
             v-for="size in pageSizes"
@@ -85,26 +86,26 @@ const pageSizes = [
             :class="[
               'flex flex-col items-center justify-center gap-1.5 border-2 rounded-xl py-4 transition-all',
               activePageSize === size.value
-                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 shadow-sm'
-                : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700/50',
+                ? 'border-[var(--gold)] bg-[var(--gold-bg)] shadow-sm'
+                : 'border-[var(--border)] hover:bg-[var(--bg-subtle)]',
             ]"
           >
             <div
               :class="[
                 'border-2 rounded-sm bg-white',
-                activePageSize === size.value ? 'border-indigo-400' : 'border-gray-300 dark:border-gray-500',
+                activePageSize === size.value ? 'border-[var(--gold)]' : 'border-[var(--border)]',
                 size.value === 'A3' ? 'w-6 h-8' : size.value === 'Legal' ? 'w-5 h-8' : 'w-6 h-7',
               ]"
             />
             <span
               :class="[
                 'text-sm font-semibold',
-                activePageSize === size.value ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300',
+                activePageSize === size.value ? 'text-[var(--gold)]' : 'text-[var(--ink)]',
               ]"
             >
               {{ size.label }}
             </span>
-            <span class="text-xs text-gray-400 dark:text-gray-500">{{ size.dimensions }}</span>
+            <span class="text-xs text-[var(--ink-3)]">{{ size.dimensions }}</span>
           </button>
         </div>
       </div>

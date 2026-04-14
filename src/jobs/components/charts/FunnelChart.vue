@@ -152,7 +152,7 @@ const noResponse = computed(() => {
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--gold) 0%, rgba(184,146,58,0.7) 100%);
+  background: linear-gradient(90deg, var(--gold) 0%, rgba(0,94,180,0.7) 100%);
   border-radius: 6px;
   display: flex; align-items: center; justify-content: flex-end;
   padding-right: 0.5rem;

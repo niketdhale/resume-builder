@@ -57,8 +57,8 @@ async function renderChart() {
     const tickColor   = dark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'
     const gridColor   = dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'
     // Gold palette
-    const appliedBg   = dark ? 'rgba(184,146,58,0.55)' : 'rgba(184,146,58,0.65)'
-    const responsesBg = dark ? 'rgba(184,146,58,0.9)'  : 'rgba(184,146,58,1)'
+    const appliedBg   = dark ? 'rgba(0,94,180,0.55)' : 'rgba(0,94,180,0.65)'
+    const responsesBg = dark ? 'rgba(0,94,180,0.9)'  : 'rgba(0,94,180,1)'
 
     chartInstance = new Chart(canvas.value, {
       type: 'bar',
@@ -189,7 +189,7 @@ onUnmounted(() => observer?.disconnect())
 }
 .legend-item { display: flex; align-items: center; gap: 0.375rem; }
 .legend-dot  { width: 12px; height: 12px; border-radius: 3px; }
-.legend-dot--dim   { background: rgba(184,146,58,0.55); }
+.legend-dot--dim   { background: rgba(0,94,180,0.55); }
 .legend-dot--solid { background: var(--gold); }
 .legend-label { font-size: 0.75rem; color: var(--ink-3); }
 

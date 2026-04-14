@@ -294,7 +294,7 @@ const filterPills = computed(() => [
   width: 3.5rem; height: 3.5rem;
   background: var(--gold); color: #fff;
   font-size: 1.5rem; border: none; border-radius: 1rem;
-  box-shadow: 0 4px 20px rgba(184,146,58,0.4);
+  box-shadow: 0 4px 20px rgba(0,94,180,0.4);
   cursor: pointer; transition: opacity 0.15s;
 }
 .fab:hover { opacity: 0.88; }

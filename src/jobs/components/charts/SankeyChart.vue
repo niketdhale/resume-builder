@@ -62,10 +62,10 @@ const layout = computed(() => {
 
   // ── Nodes ──────────────────────────────────────────────────────
   const nodes = [
-    { id: 'applied',       col: 0, x: COL[0], y: Y_MARGIN,                           h: hApplied,      fill: 'rgba(184,146,58,1)',    label: 'Applied',     count: total },
-    { id: 'screening',     col: 1, x: COL[1], y: Y_MARGIN,                           h: hScreening,    fill: 'rgba(184,146,58,0.75)', label: 'Screening',   count: screening },
+    { id: 'applied',       col: 0, x: COL[0], y: Y_MARGIN,                           h: hApplied,      fill: 'rgba(0,94,180,1)',    label: 'Applied',     count: total },
+    { id: 'screening',     col: 1, x: COL[1], y: Y_MARGIN,                           h: hScreening,    fill: 'rgba(0,94,180,0.75)', label: 'Screening',   count: screening },
     { id: 'noProgress',    col: 1, x: COL[1], y: Y_MARGIN + hScreening + Y_GAP,      h: hNoProgress,   fill: 'rgba(140,140,140,0.4)', label: 'No Response', count: noProgress },
-    { id: 'interview',     col: 2, x: COL[2], y: Y_MARGIN,                           h: hInterview,    fill: 'rgba(184,146,58,0.6)',  label: 'Interview',   count: interview },
+    { id: 'interview',     col: 2, x: COL[2], y: Y_MARGIN,                           h: hInterview,    fill: 'rgba(0,94,180,0.6)',  label: 'Interview',   count: interview },
     { id: 'lostScreen',    col: 2, x: COL[2], y: Y_MARGIN + hInterview + Y_GAP,      h: hLostScreen,   fill: 'rgba(239,68,68,0.55)',  label: 'Dropped',     count: lostScreening },
     { id: 'offer',         col: 3, x: COL[3], y: Y_MARGIN,                           h: hOffer,        fill: 'rgba(34,197,94,0.8)',   label: 'Offer',       count: offer },
     { id: 'lostInterview', col: 3, x: COL[3], y: Y_MARGIN + hOffer + Y_GAP,          h: hLostInterview,fill: 'rgba(239,68,68,0.55)',  label: 'Rejected',    count: lostInterview },
@@ -96,7 +96,7 @@ const layout = computed(() => {
   if (applied && scNode && screening > 0) {
     flows.push({
       path: ribbon(applied.x + NODE_W, applied.y, applied.y + apSplitScreen, scNode.x, scNode.y, scNode.y + scNode.h),
-      fill: 'rgba(184,146,58,0.12)',
+      fill: 'rgba(0,94,180,0.12)',
     })
   }
 
@@ -112,7 +112,7 @@ const layout = computed(() => {
   if (scNode && intNode && interview > 0) {
     flows.push({
       path: ribbon(scNode.x + NODE_W, scNode.y, scNode.y + scSplitInterview, intNode.x, intNode.y, intNode.y + intNode.h),
-      fill: 'rgba(184,146,58,0.12)',
+      fill: 'rgba(0,94,180,0.12)',
     })
   }
 

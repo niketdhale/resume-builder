@@ -205,7 +205,7 @@ async function handleSignOut() {
 .drawer-item--active {
   background: var(--gold-bg);
   color: var(--gold);
-  border: 1px solid rgba(184,146,58,0.2);
+  border: 1px solid rgba(0,94,180,0.2);
 }
 .drawer-item-icon { font-size: 1rem; flex-shrink: 0; }
 
@@ -225,7 +225,7 @@ async function handleSignOut() {
   background: var(--bg-subtle); border: 1px solid var(--border);
   transition: background 0.2s;
 }
-.drawer-toggle-switch--on { background: var(--gold-bg); border-color: rgba(184,146,58,0.3); }
+.drawer-toggle-switch--on { background: var(--gold-bg); border-color: rgba(0,94,180,0.3); }
 .drawer-toggle-knob {
   position: absolute; top: 2px; left: 2px;
   width: 18px; height: 18px;

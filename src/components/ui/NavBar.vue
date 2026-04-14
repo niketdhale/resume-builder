@@ -72,12 +72,12 @@ function closeMenu(e) {
       >
         <div
           class="flex items-center justify-center w-7 h-7 rounded-lg text-white text-xs font-semibold flex-shrink-0"
-          style="background: var(--gold); font-family: var(--font-display); font-style: italic; font-size: 1rem; font-weight: 500; letter-spacing: -0.01em;"
-        >R</div>
+          style="background: var(--gold); font-family: var(--font-display); font-size: 1rem; font-weight: 700; letter-spacing: -0.01em;"
+        >C</div>
         <span
           class="hidden sm:block text-sm font-medium tracking-tight"
-          style="font-family: var(--font-display); font-size: 1.0625rem; font-weight: 500; color: var(--ink); letter-spacing: -0.01em;"
-        >Résumé Builder</span>
+          style="font-family: var(--font-display); font-size: 1.0625rem; font-weight: 600; color: var(--ink); letter-spacing: -0.01em;"
+        >CuratorWorkspace</span>
       </button>
 
       <!-- Desktop nav links -->

@@ -202,7 +202,7 @@ const totalCount = computed(() => props.section.entries.length)
   padding: 0.125rem 0.5rem;
   border-radius: 99px;
   flex-shrink: 0;
-  border: 1px solid rgba(184,146,58,0.2);
+  border: 1px solid rgba(0,94,180,0.2);
 }
 
 .count-badge {
@@ -260,7 +260,7 @@ const totalCount = computed(() => props.section.entries.length)
   font-weight: 500;
   color: var(--gold);
   background: transparent;
-  border: 1px dashed rgba(184,146,58,0.35);
+  border: 1px dashed rgba(0,94,180,0.35);
   border-radius: 7px;
   padding: 0.5rem 0.75rem;
   cursor: pointer;
