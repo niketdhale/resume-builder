@@ -32,7 +32,7 @@ const subTabs = [
         :class="[
           'flex-shrink-0 px-3 py-2 text-xs font-medium rounded-t-md border-b-2 transition-colors whitespace-nowrap',
           activeSubTab === tab.value
-            ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30'
+            ? 'border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30'
             : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50',
         ]"
       >

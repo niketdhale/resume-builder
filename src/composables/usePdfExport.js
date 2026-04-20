@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas-pro'
+import { scheduleAutoCommit } from './useVersionControl.js'
 
 /**
  * usePdfExport
@@ -96,6 +97,7 @@ export function usePdfExport(activePageSize, activeResume) {
       }
 
       pdf.save(filename)
+      scheduleAutoCommit(activeResume?.value?.id, 'export')
     } catch (err) {
       console.error('[usePdfExport] PDF export failed:', err)
     } finally {

@@ -13,6 +13,18 @@ export default defineConfig({
     },
   },
 
+  ssr: {
+    noExternal: ['isomorphic-git'],
+  },
+
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+    },
+  },
+
   test: {
     environment: 'happy-dom',
     globals: true,

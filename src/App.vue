@@ -34,6 +34,7 @@ import {
 } from './composables/useImportExport'
 
 import { setupDebugGlobal } from './utils/useDebugLogger'
+import { initFs } from './services/git/fs.js'
 import { useFontLoader } from './composables/useFontLoader'
 import { undo, redo, canUndo, canRedo } from './composables/useHistory'
 import { hydrateJobs, setupJobStorageWatcher } from './jobs/composables/useJobStorage'
@@ -46,6 +47,8 @@ import { setupMigration } from './composables/useMigration.js'
 const { userId } = useAuth()
 watch(userId, async (id, oldId) => {
   setStorageUserId(id)
+  // Re-scope the git FS to the new user so repos don't bleed between accounts
+  initFs(id || 'guest')
   if (oldId === 'local' && id !== 'local') {
     // Logged in — load from cloud
     await hydrateFromStorage()
