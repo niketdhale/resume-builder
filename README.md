@@ -83,7 +83,7 @@ All hardcoded legacy gold hex values (`#B8923A`, `rgba(184,146,58,...)`) replace
 - **Drag & drop** — reorder sections and entries with touch support
 - **Undo / Redo** — full history with `Ctrl+Z` / `Ctrl+Shift+Z`
 - **Resume Info** — name, job title, email, phone, location, LinkedIn, website, profile photo
-- **Multiple sections** — Experience, Education, Skills, Projects, Certifications, and custom sections
+- **Multiple sections** — Experience, Education, Skills, Projects, Certifications, and custom sections.
 - **Language variants** — create translated copies of any resume (EN, FR, DE, ES, and more)
 
 ### Customization
